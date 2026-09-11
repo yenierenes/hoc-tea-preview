@@ -1,0 +1,1003 @@
+/* ==========================================================================
+   HOC TEA — hoc-core.css
+   Foundation: tokens, reset, grid, typography, shape primitive, buttons,
+   header, cart drawer, motion tiers.
+
+   Section-level layout lives in hoc-sections.css.
+   Spec refs are noted inline as §n.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. TOKENS  §3 §5 §6 §8
+   -------------------------------------------------------------------------- */
+
+:root {
+  /* --- Ground ----------------------------------------------------------- */
+  --hoc-bone: #f1efe8;
+  --hoc-bone-soft: #e9e6dd; /* recessed surface on bone */
+  --hoc-bone-edge: #dcd8cd; /* hairline on bone */
+  --hoc-ink: #232322;
+  --hoc-ink-soft: #2d2a2b; /* the logo's own ink */
+  --hoc-ink-lift: #3a3737; /* raised surface on ink */
+  --hoc-ink-edge: #46423f; /* hairline on ink */
+
+  /* --- Brand ------------------------------------------------------------ */
+  --hoc-teal: #4c8984; /* sampled from the printed pack */
+  --hoc-teal-lift: #5d9993;
+  --hoc-teal-deep: #35635f;
+  --hoc-teal-wash: #d8e4e2;
+
+  /* --- Brushed metal (the tins) ----------------------------------------- */
+  --hoc-metal: #b9bcbc;
+  --hoc-metal-dim: #8e9497;
+  --hoc-metal-lit: #e2e4e3;
+
+  /* --- Accent slots. Overwritten per blend by [data-blend] ---------------- */
+  --accent: var(--hoc-teal);
+  --accent-2: var(--hoc-teal-lift);
+  --accent-wash: var(--hoc-teal-wash);
+  --accent-ink: #2b4b48; /* accent dark enough for body text on bone */
+
+  /* --- Semantic surface. Flipped by [data-theme] ------------------------- */
+  --surface: var(--hoc-bone);
+  --surface-soft: var(--hoc-bone-soft);
+  --on-surface: var(--hoc-ink);
+  --on-surface-dim: #6c6862;
+  --hairline: var(--hoc-bone-edge);
+
+  /* --- Type ------------------------------------------------------------- */
+  --ff-display: "Instrument Serif", "PP Editorial New", Canela, "Ivar Display",
+    "Iowan Old Style", Palatino, Georgia, serif;
+  --ff-ui: "Manrope", "Neue Montreal", "Suisse Intl", "Söhne", -apple-system,
+    BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+  --fs-display-xl: clamp(3rem, 8vw, 9.375rem); /* 48 → 150 §5 */
+  --fs-display-l: clamp(2.625rem, 6vw, 6rem); /* 42 → 96 */
+  --fs-section: clamp(2rem, 4.2vw, 4rem); /* 32 → 64 */
+  --fs-lede: clamp(1.125rem, 1.7vw, 1.5rem);
+  --fs-body: clamp(0.9375rem, 0.42vw + 0.85rem, 1.125rem); /* 15 → 18 */
+  --fs-small: 0.875rem;
+  --fs-micro: clamp(0.6875rem, 0.14vw + 0.65rem, 0.75rem); /* 11 → 12 */
+
+  --lh-display: 0.92;
+  --lh-display-tight: 0.88;
+  --lh-title: 1.02;
+  --lh-body: 1.62;
+
+  --ls-micro: 0.16em;
+  --ls-display: -0.02em;
+
+  /* --- Grid  §6 --------------------------------------------------------- */
+  --page-max: 1600px;
+  --gutter: clamp(1.125rem, 4vw, 4.5rem); /* 18 → 72 */
+  --col-gap: clamp(1rem, 1.6vw, 1.75rem);
+  --cols: 12;
+
+  /* --- Rhythm ----------------------------------------------------------- */
+  --space-section: clamp(5rem, 11vh + 3rem, 11rem);
+  --space-block: clamp(2rem, 4vw, 4.5rem);
+
+  /* --- Shape primitive  §4 ---------------------------------------------- */
+  /* Top-left + bottom-right rounded, the other two square. Measured off the
+     mark: radius is 20% of the side. Never a uniform border-radius. */
+  --curve-sm: 0.75rem;
+  --curve-md: clamp(1.25rem, 2.4vw, 2.5rem);
+  --curve-lg: clamp(2rem, 5.5vw, 5.5rem);
+  --curve-xl: clamp(3rem, 9vw, 9rem);
+
+  /* --- Motion  §8 ------------------------------------------------------- */
+  --t-micro: 0.32s;
+  --t-ui: 0.56s;
+  --t-reveal: 1s;
+  --t-scene: 1.3s;
+  --e-hoc: cubic-bezier(0.22, 1, 0.36, 1);
+  --e-hoc-in: cubic-bezier(0.62, 0.05, 0.36, 1);
+
+  /* --- Chrome ----------------------------------------------------------- */
+  --header-h: 84px;
+  --header-h-scrolled: 62px;
+  --z-header: 200;
+  --z-drawer: 400;
+  --z-menu: 500;
+}
+
+@media (max-width: 767px) {
+  :root {
+    --cols: 4;
+    --header-h: 64px;
+    --header-h-scrolled: 56px;
+  }
+}
+@media (min-width: 768px) and (max-width: 1023px) {
+  :root {
+    --cols: 8;
+  }
+}
+
+/* Dark editorial ground. Applied per-section, not globally. */
+[data-theme="ink"] {
+  --surface: var(--hoc-ink);
+  --surface-soft: var(--hoc-ink-lift);
+  --on-surface: var(--hoc-bone);
+  --on-surface-dim: #9b958c;
+  --hairline: var(--hoc-ink-edge);
+}
+
+/* --------------------------------------------------------------------------
+   2. RESET
+   -------------------------------------------------------------------------- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: auto; /* Lenis owns scrolling §30 */
+}
+
+body {
+  margin: 0;
+  background: var(--hoc-bone);
+  color: var(--hoc-ink);
+  font-family: var(--ff-ui);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: clip;
+}
+
+/* Lenis drives transform on <html>; lock the page while a drawer is open. */
+body.is-locked {
+  overflow: hidden;
+}
+
+h1,
+h2,
+h3,
+h4,
+p,
+figure,
+blockquote,
+dl,
+dd {
+  margin: 0;
+}
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+img,
+svg,
+video,
+canvas {
+  display: block;
+  max-width: 100%;
+}
+img,
+video {
+  height: auto;
+}
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+button {
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+/* Never remove focus rings — §45. */
+
+.hoc-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.hoc-skip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 999;
+  padding: 0.75rem 1.25rem;
+  background: var(--hoc-ink);
+  color: var(--hoc-bone);
+  transform: translateY(-120%);
+  transition: transform var(--t-micro) var(--e-hoc);
+}
+.hoc-skip:focus {
+  transform: translateY(0);
+}
+
+/* --------------------------------------------------------------------------
+   3. LAYOUT  §6
+   -------------------------------------------------------------------------- */
+
+.hoc-section {
+  position: relative;
+  background: var(--surface);
+  color: var(--on-surface);
+}
+
+.hoc-wrap {
+  width: 100%;
+  max-width: var(--page-max);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.hoc-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+  gap: var(--col-gap);
+}
+
+.hoc-pad {
+  padding-block: var(--space-section);
+}
+
+/* --------------------------------------------------------------------------
+   4. TYPOGRAPHY  §5
+   -------------------------------------------------------------------------- */
+
+.hoc-display-xl,
+.hoc-display-l,
+.hoc-title {
+  font-family: var(--ff-display);
+  font-weight: 400;
+  letter-spacing: var(--ls-display);
+  text-wrap: balance;
+}
+
+.hoc-display-xl {
+  font-size: var(--fs-display-xl);
+  line-height: var(--lh-display-tight);
+}
+.hoc-display-l {
+  font-size: var(--fs-display-l);
+  line-height: var(--lh-display);
+}
+.hoc-title {
+  font-size: var(--fs-section);
+  line-height: var(--lh-title);
+}
+
+.hoc-italic {
+  font-style: italic;
+}
+
+.hoc-lede {
+  font-size: var(--fs-lede);
+  line-height: 1.42;
+  max-width: 34ch;
+  color: var(--on-surface);
+}
+
+.hoc-body {
+  max-width: 58ch;
+  color: var(--on-surface-dim);
+}
+
+/* MICRO LABEL — `HOC / BLEND 01`, `03G · 330ML · 90°C` §5 */
+.hoc-micro {
+  font-family: var(--ff-ui);
+  font-size: var(--fs-micro);
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: var(--ls-micro);
+  text-transform: uppercase;
+  color: var(--on-surface-dim);
+}
+
+.hoc-micro--accent {
+  color: var(--accent);
+}
+
+.hoc-index {
+  font-variant-numeric: tabular-nums;
+}
+
+/* --------------------------------------------------------------------------
+   5. SHAPE PRIMITIVE  §4
+   The logo's asymmetry, reused as a frame. Corner size scales with the box.
+   -------------------------------------------------------------------------- */
+
+.hoc-shape {
+  border-start-start-radius: var(--curve-md);
+  border-end-end-radius: var(--curve-md);
+  border-start-end-radius: 0;
+  border-end-start-radius: 0;
+  overflow: hidden;
+}
+.hoc-shape--lg {
+  border-start-start-radius: var(--curve-lg);
+  border-end-end-radius: var(--curve-lg);
+}
+.hoc-shape--xl {
+  border-start-start-radius: var(--curve-xl);
+  border-end-end-radius: var(--curve-xl);
+}
+.hoc-shape--sm {
+  border-start-start-radius: var(--curve-sm);
+  border-end-end-radius: var(--curve-sm);
+}
+/* Mirrored, for pieces that sit opposite a .hoc-shape in a spread. */
+.hoc-shape--flip {
+  border-start-start-radius: 0;
+  border-end-end-radius: 0;
+  border-start-end-radius: var(--curve-lg);
+  border-end-start-radius: var(--curve-lg);
+}
+
+/* --------------------------------------------------------------------------
+   6. MEDIA
+   -------------------------------------------------------------------------- */
+
+.hoc-media {
+  position: relative;
+  overflow: hidden;
+  background: var(--surface-soft);
+}
+.hoc-media > img,
+.hoc-media > video,
+.hoc-media > canvas {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.hoc-media--fill {
+  position: absolute;
+  inset: 0;
+}
+
+/* Ratio helpers keep CLS at 0 before the image decodes §43. */
+.hoc-ratio-1 {
+  aspect-ratio: 1;
+}
+.hoc-ratio-45 {
+  aspect-ratio: 4 / 5;
+}
+.hoc-ratio-34 {
+  aspect-ratio: 3 / 4;
+}
+.hoc-ratio-32 {
+  aspect-ratio: 3 / 2;
+}
+.hoc-ratio-169 {
+  aspect-ratio: 16 / 9;
+}
+
+/* --------------------------------------------------------------------------
+   7. BUTTONS  §4 (no globally-rounded pills)
+   -------------------------------------------------------------------------- */
+
+.hoc-btn {
+  --btn-fg: var(--on-surface);
+  --btn-bg: transparent;
+  --btn-edge: currentColor;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6em;
+  padding: 1.05em 1.9em;
+  min-height: 48px; /* touch target §45 */
+  font-family: var(--ff-ui);
+  font-size: var(--fs-micro);
+  font-weight: 600;
+  letter-spacing: var(--ls-micro);
+  text-transform: uppercase;
+  color: var(--btn-fg);
+  background: var(--btn-bg);
+  border: 1px solid var(--btn-edge);
+  border-start-start-radius: var(--curve-sm);
+  border-end-end-radius: var(--curve-sm);
+  overflow: hidden;
+  isolation: isolate;
+  transition: color var(--t-micro) var(--e-hoc),
+    border-color var(--t-micro) var(--e-hoc);
+}
+
+/* Fill sweeps from the logo's rounded corner, not from the centre. */
+.hoc-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--btn-fg);
+  transform: scale(1.02) translate3d(0, 101%, 0);
+  transition: transform var(--t-ui) var(--e-hoc);
+}
+.hoc-btn:hover::before,
+.hoc-btn:focus-visible::before {
+  transform: scale(1.02) translate3d(0, 0, 0);
+}
+.hoc-btn:hover,
+.hoc-btn:focus-visible {
+  color: var(--surface);
+}
+
+.hoc-btn--solid {
+  --btn-bg: var(--on-surface);
+  --btn-edge: var(--on-surface);
+  color: var(--surface);
+}
+.hoc-btn--solid::before {
+  background: var(--accent);
+}
+.hoc-btn--solid:hover,
+.hoc-btn--solid:focus-visible {
+  color: #fff;
+  border-color: var(--accent);
+}
+
+.hoc-btn--accent {
+  --btn-fg: var(--accent);
+  --btn-edge: var(--accent);
+}
+
+.hoc-btn[disabled],
+.hoc-btn[aria-disabled="true"] {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+/* Quiet text link with a rule that grows from the left. */
+.hoc-link {
+  position: relative;
+  display: inline-block;
+  padding-bottom: 0.28em;
+  font-size: var(--fs-micro);
+  font-weight: 600;
+  letter-spacing: var(--ls-micro);
+  text-transform: uppercase;
+}
+.hoc-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 1px;
+  background: currentColor;
+  transform-origin: right;
+  transform: scaleX(1);
+  transition: transform var(--t-ui) var(--e-hoc);
+}
+.hoc-link:hover::after,
+.hoc-link:focus-visible::after {
+  transform-origin: left;
+  animation: hoc-rule 0.62s var(--e-hoc);
+}
+@keyframes hoc-rule {
+  0% {
+    transform: scaleX(1);
+    transform-origin: right;
+  }
+  49% {
+    transform: scaleX(0);
+    transform-origin: right;
+  }
+  50% {
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+  100% {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   8. LOGO
+   -------------------------------------------------------------------------- */
+
+/* The plate takes currentColor; the art inside it must be the opposite, or
+   the sprout disappears. --hoc-mark-ink is that opposite. */
+.hoc-mark {
+  display: block;
+  width: auto;
+  color: currentColor;
+  --hoc-mark-ink: var(--surface, #f1efe8);
+}
+[data-theme="ink"] .hoc-mark {
+  --hoc-mark-ink: var(--hoc-ink);
+}
+.hoc-header[data-theme-mode="light"] .hoc-mark {
+  --hoc-mark-ink: var(--hoc-ink);
+}
+.hoc-header[data-theme-mode="dark"] .hoc-mark {
+  --hoc-mark-ink: var(--hoc-bone);
+}
+
+.hoc-lockup {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+.hoc-lockup .hoc-mark {
+  height: 34px;
+  width: 34px;
+  flex: none;
+}
+.hoc-lockup__word {
+  display: block;
+  font-family: var(--ff-ui);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transform-origin: left center;
+}
+
+/* --------------------------------------------------------------------------
+   9. HEADER  §9
+   -------------------------------------------------------------------------- */
+
+.hoc-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: var(--z-header);
+  height: var(--header-h);
+  display: flex;
+  align-items: center;
+  color: var(--hoc-bone);
+  transition: height var(--t-ui) var(--e-hoc),
+    color var(--t-ui) var(--e-hoc),
+    background-color var(--t-ui) var(--e-hoc);
+}
+
+/* [data-theme-mode] is the HEADER's own theme, mirrored from the section
+   currently under it via data-header-theme (§9). "light" = light chrome over a
+   dark ground; "dark" = dark chrome over bone. */
+.hoc-header[data-theme-mode="light"] {
+  color: var(--hoc-bone);
+  --header-ground: var(--hoc-ink);
+}
+.hoc-header[data-theme-mode="dark"] {
+  color: var(--hoc-ink);
+  --header-ground: var(--hoc-bone);
+}
+
+.hoc-header::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--header-ground, var(--hoc-ink));
+  opacity: 0;
+  transition: opacity var(--t-ui) var(--e-hoc),
+    background-color var(--t-ui) var(--e-hoc);
+}
+.hoc-header.is-stuck {
+  height: var(--header-h-scrolled);
+}
+.hoc-header.is-stuck::before {
+  opacity: 1;
+}
+.hoc-header.is-stuck::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.14;
+}
+
+.hoc-header__inner {
+  position: relative;
+  width: 100%;
+  max-width: var(--page-max);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 1rem;
+}
+
+.hoc-header__nav {
+  display: flex;
+  align-items: center;
+  gap: clamp(1rem, 2vw, 2.25rem);
+}
+.hoc-header__nav--end {
+  justify-content: flex-end;
+}
+
+.hoc-navlink {
+  position: relative;
+  font-size: var(--fs-micro);
+  font-weight: 600;
+  letter-spacing: var(--ls-micro);
+  text-transform: uppercase;
+  padding-block: 0.55rem;
+  white-space: nowrap;
+}
+.hoc-navlink::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0.2rem;
+  width: 100%;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform var(--t-ui) var(--e-hoc);
+}
+.hoc-navlink:hover::after,
+.hoc-navlink:focus-visible::after,
+.hoc-navlink[aria-current="page"]::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+.hoc-header__brand {
+  justify-self: center;
+}
+/* Wordmark compresses on scroll; the mark never leaves. §9 */
+.hoc-header .hoc-lockup__word {
+  transition: opacity var(--t-ui) var(--e-hoc),
+    max-width var(--t-ui) var(--e-hoc), transform var(--t-ui) var(--e-hoc);
+  max-width: 12rem;
+  overflow: hidden;
+}
+.hoc-header.is-stuck .hoc-lockup__word {
+  opacity: 0;
+  max-width: 0;
+  transform: scaleX(0.9);
+}
+.hoc-header.is-stuck .hoc-lockup .hoc-mark {
+  height: 30px;
+  width: 30px;
+}
+.hoc-header .hoc-lockup .hoc-mark {
+  transition: height var(--t-ui) var(--e-hoc), width var(--t-ui) var(--e-hoc);
+}
+
+.hoc-bag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.hoc-bag__count {
+  font-variant-numeric: tabular-nums;
+}
+
+.hoc-burger {
+  display: none;
+  width: 44px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+}
+.hoc-burger span {
+  display: block;
+  width: 20px;
+  height: 1.5px;
+  background: currentColor;
+  position: relative;
+  transition: background var(--t-micro) var(--e-hoc);
+}
+.hoc-burger span::before,
+.hoc-burger span::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 20px;
+  height: 1.5px;
+  background: currentColor;
+  transition: transform var(--t-ui) var(--e-hoc);
+}
+.hoc-burger span::before {
+  top: -6px;
+}
+.hoc-burger span::after {
+  top: 6px;
+}
+.hoc-burger[aria-expanded="true"] span {
+  background: transparent;
+}
+.hoc-burger[aria-expanded="true"] span::before {
+  transform: translateY(6px) rotate(45deg);
+}
+.hoc-burger[aria-expanded="true"] span::after {
+  transform: translateY(-6px) rotate(-45deg);
+}
+
+@media (max-width: 1023px) {
+  .hoc-header__inner {
+    grid-template-columns: auto 1fr;
+  }
+  .hoc-header__nav--start {
+    display: none;
+  }
+  .hoc-header__brand {
+    justify-self: start;
+  }
+  .hoc-header__nav--end .hoc-navlink {
+    display: none;
+  }
+  .hoc-burger {
+    display: inline-flex;
+  }
+}
+
+/* --- Mobile menu: clip-path reveal §9 ---------------------------------- */
+.hoc-menu {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-menu);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: calc(var(--header-h) + 2rem) var(--gutter) 2.5rem;
+  background: var(--hoc-ink);
+  color: var(--hoc-bone);
+  /* The menu is an ink surface, so it needs the ink token set — otherwise
+     .hoc-micro inside it inherits the bone-tuned dim colour and lands at
+     2.8:1 against the panel. */
+  --surface: var(--hoc-ink);
+  --on-surface: var(--hoc-bone);
+  --on-surface-dim: #9b958c;
+  --hairline: var(--hoc-ink-edge);
+  clip-path: inset(0 0 100% 0);
+  visibility: hidden;
+  transition: clip-path 0.7s var(--e-hoc), visibility 0s linear 0.7s;
+}
+.hoc-menu.is-open {
+  clip-path: inset(0 0 0 0);
+  visibility: visible;
+  transition: clip-path 0.7s var(--e-hoc), visibility 0s;
+}
+.hoc-menu__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.hoc-menu__link {
+  font-family: var(--ff-display);
+  font-size: clamp(2.5rem, 12vw, 4.5rem);
+  line-height: 1.06;
+  display: block;
+  padding-block: 0.1em;
+}
+.hoc-menu__foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  border-top: 1px solid var(--hoc-ink-edge);
+  padding-top: 1.5rem;
+}
+
+/* --------------------------------------------------------------------------
+   10. CART DRAWER  §55
+   -------------------------------------------------------------------------- */
+
+.hoc-drawer {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-drawer);
+  visibility: hidden;
+  pointer-events: none;
+}
+.hoc-drawer.is-open {
+  visibility: visible;
+  pointer-events: auto;
+}
+.hoc-drawer__scrim {
+  position: absolute;
+  inset: 0;
+  background: rgb(35 35 34 / 0.44);
+  opacity: 0;
+  transition: opacity var(--t-ui) var(--e-hoc);
+}
+.hoc-drawer.is-open .hoc-drawer__scrim {
+  opacity: 1;
+}
+.hoc-drawer__panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: min(27rem, 100%);
+  display: flex;
+  flex-direction: column;
+  background: var(--hoc-bone);
+  color: var(--hoc-ink);
+  /* the HOC curve, mirrored so it opens toward the page §55 */
+  border-end-start-radius: var(--curve-lg);
+  transform: translate3d(100%, 0, 0);
+  transition: transform var(--t-ui) var(--e-hoc);
+  overflow: hidden;
+}
+.hoc-drawer.is-open .hoc-drawer__panel {
+  transform: translate3d(0, 0, 0);
+}
+.hoc-drawer__head,
+.hoc-drawer__foot {
+  padding: 1.5rem var(--space-drawer, 1.5rem);
+}
+.hoc-drawer__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--hoc-bone-edge);
+}
+.hoc-drawer__body {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 1.25rem var(--space-drawer, 1.5rem);
+}
+.hoc-drawer__foot {
+  border-top: 1px solid var(--hoc-bone-edge);
+  display: grid;
+  gap: 1rem;
+}
+.hoc-drawer__empty {
+  padding-block: 3rem;
+  text-align: center;
+  color: var(--on-surface-dim);
+}
+
+.hoc-cartitem {
+  display: grid;
+  grid-template-columns: 68px 1fr auto;
+  gap: 1rem;
+  padding-block: 1rem;
+  border-bottom: 1px solid var(--hoc-bone-edge);
+  align-items: start;
+}
+.hoc-cartitem__thumb {
+  background: var(--hoc-bone-soft);
+  border-start-start-radius: var(--curve-sm);
+  border-end-end-radius: var(--curve-sm);
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+}
+.hoc-cartitem__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.hoc-cartitem__name {
+  font-family: var(--ff-display);
+  font-size: 1.25rem;
+  line-height: 1.1;
+}
+.hoc-qty {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--hoc-bone-edge);
+  margin-top: 0.5rem;
+}
+.hoc-qty button {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  font-size: 0.9rem;
+}
+.hoc-qty output {
+  min-width: 26px;
+  text-align: center;
+  font-size: var(--fs-small);
+  font-variant-numeric: tabular-nums;
+}
+.hoc-cartitem__price {
+  font-variant-numeric: tabular-nums;
+  font-size: var(--fs-small);
+}
+
+.hoc-upsell {
+  margin-top: 1.5rem;
+  padding: 1.1rem;
+  background: var(--hoc-bone-soft);
+  border-start-start-radius: var(--curve-sm);
+  border-end-end-radius: var(--curve-sm);
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+.hoc-upsell img {
+  width: 46px;
+  flex: none;
+}
+
+/* --------------------------------------------------------------------------
+   11. MOTION TIERS  §38 §45
+   Elements marked [data-reveal] start hidden ONLY when JS is present and the
+   full/standard tier is active. Without JS everything is visible — the static
+   layout is the source of truth (PHASE B before PHASE D).
+   -------------------------------------------------------------------------- */
+
+html.hoc-js [data-reveal] {
+  opacity: 0;
+}
+html.hoc-js [data-reveal="up"] {
+  transform: translate3d(0, 1.6rem, 0);
+}
+html.hoc-js [data-reveal].is-in {
+  opacity: 1;
+  transform: none;
+  transition: opacity var(--t-reveal) var(--e-hoc),
+    transform var(--t-reveal) var(--e-hoc);
+}
+
+/* Display type is hidden only until SplitText has wrapped its lines, so the
+   unsplit heading never flashes. hoc-motion.js adds .is-split on every path
+   it can take — including its own failure path — so this can never strand
+   a headline invisible. */
+html.hoc-js [data-split] {
+  opacity: 0;
+}
+html.hoc-js [data-split].is-split {
+  opacity: 1;
+}
+html.hoc-reduced [data-split] {
+  opacity: 1 !important;
+}
+
+html.hoc-reduced [data-reveal] {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.hoc-js [data-reveal] {
+    opacity: 1;
+    transform: none;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Utility for JS-driven pointer parallax; kept off the compositor otherwise. */
+.hoc-par {
+  will-change: transform;
+}
+
+/* Print / no-JS safety: never let a pinned stage collapse the page. */
+html:not(.hoc-js) .hoc-pin-space {
+  height: auto !important;
+}

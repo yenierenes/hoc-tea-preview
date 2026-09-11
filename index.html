@@ -1,0 +1,2032 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>HOC Tea — Botanical blends for hot and cold rituals</title>
+<meta name="description" content="Botanical tea blends built for aroma, colour and ritual. Fourteen blends, loose leaf, for the cup and for hospitality.">
+<meta name="theme-color" content="#232322">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="image" href="assets/img/hero-poster.jpg"
+      imagesrcset="assets/img/hero-poster-960.webp 960w, assets/img/hero-poster-1280.webp 1280w, assets/img/hero-poster-1600.webp 1600w, assets/img/hero-poster-1920.webp 1920w"
+      imagesizes="100vw" fetchpriority="high">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="assets/css/hoc-core.css">
+<link rel="stylesheet" href="assets/css/hoc-sections.css">
+<script>document.documentElement.classList.add('hoc-js');</script>
+</head>
+<body>
+
+  <a class="hoc-skip" href="#main">Skip to content</a>
+
+  <header class="hoc-header" data-theme-mode="light" data-hoc="header">
+    <div class="hoc-header__inner">
+      <nav class="hoc-header__nav hoc-header__nav--start" aria-label="Primary">
+        <a class="hoc-navlink" href="#range">Shop</a>
+        <a class="hoc-navlink" href="#blends">Blends</a>
+        <a class="hoc-navlink" href="#ritual">Ritual</a>
+      </nav>
+
+      <a class="hoc-header__brand hoc-lockup" href="#hero" aria-label="HOC Tea — home">
+        <svg class="hoc-mark" viewBox="0 0 120 120" aria-hidden="true"><use href="#hoc-mark"></use></svg>
+        <span class="hoc-lockup__word">Hoctea</span>
+      </a>
+
+      <nav class="hoc-header__nav hoc-header__nav--end" aria-label="Secondary">
+        <a class="hoc-navlink" href="#hospitality">Horeca</a>
+        <a class="hoc-navlink" href="#range">Search</a>
+        <a class="hoc-navlink" href="#newsletter">Account</a>
+        <button class="hoc-navlink hoc-bag" data-hoc="bag-open" aria-haspopup="dialog">
+          Bag (<span class="hoc-bag__count" data-hoc="bag-count">0</span>)
+        </button>
+        <button class="hoc-burger" data-hoc="menu-toggle" aria-expanded="false"
+                aria-controls="hoc-menu" aria-label="Menu"><span></span></button>
+      </nav>
+    </div>
+  </header>
+
+  <div class="hoc-menu" id="hoc-menu" data-hoc="menu" hidden>
+    <nav class="hoc-menu__list" aria-label="Mobile">
+      <a class="hoc-menu__link" href="#range">Shop</a>
+      <a class="hoc-menu__link" href="#blends">Blends</a>
+      <a class="hoc-menu__link" href="#ritual">Ritual</a>
+      <a class="hoc-menu__link" href="#hospitality">Horeca</a>
+    </nav>
+    <div class="hoc-menu__foot hoc-micro">
+      <a href="#newsletter">Account</a>
+      <a href="#newsletter">Instagram</a>
+      <a href="#newsletter">EN / TR</a>
+    </div>
+  </div>
+
+<main id="main">
+
+    <section class="hoc-section hoc-hero" id="hero" data-header-theme="dark"
+             data-hoc="hero">
+      <div class="hoc-hero__media">
+        <picture>
+          <source media="(max-width: 767px)" type="image/webp"
+                  srcset="assets/img/hero-poster-mobile-540.webp 540w, assets/img/hero-poster-mobile-780.webp 780w, assets/img/hero-poster-mobile-1080.webp 1080w"
+                  sizes="100vw">
+          <source type="image/webp"
+                  srcset="assets/img/hero-poster-960.webp 960w, assets/img/hero-poster-1280.webp 1280w, assets/img/hero-poster-1600.webp 1600w, assets/img/hero-poster-1920.webp 1920w"
+                  sizes="100vw">
+          <img class="hoc-hero__poster" src="assets/img/hero-poster.jpg"
+               width="1600" height="900" alt=""
+               fetchpriority="high" decoding="async">
+        </picture>
+
+        <!-- The film, 10.0s as delivered, ending on the HOC logo card.
+             Paced in JS rather than re-encoded (§10):
+               data-rate       overall speed — a touch under real time
+               data-slow-from  where the ramp into the ending begins
+               data-slow-rate  speed at the very end, so the logo resolves slowly
+               data-hold       seconds to hold the last frame before restarting
+             The loop attribute is deliberately absent: the hold is only
+             possible if the restart is ours to schedule. -->
+        <video class="hoc-hero__video" data-hoc="hero-video"
+               data-src="assets/video/hero-loop.mp4"
+               data-rate="0.85" data-slow-from="7.9"
+               data-slow-rate="0.4" data-hold="1.4"
+               muted playsinline preload="none" aria-hidden="true"></video>
+
+        <!-- Signature #1: pointer-direction refraction over the plate. -->
+        <canvas class="hoc-hero__gl" data-hoc="hero-gl" aria-hidden="true"></canvas>
+        <div class="hoc-hero__scrim" aria-hidden="true"></div>
+      </div>
+
+      <div class="hoc-hero__copy">
+        <div class="hoc-wrap">
+          <p class="hoc-micro" data-reveal>HOC Tea — Botanical Blends</p>
+          <h1 class="hoc-display-xl hoc-hero__h1" data-split="lines">Nature, steeped differently.</h1>
+          <p class="hoc-lede" data-reveal="up">Botanical blends crafted for hot and cold rituals.</p>
+          <div class="hoc-hero__cta" data-reveal="up">
+            <a class="hoc-btn hoc-btn--solid" href="#blends">Explore the blends</a>
+            <a class="hoc-btn" href="#hospitality">For hospitality</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="hoc-hero__foot hoc-wrap" aria-hidden="true">
+        <span class="hoc-micro">Scroll</span>
+        <span class="hoc-hero__rule"></span>
+      </div>
+    </section>
+
+    <section class="hoc-section hoc-featured" id="blends" data-header-theme="dark"
+             data-hoc="featured">
+      <div class="hoc-wrap">
+        <header class="hoc-featured__head">
+          <p class="hoc-micro"><span class="hoc-index">01</span> / Featured Blends</p>
+          <h2 class="hoc-display-l" data-split="lines">Choose your ritual.</h2>
+        </header>
+
+        <div class="hoc-featured__body">
+          <div class="hoc-featured__stage">
+            <div class="hoc-featured__ground" data-hoc="stage-ground" aria-hidden="true"></div>
+            <ul class="hoc-featured__packs" data-hoc="pack-stack">
+          <li class="hoc-pack is-active" data-pack="gift-of-nature"
+              style="--accent:#47857D;--accent-2:#7FB3AD;--accent-wash:#E0EBEA;--accent-ink:#2D4E4A;--liquid:#B4324B" aria-hidden="false">
+            <img class="hoc-pack__img"
+        src="assets/img/pack-gift-of-nature-420.webp"
+        srcset="assets/img/pack-gift-of-nature-420.webp 420w, assets/img/pack-gift-of-nature-640.webp 640w, assets/img/pack-gift-of-nature-900.webp 900w, assets/img/pack-gift-of-nature-1200.webp 1200w"
+        sizes="(max-width: 767px) 62vw, 34vw"
+        width="900" height="1422"
+        alt="Gift of Nature — Hibiscus, Mint Leaf, Lemongrass"
+        fetchpriority="high" decoding="async">
+          </li>
+          <li class="hoc-pack" data-pack="mystic-butterfly"
+              style="--accent:#553B91;--accent-2:#8A75BD;--accent-wash:#E2DEED;--accent-ink:#342654;--liquid:#2B3A8F" aria-hidden="true">
+            <img class="hoc-pack__img"
+        src="assets/img/pack-mystic-butterfly-420.webp"
+        srcset="assets/img/pack-mystic-butterfly-420.webp 420w, assets/img/pack-mystic-butterfly-640.webp 640w, assets/img/pack-mystic-butterfly-900.webp 900w, assets/img/pack-mystic-butterfly-1200.webp 1200w"
+        sizes="(max-width: 767px) 62vw, 34vw"
+        width="900" height="1422"
+        alt="Mystic Butterfly — Butterfly Pea Flower, Hibiscus, Cinnamon Stick"
+        loading="lazy" decoding="async">
+          </li>
+          <li class="hoc-pack" data-pack="mesmerize"
+              style="--accent:#376395;--accent-2:#7196C1;--accent-wash:#DDE5EE;--accent-ink:#243C57;--liquid:#2F62A8" aria-hidden="true">
+            <img class="hoc-pack__img"
+        src="assets/img/pack-mesmerize-420.webp"
+        srcset="assets/img/pack-mesmerize-420.webp 420w, assets/img/pack-mesmerize-640.webp 640w, assets/img/pack-mesmerize-900.webp 900w, assets/img/pack-mesmerize-1200.webp 1200w"
+        sizes="(max-width: 767px) 62vw, 34vw"
+        width="900" height="1422"
+        alt="Mesmerize — Mango, Pineapple, Lemongrass, Butterfly Pea Flower"
+        loading="lazy" decoding="async">
+          </li>
+            </ul>
+          </div>
+
+          <div class="hoc-featured__side">
+            <div class="hoc-selector embla" data-hoc="selector-embla">
+              <ol class="hoc-selector__list embla__container" role="tablist"
+                  aria-label="Featured blends">
+            <li class="hoc-selector__item embla__slide">
+              <button class="hoc-selector__btn" role="tab" id="tab-gift-of-nature"
+                      aria-selected="true" aria-controls="panel-gift-of-nature"
+                      tabindex="0"
+                      data-hoc="blend-select" data-blend="gift-of-nature"
+                      style="--accent:#47857D;--accent-2:#7FB3AD;--accent-wash:#E0EBEA;--accent-ink:#2D4E4A;--liquid:#B4324B">
+                <span class="hoc-index hoc-micro">01</span>
+                <span class="hoc-selector__name">Gift of Nature</span>
+              </button>
+            </li>
+            <li class="hoc-selector__item embla__slide">
+              <button class="hoc-selector__btn" role="tab" id="tab-mystic-butterfly"
+                      aria-selected="false" aria-controls="panel-mystic-butterfly"
+                      tabindex="-1"
+                      data-hoc="blend-select" data-blend="mystic-butterfly"
+                      style="--accent:#553B91;--accent-2:#8A75BD;--accent-wash:#E2DEED;--accent-ink:#342654;--liquid:#2B3A8F">
+                <span class="hoc-index hoc-micro">02</span>
+                <span class="hoc-selector__name">Mystic Butterfly</span>
+              </button>
+            </li>
+            <li class="hoc-selector__item embla__slide">
+              <button class="hoc-selector__btn" role="tab" id="tab-mesmerize"
+                      aria-selected="false" aria-controls="panel-mesmerize"
+                      tabindex="-1"
+                      data-hoc="blend-select" data-blend="mesmerize"
+                      style="--accent:#376395;--accent-2:#7196C1;--accent-wash:#DDE5EE;--accent-ink:#243C57;--liquid:#2F62A8">
+                <span class="hoc-index hoc-micro">03</span>
+                <span class="hoc-selector__name">Mesmerize</span>
+              </button>
+            </li>
+              </ol>
+            </div>
+            <div class="hoc-featured__panels">
+          <div class="hoc-blendpanel is-active" role="tabpanel"
+               id="panel-gift-of-nature" aria-labelledby="tab-gift-of-nature"
+               data-panel="gift-of-nature" style="--accent:#47857D;--accent-2:#7FB3AD;--accent-wash:#E0EBEA;--accent-ink:#2D4E4A;--liquid:#B4324B">
+            <h3 class="hoc-blendpanel__name hoc-title">Gift of Nature</h3>
+            <p class="hoc-micro hoc-micro--accent">Bright · Fresh · Botanical</p>
+            <p class="hoc-blendpanel__story hoc-body">Hibiscus carries the tartness, mint leaf the cool edge, lemongrass the thin line of citrus that holds the two apart. Steeped hot it turns deep crimson; over ice it stays sharp and clean.</p>
+
+            <ul class="hoc-inglist" data-hoc="ing-list">
+              <li class="hoc-inglist__item"><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-hibiscus"></use></svg><span>Hibiscus</span></li><li class="hoc-inglist__item"><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-mint"></use></svg><span>Mint Leaf</span></li><li class="hoc-inglist__item"><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-lemongrass"></use></svg><span>Lemongrass</span></li>
+            </ul>
+
+            <div class="hoc-blendpanel__buy">
+              <fieldset class="hoc-packsel">
+                <legend class="hoc-sr">Packaging</legend>
+                
+                <label class="hoc-packsel__opt">
+                  <input type="radio" name="pack-gift-of-nature" value="tin"
+                         data-hoc="pack-option" data-delta="400">
+                  <span class="hoc-packsel__label">Tin</span>
+                  <span class="hoc-packsel__meta hoc-micro">80 g</span>
+                </label>
+                <label class="hoc-packsel__opt">
+                  <input type="radio" name="pack-gift-of-nature" value="doypack" checked
+                         data-hoc="pack-option" data-delta="0">
+                  <span class="hoc-packsel__label">Doypack</span>
+                  <span class="hoc-packsel__meta hoc-micro">100 g</span>
+                </label>
+              </fieldset>
+              <p class="hoc-price" data-hoc="price" data-base="1400">€14</p>
+            </div>
+
+            <div class="hoc-blendpanel__actions">
+              <button class="hoc-btn hoc-btn--solid" data-hoc="add"
+                      data-blend="gift-of-nature">Add to bag</button>
+              <a class="hoc-link" href="#range">View blend</a>
+            </div>
+          </div>
+          <div class="hoc-blendpanel" role="tabpanel"
+               id="panel-mystic-butterfly" aria-labelledby="tab-mystic-butterfly"
+               data-panel="mystic-butterfly" style="--accent:#553B91;--accent-2:#8A75BD;--accent-wash:#E2DEED;--accent-ink:#342654;--liquid:#2B3A8F" hidden>
+            <h3 class="hoc-blendpanel__name hoc-title">Mystic Butterfly</h3>
+            <p class="hoc-micro hoc-micro--accent">Floral · Tart · Transforming</p>
+            <p class="hoc-blendpanel__story hoc-body">Butterfly pea steeps a deep, saturated blue. Add hibiscus — an acid — and the blue turns. Violet first, then magenta, spreading unevenly through the glass. Cinnamon sits underneath the whole thing.</p>
+
+            <ul class="hoc-inglist" data-hoc="ing-list">
+              <li class="hoc-inglist__item"><span>Butterfly Pea Flower</span></li><li class="hoc-inglist__item"><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-hibiscus"></use></svg><span>Hibiscus</span></li><li class="hoc-inglist__item"><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-cinnamon"></use></svg><span>Cinnamon Stick</span></li>
+            </ul>
+
+            <div class="hoc-blendpanel__buy">
+              <fieldset class="hoc-packsel">
+                <legend class="hoc-sr">Packaging</legend>
+                
+                <label class="hoc-packsel__opt">
+                  <input type="radio" name="pack-mystic-butterfly" value="tin"
+                         data-hoc="pack-option" data-delta="400">
+                  <span class="hoc-packsel__label">Tin</span>
+                  <span class="hoc-packsel__meta hoc-micro">80 g</span>
+                </label>
+                <label class="hoc-packsel__opt">
+                  <input type="radio" name="pack-mystic-butterfly" value="doypack" checked
+                         data-hoc="pack-option" data-delta="0">
+                  <span class="hoc-packsel__label">Doypack</span>
+                  <span class="hoc-packsel__meta hoc-micro">100 g</span>
+                </label>
+              </fieldset>
+              <p class="hoc-price" data-hoc="price" data-base="1600">€16</p>
+            </div>
+
+            <div class="hoc-blendpanel__actions">
+              <button class="hoc-btn hoc-btn--solid" data-hoc="add"
+                      data-blend="mystic-butterfly">Add to bag</button>
+              <a class="hoc-link" href="#range">View blend</a>
+            </div>
+          </div>
+          <div class="hoc-blendpanel" role="tabpanel"
+               id="panel-mesmerize" aria-labelledby="tab-mesmerize"
+               data-panel="mesmerize" style="--accent:#376395;--accent-2:#7196C1;--accent-wash:#DDE5EE;--accent-ink:#243C57;--liquid:#2F62A8" hidden>
+            <h3 class="hoc-blendpanel__name hoc-title">Mesmerize</h3>
+            <p class="hoc-micro hoc-micro--accent">Tropical · Sweet · Vivid</p>
+            <p class="hoc-blendpanel__story hoc-body">Mango and pineapple do the sweetness, lemongrass keeps it from turning syrupy, and butterfly pea pulls the whole glass toward deep blue. Best over a lot of ice.</p>
+
+            <ul class="hoc-inglist" data-hoc="ing-list">
+              <li class="hoc-inglist__item"><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-mango"></use></svg><span>Mango</span></li><li class="hoc-inglist__item"><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-pineapple"></use></svg><span>Pineapple</span></li><li class="hoc-inglist__item"><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-lemongrass"></use></svg><span>Lemongrass</span></li><li class="hoc-inglist__item"><span>Butterfly Pea Flower</span></li>
+            </ul>
+
+            <div class="hoc-blendpanel__buy">
+              <fieldset class="hoc-packsel">
+                <legend class="hoc-sr">Packaging</legend>
+                
+                <label class="hoc-packsel__opt">
+                  <input type="radio" name="pack-mesmerize" value="tin"
+                         data-hoc="pack-option" data-delta="400">
+                  <span class="hoc-packsel__label">Tin</span>
+                  <span class="hoc-packsel__meta hoc-micro">80 g</span>
+                </label>
+                <label class="hoc-packsel__opt">
+                  <input type="radio" name="pack-mesmerize" value="doypack" checked
+                         data-hoc="pack-option" data-delta="0">
+                  <span class="hoc-packsel__label">Doypack</span>
+                  <span class="hoc-packsel__meta hoc-micro">100 g</span>
+                </label>
+              </fieldset>
+              <p class="hoc-price" data-hoc="price" data-base="1600">€16</p>
+            </div>
+
+            <div class="hoc-blendpanel__actions">
+              <button class="hoc-btn hoc-btn--solid" data-hoc="add"
+                      data-blend="mesmerize">Add to bag</button>
+              <a class="hoc-link" href="#range">View blend</a>
+            </div>
+          </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="hoc-section hoc-manifesto" data-theme="ink" data-header-theme="light">
+      <svg class="hoc-manifesto__sprig" viewBox="0 0 900 100" aria-hidden="true"
+           data-hoc="draw"><use href="#b-branch"></use></svg>
+      <div class="hoc-wrap hoc-pad">
+        <p class="hoc-micro" data-reveal>HOC / Tea &amp; More</p>
+        <h2 class="hoc-display-l hoc-manifesto__h2" data-split="lines">Not just brewed.
+<em class="hoc-italic">Composed.</em></h2>
+        <p class="hoc-body hoc-manifesto__body" data-reveal="up">Botanical ingredients, layered for aroma, colour and a ritual that works just as beautifully over ice.</p>
+      </div>
+    </section>
+
+    <section class="hoc-section hoc-l2g" id="leaf-to-glass" data-theme="ink"
+             data-header-theme="light" data-hoc="leaf-to-glass"
+             style="--accent:#47857D;--accent-2:#7FB3AD;--accent-wash:#E0EBEA;--accent-ink:#2D4E4A;--liquid:#B4324B">
+
+      <!-- DESKTOP: pinned scrub stage (§13) -->
+      <div class="hoc-l2g__track" data-hoc="l2g-track">
+        <div class="hoc-l2g__stage">
+          <div class="hoc-wrap hoc-l2g__inner">
+
+            <div class="hoc-l2g__col hoc-l2g__col--left">
+              <p class="hoc-micro"><span class="hoc-index" data-hoc="l2g-num">01</span> /
+                <span data-hoc="l2g-label">Raw</span></p>
+              <h2 class="hoc-title hoc-l2g__title">From leaf<br>to glass.</h2>
+              <ul class="hoc-l2g__ings">
+                <li data-ing="hibiscus"><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-hibiscus"></use></svg><span class="hoc-micro">Hibiscus</span></li><li data-ing="mint"><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-mint"></use></svg><span class="hoc-micro">Mint Leaf</span></li><li data-ing="lemongrass"><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-lemongrass"></use></svg><span class="hoc-micro">Lemongrass</span></li>
+              </ul>
+            </div>
+
+            <div class="hoc-l2g__col hoc-l2g__col--center">
+            <div class="hoc-l2g__glass">
+              <canvas data-hoc="l2g-canvas" aria-hidden="true"></canvas>
+            </div>
+            </div>
+
+            <div class="hoc-l2g__col hoc-l2g__col--right">
+              <dl class="hoc-brewdata">
+                
+                <div class="hoc-brewdata__row" data-metric="g">
+                  <dt class="hoc-micro">Leaf</dt>
+                  <dd class="hoc-brewdata__v">3<span class="hoc-brewdata__u">G</span></dd>
+                </div>
+                <div class="hoc-brewdata__row" data-metric="ml">
+                  <dt class="hoc-micro">Water</dt>
+                  <dd class="hoc-brewdata__v">330<span class="hoc-brewdata__u">ML</span></dd>
+                </div>
+                <div class="hoc-brewdata__row" data-metric="c">
+                  <dt class="hoc-micro">Temperature</dt>
+                  <dd class="hoc-brewdata__v">90<span class="hoc-brewdata__u">°C</span></dd>
+                </div>
+                <div class="hoc-brewdata__row" data-metric="min">
+                  <dt class="hoc-micro">Time</dt>
+                  <dd class="hoc-brewdata__v">05:00<span class="hoc-brewdata__u"></span></dd>
+                </div>
+              </dl>
+              <div class="hoc-l2g__cta">
+                <a class="hoc-btn" href="#blends">Discover Gift of Nature</a>
+              </div>
+            </div>
+
+          </div>
+          <ol class="hoc-l2g__progress" aria-hidden="true">
+            <li class="is-on" data-step="0"><span class="hoc-micro">Raw</span></li><li data-step="1"><span class="hoc-micro">Fall</span></li><li data-step="2"><span class="hoc-micro">Infuse</span></li><li data-step="3"><span class="hoc-micro">Colour</span></li><li data-step="4"><span class="hoc-micro">Ice</span></li><li data-step="5"><span class="hoc-micro">Serve</span></li>
+          </ol>
+        </div>
+      </div>
+
+      <!-- MOBILE: three short stages, no pin (§13, §44) -->
+      <div class="hoc-l2g__mobile" data-hoc="l2g-mobile">
+        
+        <article class="hoc-l2gm" data-progress="0.12">
+          <div class="hoc-l2gm__glass"><canvas data-hoc="l2g-mcanvas" aria-hidden="true"></canvas></div>
+          <div class="hoc-l2gm__copy">
+            <p class="hoc-micro"><span class="hoc-index">01</span> / Raw</p>
+            <p class="hoc-body">Three grams of hibiscus, mint leaf and lemongrass. Dry, whole, unground.</p>
+          </div>
+        </article>
+        <article class="hoc-l2gm" data-progress="0.55">
+          <div class="hoc-l2gm__glass"><canvas data-hoc="l2g-mcanvas" aria-hidden="true"></canvas></div>
+          <div class="hoc-l2gm__copy">
+            <p class="hoc-micro"><span class="hoc-index">02</span> / Brew</p>
+            <p class="hoc-body">330 ml at 90 °C. The hibiscus goes first, and the water turns.</p>
+          </div>
+        </article>
+        <article class="hoc-l2gm" data-progress="0.97">
+          <div class="hoc-l2gm__glass"><canvas data-hoc="l2g-mcanvas" aria-hidden="true"></canvas></div>
+          <div class="hoc-l2gm__copy">
+            <p class="hoc-micro"><span class="hoc-index">03</span> / Serve</p>
+            <p class="hoc-body">Five minutes, then ice. It holds its colour all the way down.</p>
+          </div>
+        </article>
+        <div class="hoc-l2gm__cta"><a class="hoc-btn" href="#blends">Discover Gift of Nature</a></div>
+      </div>
+    </section>
+
+    <section class="hoc-section hoc-alchemy" id="alchemy" data-theme="ink"
+             data-header-theme="light" data-hoc="alchemy" style="--accent:#553B91;--accent-2:#8A75BD;--accent-wash:#E2DEED;--accent-ink:#342654;--liquid:#2B3A8F">
+      <div class="hoc-alchemy__track" data-hoc="alchemy-track">
+        <div class="hoc-alchemy__stage">
+          <canvas class="hoc-alchemy__gl" data-hoc="alchemy-gl" aria-hidden="true"></canvas>
+          <div class="hoc-alchemy__fallback" data-hoc="alchemy-fallback" aria-hidden="true"></div>
+
+          <div class="hoc-wrap hoc-alchemy__copy">
+            <p class="hoc-micro">Mystic Butterfly / Natural colour reaction</p>
+            <h2 class="hoc-display-l" data-split="lines">Watch nature change its mind.</h2>
+            <p class="hoc-alchemy__hint hoc-micro" data-hoc="alchemy-hint">Move across the glass</p>
+          </div>
+
+          <ol class="hoc-alchemy__chain" aria-label="Colour reaction">
+            <li data-step="0"><span class="hoc-swatch" style="--s:#2B3A8F"></span><span class="hoc-micro">Butterfly Pea</span></li>
+            <li class="hoc-alchemy__plus" aria-hidden="true">+</li>
+            <li data-step="1"><span class="hoc-swatch" style="--s:#B4324B"></span><span class="hoc-micro">Hibiscus</span></li>
+            <li class="hoc-alchemy__arrow" aria-hidden="true">→</li>
+            <li data-step="2"><span class="hoc-swatch" style="--s:#B0417E"></span><span class="hoc-micro">Magenta</span></li>
+          </ol>
+
+          <div class="hoc-alchemy__drop" data-hoc="alchemy-drop" aria-hidden="true"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="hoc-section hoc-moods" id="moods" data-header-theme="dark"
+             data-hoc="moods">
+      <div class="hoc-wrap hoc-pad">
+        <header class="hoc-moods__head">
+          <p class="hoc-micro" data-reveal>Find your HOC</p>
+          <h2 class="hoc-display-l" data-split="lines">What are you in the mood for?</h2>
+        </header>
+        <ul class="hoc-moods__list" data-hoc="mood-list">
+          <li class="hoc-mood" data-mood="refresh" style="--accent:#47857D;--accent-2:#7FB3AD;--accent-wash:#E0EBEA;--accent-ink:#2D4E4A;--liquid:#B4324B">
+            <button class="hoc-mood__btn" data-hoc="mood" aria-expanded="false"
+                    aria-controls="mood-refresh">
+              <span class="hoc-mood__word hoc-display-l">Refresh</span>
+              <span class="hoc-mood__meta hoc-micro" data-scramble="FRESH / CITRUS / COOLING">FRESH / CITRUS / COOLING</span>
+            </button>
+            <div class="hoc-mood__reveal" id="mood-refresh" data-hoc="mood-panel">
+              <div class="hoc-mood__pack hoc-shape">
+                <img
+        src="assets/img/pack-gift-of-nature-420.webp"
+        srcset="assets/img/pack-gift-of-nature-420.webp 420w, assets/img/pack-gift-of-nature-640.webp 640w, assets/img/pack-gift-of-nature-900.webp 900w, assets/img/pack-gift-of-nature-1200.webp 1200w"
+        sizes="(max-width: 767px) 60vw, 20vw"
+        width="900" height="1422"
+        alt="Gift of Nature"
+        loading="lazy" decoding="async">
+              </div>
+              <div class="hoc-mood__info">
+                <p class="hoc-micro hoc-micro--accent">Bright · Fresh · Botanical</p>
+                <p class="hoc-mood__name hoc-title">Gift of Nature</p>
+                <ul class="hoc-mood__ings"><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-mint"></use></svg><span class="hoc-micro">Mint Leaf</span></li><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-hibiscus"></use></svg><span class="hoc-micro">Hibiscus</span></li><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-lemongrass"></use></svg><span class="hoc-micro">Lemongrass</span></li></ul>
+                <a class="hoc-link" href="#range">Shop Gift of Nature</a>
+              </div>
+            </div>
+          </li>
+          <li class="hoc-mood" data-mood="escape" style="--accent:#376395;--accent-2:#7196C1;--accent-wash:#DDE5EE;--accent-ink:#243C57;--liquid:#2F62A8">
+            <button class="hoc-mood__btn" data-hoc="mood" aria-expanded="false"
+                    aria-controls="mood-escape">
+              <span class="hoc-mood__word hoc-display-l">Escape</span>
+              <span class="hoc-mood__meta hoc-micro" data-scramble="TROPICAL / SWEET / VIVID">TROPICAL / SWEET / VIVID</span>
+            </button>
+            <div class="hoc-mood__reveal" id="mood-escape" data-hoc="mood-panel">
+              <div class="hoc-mood__pack hoc-shape">
+                <img
+        src="assets/img/pack-mesmerize-420.webp"
+        srcset="assets/img/pack-mesmerize-420.webp 420w, assets/img/pack-mesmerize-640.webp 640w, assets/img/pack-mesmerize-900.webp 900w, assets/img/pack-mesmerize-1200.webp 1200w"
+        sizes="(max-width: 767px) 60vw, 20vw"
+        width="900" height="1422"
+        alt="Mesmerize"
+        loading="lazy" decoding="async">
+              </div>
+              <div class="hoc-mood__info">
+                <p class="hoc-micro hoc-micro--accent">Tropical · Sweet · Vivid</p>
+                <p class="hoc-mood__name hoc-title">Mesmerize</p>
+                <ul class="hoc-mood__ings"><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-mango"></use></svg><span class="hoc-micro">Mango</span></li><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-pineapple"></use></svg><span class="hoc-micro">Pineapple</span></li><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-butterfly-pea"></use></svg><span class="hoc-micro">Butterfly Pea</span></li></ul>
+                <a class="hoc-link" href="#range">Shop Mesmerize</a>
+              </div>
+            </div>
+          </li>
+          <li class="hoc-mood" data-mood="slow-down" style="--accent:#6C4983;--accent-2:#9E81B1;--accent-wash:#E7E0EB;--accent-ink:#402E4D;--liquid:#B9A44C">
+            <button class="hoc-mood__btn" data-hoc="mood" aria-expanded="false"
+                    aria-controls="mood-slow-down">
+              <span class="hoc-mood__word hoc-display-l">Slow Down</span>
+              <span class="hoc-mood__meta hoc-micro" data-scramble="FLORAL / SOFT / HERBAL">FLORAL / SOFT / HERBAL</span>
+            </button>
+            <div class="hoc-mood__reveal" id="mood-slow-down" data-hoc="mood-panel">
+              <div class="hoc-mood__pack hoc-shape">
+                <img
+        src="assets/img/pack-innerbloom-420.webp"
+        srcset="assets/img/pack-innerbloom-420.webp 420w, assets/img/pack-innerbloom-640.webp 640w, assets/img/pack-innerbloom-900.webp 900w, assets/img/pack-innerbloom-1200.webp 1200w"
+        sizes="(max-width: 767px) 60vw, 20vw"
+        width="900" height="1422"
+        alt="Innerbloom"
+        loading="lazy" decoding="async">
+              </div>
+              <div class="hoc-mood__info">
+                <p class="hoc-micro hoc-micro--accent">Floral · Soft · Calm</p>
+                <p class="hoc-mood__name hoc-title">Innerbloom</p>
+                <ul class="hoc-mood__ings"><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-lavender"></use></svg><span class="hoc-micro">Lavender</span></li><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-chamomile"></use></svg><span class="hoc-micro">Chamomile</span></li><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-rose"></use></svg><span class="hoc-micro">Dried Rose</span></li></ul>
+                <a class="hoc-link" href="#range">Shop Innerbloom</a>
+              </div>
+            </div>
+          </li>
+          <li class="hoc-mood" data-mood="brighten" style="--accent:#6B8B41;--accent-2:#9DB87A;--accent-wash:#E6ECDF;--accent-ink:#405129;--liquid:#6E8A3F">
+            <button class="hoc-mood__btn" data-hoc="mood" aria-expanded="false"
+                    aria-controls="mood-brighten">
+              <span class="hoc-mood__word hoc-display-l">Brighten</span>
+              <span class="hoc-mood__meta hoc-micro" data-scramble="BERRY / GREEN / LIGHT">BERRY / GREEN / LIGHT</span>
+            </button>
+            <div class="hoc-mood__reveal" id="mood-brighten" data-hoc="mood-panel">
+              <div class="hoc-mood__pack hoc-shape">
+                <img
+        src="assets/img/pack-gold-skies-420.webp"
+        srcset="assets/img/pack-gold-skies-420.webp 420w, assets/img/pack-gold-skies-640.webp 640w, assets/img/pack-gold-skies-900.webp 900w, assets/img/pack-gold-skies-1200.webp 1200w"
+        sizes="(max-width: 767px) 60vw, 20vw"
+        width="900" height="1422"
+        alt="Gold Skies"
+        loading="lazy" decoding="async">
+              </div>
+              <div class="hoc-mood__info">
+                <p class="hoc-micro hoc-micro--accent">Berry · Grassy · Light</p>
+                <p class="hoc-mood__name hoc-title">Gold Skies</p>
+                <ul class="hoc-mood__ings"><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-strawberry"></use></svg><span class="hoc-micro">Strawberry</span></li><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-blackberry"></use></svg><span class="hoc-micro">Blackberry</span></li><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-lemongrass"></use></svg><span class="hoc-micro">Lemongrass</span></li></ul>
+                <a class="hoc-link" href="#range">Shop Gold Skies</a>
+              </div>
+            </div>
+          </li>
+          <li class="hoc-mood" data-mood="warm-up" style="--accent:#975235;--accent-2:#C3886F;--accent-wash:#EEE2DD;--accent-ink:#583323;--liquid:#A85426">
+            <button class="hoc-mood__btn" data-hoc="mood" aria-expanded="false"
+                    aria-controls="mood-warm-up">
+              <span class="hoc-mood__word hoc-display-l">Warm Up</span>
+              <span class="hoc-mood__meta hoc-micro" data-scramble="SPICED / CITRUS / DEEP">SPICED / CITRUS / DEEP</span>
+            </button>
+            <div class="hoc-mood__reveal" id="mood-warm-up" data-hoc="mood-panel">
+              <div class="hoc-mood__pack hoc-shape">
+                <img
+        src="assets/img/pack-winter-tale-420.webp"
+        srcset="assets/img/pack-winter-tale-420.webp 420w, assets/img/pack-winter-tale-640.webp 640w, assets/img/pack-winter-tale-900.webp 900w, assets/img/pack-winter-tale-1200.webp 1200w"
+        sizes="(max-width: 767px) 60vw, 20vw"
+        width="900" height="1422"
+        alt="Winter Tale"
+        loading="lazy" decoding="async">
+              </div>
+              <div class="hoc-mood__info">
+                <p class="hoc-micro hoc-micro--accent">Spiced · Citrus · Warming</p>
+                <p class="hoc-mood__name hoc-title">Winter Tale</p>
+                <ul class="hoc-mood__ings"><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-ginger"></use></svg><span class="hoc-micro">Ginger</span></li><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-orange-peel"></use></svg><span class="hoc-micro">Orange Peel</span></li><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-cinnamon"></use></svg><span class="hoc-micro">Cinnamon Stick</span></li></ul>
+                <a class="hoc-link" href="#range">Shop Winter Tale</a>
+              </div>
+            </div>
+          </li>
+          <li class="hoc-mood" data-mood="discover" style="--accent:#553B91;--accent-2:#8A75BD;--accent-wash:#E2DEED;--accent-ink:#342654;--liquid:#2B3A8F">
+            <button class="hoc-mood__btn" data-hoc="mood" aria-expanded="false"
+                    aria-controls="mood-discover">
+              <span class="hoc-mood__word hoc-display-l">Discover</span>
+              <span class="hoc-mood__meta hoc-micro" data-scramble="FLORAL / TART / CHANGING">FLORAL / TART / CHANGING</span>
+            </button>
+            <div class="hoc-mood__reveal" id="mood-discover" data-hoc="mood-panel">
+              <div class="hoc-mood__pack hoc-shape">
+                <img
+        src="assets/img/pack-mystic-butterfly-420.webp"
+        srcset="assets/img/pack-mystic-butterfly-420.webp 420w, assets/img/pack-mystic-butterfly-640.webp 640w, assets/img/pack-mystic-butterfly-900.webp 900w, assets/img/pack-mystic-butterfly-1200.webp 1200w"
+        sizes="(max-width: 767px) 60vw, 20vw"
+        width="900" height="1422"
+        alt="Mystic Butterfly"
+        loading="lazy" decoding="async">
+              </div>
+              <div class="hoc-mood__info">
+                <p class="hoc-micro hoc-micro--accent">Floral · Tart · Transforming</p>
+                <p class="hoc-mood__name hoc-title">Mystic Butterfly</p>
+                <ul class="hoc-mood__ings"><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-butterfly-pea"></use></svg><span class="hoc-micro">Butterfly Pea</span></li><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-hibiscus"></use></svg><span class="hoc-micro">Hibiscus</span></li><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-cinnamon"></use></svg><span class="hoc-micro">Cinnamon Stick</span></li></ul>
+                <a class="hoc-link" href="#range">Shop Mystic Butterfly</a>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <div class="hoc-moods__preview" data-hoc="mood-preview" aria-hidden="true">
+        <div class="hoc-moods__previewinner hoc-shape--lg"></div>
+      </div>
+    </section>
+
+    <section class="hoc-section hoc-atlas" id="atlas" data-header-theme="dark"
+             data-hoc="atlas">
+      <div class="hoc-wrap hoc-pad">
+        <div class="hoc-atlas__top">
+          <header class="hoc-atlas__head">
+            <p class="hoc-micro" data-reveal>Inside the blends</p>
+            <h2 class="hoc-display-l" data-split="lines">Ingredient by ingredient.</h2>
+            <p class="hoc-body" data-reveal="up">Taste, aroma and colour — what each botanical actually does in the cup. Pick one.</p>
+          </header>
+
+          <figure class="hoc-atlas__lead" id="atlas-lead" aria-live="polite"
+                  style="--accent:#B4324B">
+            <div class="hoc-atlas__leadart" data-hoc="atlas-art">
+              <svg class="hoc-bot hoc-atlas__bigsvg" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-hibiscus"></use></svg>
+            </div>
+            <figcaption class="hoc-atlas__leadinfo">
+              <p class="hoc-atlas__leadname hoc-title" data-fact="name">Hibiscus</p>
+              <p class="hoc-micro hoc-atlas__bot" data-fact="botanical">Hibiscus sabdariffa</p>
+              <dl class="hoc-atlas__facts">
+                <div><dt class="hoc-micro">Profile</dt><dd data-fact="profile">Tart</dd></div>
+                <div><dt class="hoc-micro">Aroma</dt><dd data-fact="aroma">Red fruit, cranberry</dd></div>
+                <div><dt class="hoc-micro">Colour</dt><dd data-fact="color">Crimson</dd></div>
+              </dl>
+              <p class="hoc-atlas__note" data-fact="note">The acid in the range. It is what turns butterfly pea from blue to magenta.</p>
+            </figcaption>
+          </figure>
+        </div>
+
+        <ul class="hoc-atlas__grid">
+          <li class="hoc-atlas__item is-on" data-ing="hibiscus"
+              style="--accent:#B4324B">
+            <button class="hoc-atlas__btn" data-hoc="atlas-pick" data-ing="hibiscus"
+                    aria-controls="atlas-lead" aria-pressed="true">
+              <span class="hoc-atlas__art"><svg class="hoc-bot hoc-atlas__svg" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-hibiscus"></use></svg></span>
+              <span class="hoc-atlas__name hoc-micro">Hibiscus</span>
+            </button>
+          </li>
+          <li class="hoc-atlas__item" data-ing="butterfly-pea"
+              style="--accent:#3B3B8F">
+            <button class="hoc-atlas__btn" data-hoc="atlas-pick" data-ing="butterfly-pea"
+                    aria-controls="atlas-lead" aria-pressed="false">
+              <span class="hoc-atlas__art"><svg class="hoc-bot hoc-atlas__svg" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-butterfly-pea"></use></svg></span>
+              <span class="hoc-atlas__name hoc-micro">Butterfly Pea</span>
+            </button>
+          </li>
+          <li class="hoc-atlas__item" data-ing="mint"
+              style="--accent:#5E9A62">
+            <button class="hoc-atlas__btn" data-hoc="atlas-pick" data-ing="mint"
+                    aria-controls="atlas-lead" aria-pressed="false">
+              <span class="hoc-atlas__art"><svg class="hoc-bot hoc-atlas__svg" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-mint"></use></svg></span>
+              <span class="hoc-atlas__name hoc-micro">Mint Leaf</span>
+            </button>
+          </li>
+          <li class="hoc-atlas__item" data-ing="lemongrass"
+              style="--accent:#A9A24B">
+            <button class="hoc-atlas__btn" data-hoc="atlas-pick" data-ing="lemongrass"
+                    aria-controls="atlas-lead" aria-pressed="false">
+              <span class="hoc-atlas__art"><svg class="hoc-bot hoc-atlas__svg" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-lemongrass"></use></svg></span>
+              <span class="hoc-atlas__name hoc-micro">Lemongrass</span>
+            </button>
+          </li>
+          <li class="hoc-atlas__item" data-ing="cinnamon"
+              style="--accent:#9B5B2E">
+            <button class="hoc-atlas__btn" data-hoc="atlas-pick" data-ing="cinnamon"
+                    aria-controls="atlas-lead" aria-pressed="false">
+              <span class="hoc-atlas__art"><svg class="hoc-bot hoc-atlas__svg" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-cinnamon"></use></svg></span>
+              <span class="hoc-atlas__name hoc-micro">Cinnamon Stick</span>
+            </button>
+          </li>
+          <li class="hoc-atlas__item" data-ing="mango"
+              style="--accent:#D99A32">
+            <button class="hoc-atlas__btn" data-hoc="atlas-pick" data-ing="mango"
+                    aria-controls="atlas-lead" aria-pressed="false">
+              <span class="hoc-atlas__art"><svg class="hoc-bot hoc-atlas__svg" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-mango"></use></svg></span>
+              <span class="hoc-atlas__name hoc-micro">Mango</span>
+            </button>
+          </li>
+          <li class="hoc-atlas__item" data-ing="lavender"
+              style="--accent:#8A7FB5">
+            <button class="hoc-atlas__btn" data-hoc="atlas-pick" data-ing="lavender"
+                    aria-controls="atlas-lead" aria-pressed="false">
+              <span class="hoc-atlas__art"><svg class="hoc-bot hoc-atlas__svg" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-lavender"></use></svg></span>
+              <span class="hoc-atlas__name hoc-micro">Lavender</span>
+            </button>
+          </li>
+          <li class="hoc-atlas__item" data-ing="chamomile"
+              style="--accent:#C9AE55">
+            <button class="hoc-atlas__btn" data-hoc="atlas-pick" data-ing="chamomile"
+                    aria-controls="atlas-lead" aria-pressed="false">
+              <span class="hoc-atlas__art"><svg class="hoc-bot hoc-atlas__svg" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-chamomile"></use></svg></span>
+              <span class="hoc-atlas__name hoc-micro">Chamomile</span>
+            </button>
+          </li>
+          <li class="hoc-atlas__item" data-ing="rooibos"
+              style="--accent:#9C4B2A">
+            <button class="hoc-atlas__btn" data-hoc="atlas-pick" data-ing="rooibos"
+                    aria-controls="atlas-lead" aria-pressed="false">
+              <span class="hoc-atlas__art"><svg class="hoc-bot hoc-atlas__svg" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-rooibos"></use></svg></span>
+              <span class="hoc-atlas__name hoc-micro">Rooibos</span>
+            </button>
+          </li>
+          <li class="hoc-atlas__item" data-ing="ginger"
+              style="--accent:#C08A3A">
+            <button class="hoc-atlas__btn" data-hoc="atlas-pick" data-ing="ginger"
+                    aria-controls="atlas-lead" aria-pressed="false">
+              <span class="hoc-atlas__art"><svg class="hoc-bot hoc-atlas__svg" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-ginger"></use></svg></span>
+              <span class="hoc-atlas__name hoc-micro">Ginger</span>
+            </button>
+          </li>
+          <li class="hoc-atlas__item" data-ing="orange-peel"
+              style="--accent:#CE7B33">
+            <button class="hoc-atlas__btn" data-hoc="atlas-pick" data-ing="orange-peel"
+                    aria-controls="atlas-lead" aria-pressed="false">
+              <span class="hoc-atlas__art"><svg class="hoc-bot hoc-atlas__svg" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-orange-peel"></use></svg></span>
+              <span class="hoc-atlas__name hoc-micro">Orange Peel</span>
+            </button>
+          </li>
+          <li class="hoc-atlas__item" data-ing="strawberry"
+              style="--accent:#C0485C">
+            <button class="hoc-atlas__btn" data-hoc="atlas-pick" data-ing="strawberry"
+                    aria-controls="atlas-lead" aria-pressed="false">
+              <span class="hoc-atlas__art"><svg class="hoc-bot hoc-atlas__svg" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-strawberry"></use></svg></span>
+              <span class="hoc-atlas__name hoc-micro">Strawberry</span>
+            </button>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="hoc-section hoc-range" id="range" data-header-theme="dark"
+             data-hoc="range">
+      <div class="hoc-wrap">
+        <header class="hoc-range__head">
+          <p class="hoc-micro" data-reveal>The range</p>
+          <h2 class="hoc-display-l" data-split="lines">All fourteen, one at a time.</h2>
+        </header>
+      </div>
+
+      <div class="hoc-range__stage" data-hoc="range-stage">
+        <ul class="hoc-range__col hoc-range__col--left" data-hoc="range-col" data-speed="-0.10">
+          
+          <li class="hoc-range__cell" data-index="0">
+            <div class="hoc-range__pile">
+              <img
+        src="assets/img/pile-gift-of-nature-420.webp"
+        srcset="assets/img/pile-gift-of-nature-420.webp 420w, assets/img/pile-gift-of-nature-640.webp 640w, assets/img/pile-gift-of-nature-900.webp 900w"
+        sizes="(max-width: 899px) 62vw, 26vw"
+        width="640" height="640"
+        alt="Gift of Nature — loose blend: Hibiscus, Mint Leaf, Lemongrass"
+        loading="lazy" decoding="async">
+            </div>
+            <!-- Mobile only. There is no sticky centre panel below 900px, so
+                 each blend carries its own copy and the section becomes a
+                 plain stack (§44). -->
+            <div class="hoc-range__mcopy" style="--accent:#47857D;--accent-2:#7FB3AD;--accent-wash:#E0EBEA;--accent-ink:#2D4E4A;--liquid:#B4324B">
+              <p class="hoc-micro hoc-range__count"><span class="hoc-index">01</span> / 14</p>
+              <h3 class="hoc-range__name">Gift of Nature</h3>
+              <p class="hoc-micro hoc-micro--accent">Bright · Fresh · Botanical</p>
+              <p class="hoc-range__price"><span class="hoc-micro">From</span> €14</p>
+              <div class="hoc-range__actions">
+                <button class="hoc-btn hoc-btn--solid" data-hoc="add" data-blend="gift-of-nature">Add to bag</button>
+              </div>
+            </div>
+          </li>
+          <li class="hoc-range__cell" data-index="1">
+            <div class="hoc-range__pile">
+              <img
+        src="assets/img/pile-mystic-butterfly-420.webp"
+        srcset="assets/img/pile-mystic-butterfly-420.webp 420w, assets/img/pile-mystic-butterfly-640.webp 640w, assets/img/pile-mystic-butterfly-900.webp 900w"
+        sizes="(max-width: 899px) 62vw, 26vw"
+        width="640" height="640"
+        alt="Mystic Butterfly — loose blend: Butterfly Pea Flower, Hibiscus, Cinnamon Stick"
+        loading="lazy" decoding="async">
+            </div>
+            <!-- Mobile only. There is no sticky centre panel below 900px, so
+                 each blend carries its own copy and the section becomes a
+                 plain stack (§44). -->
+            <div class="hoc-range__mcopy" style="--accent:#553B91;--accent-2:#8A75BD;--accent-wash:#E2DEED;--accent-ink:#342654;--liquid:#2B3A8F">
+              <p class="hoc-micro hoc-range__count"><span class="hoc-index">02</span> / 14</p>
+              <h3 class="hoc-range__name">Mystic Butterfly</h3>
+              <p class="hoc-micro hoc-micro--accent">Floral · Tart · Transforming</p>
+              <p class="hoc-range__price"><span class="hoc-micro">From</span> €16</p>
+              <div class="hoc-range__actions">
+                <button class="hoc-btn hoc-btn--solid" data-hoc="add" data-blend="mystic-butterfly">Add to bag</button>
+              </div>
+            </div>
+          </li>
+          <li class="hoc-range__cell" data-index="2">
+            <div class="hoc-range__pile">
+              <img
+        src="assets/img/pile-mesmerize-420.webp"
+        srcset="assets/img/pile-mesmerize-420.webp 420w, assets/img/pile-mesmerize-640.webp 640w, assets/img/pile-mesmerize-900.webp 900w"
+        sizes="(max-width: 899px) 62vw, 26vw"
+        width="640" height="640"
+        alt="Mesmerize — loose blend: Mango, Pineapple, Lemongrass, Butterfly Pea Flower"
+        loading="lazy" decoding="async">
+            </div>
+            <!-- Mobile only. There is no sticky centre panel below 900px, so
+                 each blend carries its own copy and the section becomes a
+                 plain stack (§44). -->
+            <div class="hoc-range__mcopy" style="--accent:#376395;--accent-2:#7196C1;--accent-wash:#DDE5EE;--accent-ink:#243C57;--liquid:#2F62A8">
+              <p class="hoc-micro hoc-range__count"><span class="hoc-index">03</span> / 14</p>
+              <h3 class="hoc-range__name">Mesmerize</h3>
+              <p class="hoc-micro hoc-micro--accent">Tropical · Sweet · Vivid</p>
+              <p class="hoc-range__price"><span class="hoc-micro">From</span> €16</p>
+              <div class="hoc-range__actions">
+                <button class="hoc-btn hoc-btn--solid" data-hoc="add" data-blend="mesmerize">Add to bag</button>
+              </div>
+            </div>
+          </li>
+          <li class="hoc-range__cell" data-index="3">
+            <div class="hoc-range__pile">
+              <img
+        src="assets/img/pile-sunset-valley-420.webp"
+        srcset="assets/img/pile-sunset-valley-420.webp 420w, assets/img/pile-sunset-valley-640.webp 640w, assets/img/pile-sunset-valley-900.webp 900w"
+        sizes="(max-width: 899px) 62vw, 26vw"
+        width="640" height="640"
+        alt="Sunset Valley — loose blend: Rooibos, Strawberry, Apple, Bourbon Vanilla"
+        loading="lazy" decoding="async">
+            </div>
+            <!-- Mobile only. There is no sticky centre panel below 900px, so
+                 each blend carries its own copy and the section becomes a
+                 plain stack (§44). -->
+            <div class="hoc-range__mcopy" style="--accent:#913B41;--accent-2:#BD7579;--accent-wash:#EDDEDF;--accent-ink:#542629;--liquid:#A8462F">
+              <p class="hoc-micro hoc-range__count"><span class="hoc-index">04</span> / 14</p>
+              <h3 class="hoc-range__name">Sunset Valley</h3>
+              <p class="hoc-micro hoc-micro--accent">Soft · Sweet · Rounded</p>
+              <p class="hoc-range__price"><span class="hoc-micro">From</span> €14</p>
+              <div class="hoc-range__actions">
+                <button class="hoc-btn hoc-btn--solid" data-hoc="add" data-blend="sunset-valley">Add to bag</button>
+              </div>
+            </div>
+          </li>
+          <li class="hoc-range__cell" data-index="4">
+            <div class="hoc-range__pile">
+              <img
+        src="assets/img/pile-asian-breeze-420.webp"
+        srcset="assets/img/pile-asian-breeze-420.webp 420w, assets/img/pile-asian-breeze-640.webp 640w, assets/img/pile-asian-breeze-900.webp 900w"
+        sizes="(max-width: 899px) 62vw, 26vw"
+        width="640" height="640"
+        alt="Asian Breeze — loose blend: Rooibos, Mango, Pineapple, Dried Ginger, Cinnamon Stick, Lemon Peel"
+        loading="lazy" decoding="async">
+            </div>
+            <!-- Mobile only. There is no sticky centre panel below 900px, so
+                 each blend carries its own copy and the section becomes a
+                 plain stack (§44). -->
+            <div class="hoc-range__mcopy" style="--accent:#9B6231;--accent-2:#C6966C;--accent-wash:#EFE5DC;--accent-ink:#5A3B21;--liquid:#B4682A">
+              <p class="hoc-micro hoc-range__count"><span class="hoc-index">05</span> / 14</p>
+              <h3 class="hoc-range__name">Asian Breeze</h3>
+              <p class="hoc-micro hoc-micro--accent">Tropical · Spiced · Warm</p>
+              <p class="hoc-range__price"><span class="hoc-micro">From</span> €15</p>
+              <div class="hoc-range__actions">
+                <button class="hoc-btn hoc-btn--solid" data-hoc="add" data-blend="asian-breeze">Add to bag</button>
+              </div>
+            </div>
+          </li>
+          <li class="hoc-range__cell" data-index="5">
+            <div class="hoc-range__pile">
+              <img
+        src="assets/img/pile-souls-rest-420.webp"
+        srcset="assets/img/pile-souls-rest-420.webp 420w, assets/img/pile-souls-rest-640.webp 640w, assets/img/pile-souls-rest-900.webp 900w"
+        sizes="(max-width: 899px) 62vw, 26vw"
+        width="640" height="640"
+        alt="Soul's Rest — loose blend: Oolong, Dried Rose, Hibiscus, Chamomile"
+        loading="lazy" decoding="async">
+            </div>
+            <!-- Mobile only. There is no sticky centre panel below 900px, so
+                 each blend carries its own copy and the section becomes a
+                 plain stack (§44). -->
+            <div class="hoc-range__mcopy" style="--accent:#85475E;--accent-2:#B37F92;--accent-wash:#EBE0E4;--accent-ink:#4E2D39;--liquid:#9E4A5E">
+              <p class="hoc-micro hoc-range__count"><span class="hoc-index">06</span> / 14</p>
+              <h3 class="hoc-range__name">Soul's Rest</h3>
+              <p class="hoc-micro hoc-micro--accent">Floral · Delicate · Still</p>
+              <p class="hoc-range__price"><span class="hoc-micro">From</span> €17</p>
+              <div class="hoc-range__actions">
+                <button class="hoc-btn hoc-btn--solid" data-hoc="add" data-blend="souls-rest">Add to bag</button>
+              </div>
+            </div>
+          </li>
+          <li class="hoc-range__cell" data-index="6">
+            <div class="hoc-range__pile">
+              <img
+        src="assets/img/pile-gold-skies-420.webp"
+        srcset="assets/img/pile-gold-skies-420.webp 420w, assets/img/pile-gold-skies-640.webp 640w, assets/img/pile-gold-skies-900.webp 900w"
+        sizes="(max-width: 899px) 62vw, 26vw"
+        width="640" height="640"
+        alt="Gold Skies — loose blend: Green Tea, Lemongrass, Strawberry, Blackberry, Butterfly Pea Flower"
+        loading="lazy" decoding="async">
+            </div>
+            <!-- Mobile only. There is no sticky centre panel below 900px, so
+                 each blend carries its own copy and the section becomes a
+                 plain stack (§44). -->
+            <div class="hoc-range__mcopy" style="--accent:#6B8B41;--accent-2:#9DB87A;--accent-wash:#E6ECDF;--accent-ink:#405129;--liquid:#6E8A3F">
+              <p class="hoc-micro hoc-range__count"><span class="hoc-index">07</span> / 14</p>
+              <h3 class="hoc-range__name">Gold Skies</h3>
+              <p class="hoc-micro hoc-micro--accent">Berry · Grassy · Light</p>
+              <p class="hoc-range__price"><span class="hoc-micro">From</span> €16</p>
+              <div class="hoc-range__actions">
+                <button class="hoc-btn hoc-btn--solid" data-hoc="add" data-blend="gold-skies">Add to bag</button>
+              </div>
+            </div>
+          </li>
+          <li class="hoc-range__cell" data-index="7">
+            <div class="hoc-range__pile">
+              <img
+        src="assets/img/pile-pink-moon-420.webp"
+        srcset="assets/img/pile-pink-moon-420.webp 420w, assets/img/pile-pink-moon-640.webp 640w, assets/img/pile-pink-moon-900.webp 900w"
+        sizes="(max-width: 899px) 62vw, 26vw"
+        width="640" height="640"
+        alt="Pink Moon — loose blend: Jasmine, Pineapple, Hibiscus, White Tea, Cinnamon Stick"
+        loading="lazy" decoding="async">
+            </div>
+            <!-- Mobile only. There is no sticky centre panel below 900px, so
+                 each blend carries its own copy and the section becomes a
+                 plain stack (§44). -->
+            <div class="hoc-range__mcopy" style="--accent:#89436B;--accent-2:#B67C9D;--accent-wash:#ECDFE6;--accent-ink:#502A40;--liquid:#B04E77">
+              <p class="hoc-micro hoc-range__count"><span class="hoc-index">08</span> / 14</p>
+              <h3 class="hoc-range__name">Pink Moon</h3>
+              <p class="hoc-micro hoc-micro--accent">Floral · Tropical · Fine</p>
+              <p class="hoc-range__price"><span class="hoc-micro">From</span> €18</p>
+              <div class="hoc-range__actions">
+                <button class="hoc-btn hoc-btn--solid" data-hoc="add" data-blend="pink-moon">Add to bag</button>
+              </div>
+            </div>
+          </li>
+          <li class="hoc-range__cell" data-index="8">
+            <div class="hoc-range__pile">
+              <img
+        src="assets/img/pile-innerbloom-420.webp"
+        srcset="assets/img/pile-innerbloom-420.webp 420w, assets/img/pile-innerbloom-640.webp 640w, assets/img/pile-innerbloom-900.webp 900w"
+        sizes="(max-width: 899px) 62vw, 26vw"
+        width="640" height="640"
+        alt="Innerbloom — loose blend: Jasmine, Chamomile, Lavender, Lemon Balm"
+        loading="lazy" decoding="async">
+            </div>
+            <!-- Mobile only. There is no sticky centre panel below 900px, so
+                 each blend carries its own copy and the section becomes a
+                 plain stack (§44). -->
+            <div class="hoc-range__mcopy" style="--accent:#6C4983;--accent-2:#9E81B1;--accent-wash:#E7E0EB;--accent-ink:#402E4D;--liquid:#B9A44C">
+              <p class="hoc-micro hoc-range__count"><span class="hoc-index">09</span> / 14</p>
+              <h3 class="hoc-range__name">Innerbloom</h3>
+              <p class="hoc-micro hoc-micro--accent">Floral · Soft · Calm</p>
+              <p class="hoc-range__price"><span class="hoc-micro">From</span> €15</p>
+              <div class="hoc-range__actions">
+                <button class="hoc-btn hoc-btn--solid" data-hoc="add" data-blend="innerbloom">Add to bag</button>
+              </div>
+            </div>
+          </li>
+          <li class="hoc-range__cell" data-index="9">
+            <div class="hoc-range__pile">
+              <img
+        src="assets/img/pile-white-tea-melody-420.webp"
+        srcset="assets/img/pile-white-tea-melody-420.webp 420w, assets/img/pile-white-tea-melody-640.webp 640w, assets/img/pile-white-tea-melody-900.webp 900w"
+        sizes="(max-width: 899px) 62vw, 26vw"
+        width="640" height="640"
+        alt="White Tea Melody — loose blend: Strawberry, White Tea, Lemon Peel, Apple, Mango, Cinnamon Stick"
+        loading="lazy" decoding="async">
+            </div>
+            <!-- Mobile only. There is no sticky centre panel below 900px, so
+                 each blend carries its own copy and the section becomes a
+                 plain stack (§44). -->
+            <div class="hoc-range__mcopy" style="--accent:#8B5241;--accent-2:#B8887A;--accent-wash:#ECE2DF;--accent-ink:#513329;--liquid:#C06A4A">
+              <p class="hoc-micro hoc-range__count"><span class="hoc-index">10</span> / 14</p>
+              <h3 class="hoc-range__name">White Tea Melody</h3>
+              <p class="hoc-micro hoc-micro--accent">Fruity · Light · Warm</p>
+              <p class="hoc-range__price"><span class="hoc-micro">From</span> €17</p>
+              <div class="hoc-range__actions">
+                <button class="hoc-btn hoc-btn--solid" data-hoc="add" data-blend="white-tea-melody">Add to bag</button>
+              </div>
+            </div>
+          </li>
+          <li class="hoc-range__cell" data-index="10">
+            <div class="hoc-range__pile">
+              <img
+        src="assets/img/pile-reflection-420.webp"
+        srcset="assets/img/pile-reflection-420.webp 420w, assets/img/pile-reflection-640.webp 640w, assets/img/pile-reflection-900.webp 900w"
+        sizes="(max-width: 899px) 62vw, 26vw"
+        width="640" height="640"
+        alt="Reflection — loose blend: Passionflower, Apple, Lemongrass, Hibiscus, Blackberry"
+        loading="lazy" decoding="async">
+            </div>
+            <!-- Mobile only. There is no sticky centre panel below 900px, so
+                 each blend carries its own copy and the section becomes a
+                 plain stack (§44). -->
+            <div class="hoc-range__mcopy" style="--accent:#854785;--accent-2:#B37FB3;--accent-wash:#EBE0EB;--accent-ink:#4E2D4E;--liquid:#8A3B63">
+              <p class="hoc-micro hoc-range__count"><span class="hoc-index">11</span> / 14</p>
+              <h3 class="hoc-range__name">Reflection</h3>
+              <p class="hoc-micro hoc-micro--accent">Fruity · Tart · Grounded</p>
+              <p class="hoc-range__price"><span class="hoc-micro">From</span> €15</p>
+              <div class="hoc-range__actions">
+                <button class="hoc-btn hoc-btn--solid" data-hoc="add" data-blend="reflection">Add to bag</button>
+              </div>
+            </div>
+          </li>
+          <li class="hoc-range__cell" data-index="11">
+            <div class="hoc-range__pile">
+              <img
+        src="assets/img/pile-winter-tale-420.webp"
+        srcset="assets/img/pile-winter-tale-420.webp 420w, assets/img/pile-winter-tale-640.webp 640w, assets/img/pile-winter-tale-900.webp 900w"
+        sizes="(max-width: 899px) 62vw, 26vw"
+        width="640" height="640"
+        alt="Winter Tale — loose blend: Rooibos, Mate, Fresh Ginger, Strawberry, Orange Peel"
+        loading="lazy" decoding="async">
+            </div>
+            <!-- Mobile only. There is no sticky centre panel below 900px, so
+                 each blend carries its own copy and the section becomes a
+                 plain stack (§44). -->
+            <div class="hoc-range__mcopy" style="--accent:#975235;--accent-2:#C3886F;--accent-wash:#EEE2DD;--accent-ink:#583323;--liquid:#A85426">
+              <p class="hoc-micro hoc-range__count"><span class="hoc-index">12</span> / 14</p>
+              <h3 class="hoc-range__name">Winter Tale</h3>
+              <p class="hoc-micro hoc-micro--accent">Spiced · Citrus · Warming</p>
+              <p class="hoc-range__price"><span class="hoc-micro">From</span> €16</p>
+              <div class="hoc-range__actions">
+                <button class="hoc-btn hoc-btn--solid" data-hoc="add" data-blend="winter-tale">Add to bag</button>
+              </div>
+            </div>
+          </li>
+          <li class="hoc-range__cell" data-index="12">
+            <div class="hoc-range__pile">
+              <img
+        src="assets/img/pile-wintertide-420.webp"
+        srcset="assets/img/pile-wintertide-420.webp 420w, assets/img/pile-wintertide-640.webp 640w, assets/img/pile-wintertide-900.webp 900w"
+        sizes="(max-width: 899px) 62vw, 26vw"
+        width="640" height="640"
+        alt="Wintertide — loose blend: Apple, Mango, Rosehip, Fennel, Passionflower"
+        loading="lazy" decoding="async">
+            </div>
+            <!-- Mobile only. There is no sticky centre panel below 900px, so
+                 each blend carries its own copy and the section becomes a
+                 plain stack (§44). -->
+            <div class="hoc-range__mcopy" style="--accent:#997A33;--accent-2:#C4AA6E;--accent-wash:#EFE9DC;--accent-ink:#594822;--liquid:#C0752F">
+              <p class="hoc-micro hoc-range__count"><span class="hoc-index">13</span> / 14</p>
+              <h3 class="hoc-range__name">Wintertide</h3>
+              <p class="hoc-micro hoc-micro--accent">Sweet · Aniseed · Tart</p>
+              <p class="hoc-range__price"><span class="hoc-micro">From</span> €15</p>
+              <div class="hoc-range__actions">
+                <button class="hoc-btn hoc-btn--solid" data-hoc="add" data-blend="wintertide">Add to bag</button>
+              </div>
+            </div>
+          </li>
+          <li class="hoc-range__cell" data-index="13">
+            <div class="hoc-range__pile">
+              <img
+        src="assets/img/pile-bloomera-420.webp"
+        srcset="assets/img/pile-bloomera-420.webp 420w, assets/img/pile-bloomera-640.webp 640w, assets/img/pile-bloomera-900.webp 900w"
+        sizes="(max-width: 899px) 62vw, 26vw"
+        width="640" height="640"
+        alt="Bloomera — loose blend: Apple, Cinnamon Stick, Hibiscus, Orange Peel"
+        loading="lazy" decoding="async">
+            </div>
+            <!-- Mobile only. There is no sticky centre panel below 900px, so
+                 each blend carries its own copy and the section becomes a
+                 plain stack (§44). -->
+            <div class="hoc-range__mcopy" style="--accent:#954437;--accent-2:#C17C71;--accent-wash:#EEDFDD;--accent-ink:#572B24;--liquid:#B03C33">
+              <p class="hoc-micro hoc-range__count"><span class="hoc-index">14</span> / 14</p>
+              <h3 class="hoc-range__name">Bloomera</h3>
+              <p class="hoc-micro hoc-micro--accent">Spiced · Fruity · Tart</p>
+              <p class="hoc-range__price"><span class="hoc-micro">From</span> €14</p>
+              <div class="hoc-range__actions">
+                <button class="hoc-btn hoc-btn--solid" data-hoc="add" data-blend="bloomera">Add to bag</button>
+              </div>
+            </div>
+          </li>
+        </ul>
+
+        <div class="hoc-range__centre">
+          <div class="hoc-range__sticky" data-hoc="range-sticky">
+            <div class="hoc-range__frame">
+              
+          <article class="hoc-range__panel is-on"
+                   data-panel-index="0" style="--accent:#47857D;--accent-2:#7FB3AD;--accent-wash:#E0EBEA;--accent-ink:#2D4E4A;--liquid:#B4324B"
+                   >
+            <p class="hoc-micro hoc-range__count">
+              <span class="hoc-index">01</span> / 14
+            </p>
+            <h3 class="hoc-range__name">Gift of Nature</h3>
+            <p class="hoc-micro hoc-micro--accent">Bright · Fresh · Botanical</p>
+            <ul class="hoc-range__ings"><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-hibiscus"></use></svg><span class="hoc-micro">Hibiscus</span></li><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-mint"></use></svg><span class="hoc-micro">Mint Leaf</span></li><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-lemongrass"></use></svg><span class="hoc-micro">Lemongrass</span></li></ul>
+            <p class="hoc-range__price">
+              <span class="hoc-micro">From</span> €14
+            </p>
+            <div class="hoc-range__actions">
+              <button class="hoc-btn hoc-btn--solid" data-hoc="add" data-blend="gift-of-nature">Add to bag</button>
+              <a class="hoc-link" href="#blends">View blend</a>
+            </div>
+          </article>
+          <article class="hoc-range__panel"
+                   data-panel-index="1" style="--accent:#553B91;--accent-2:#8A75BD;--accent-wash:#E2DEED;--accent-ink:#342654;--liquid:#2B3A8F"
+                   aria-hidden="true">
+            <p class="hoc-micro hoc-range__count">
+              <span class="hoc-index">02</span> / 14
+            </p>
+            <h3 class="hoc-range__name">Mystic Butterfly</h3>
+            <p class="hoc-micro hoc-micro--accent">Floral · Tart · Transforming</p>
+            <ul class="hoc-range__ings"><li><span class="hoc-micro">Butterfly Pea Flower</span></li><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-hibiscus"></use></svg><span class="hoc-micro">Hibiscus</span></li><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-cinnamon"></use></svg><span class="hoc-micro">Cinnamon Stick</span></li></ul>
+            <p class="hoc-range__price">
+              <span class="hoc-micro">From</span> €16
+            </p>
+            <div class="hoc-range__actions">
+              <button class="hoc-btn hoc-btn--solid" data-hoc="add" data-blend="mystic-butterfly">Add to bag</button>
+              <a class="hoc-link" href="#blends">View blend</a>
+            </div>
+          </article>
+          <article class="hoc-range__panel"
+                   data-panel-index="2" style="--accent:#376395;--accent-2:#7196C1;--accent-wash:#DDE5EE;--accent-ink:#243C57;--liquid:#2F62A8"
+                   aria-hidden="true">
+            <p class="hoc-micro hoc-range__count">
+              <span class="hoc-index">03</span> / 14
+            </p>
+            <h3 class="hoc-range__name">Mesmerize</h3>
+            <p class="hoc-micro hoc-micro--accent">Tropical · Sweet · Vivid</p>
+            <ul class="hoc-range__ings"><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-mango"></use></svg><span class="hoc-micro">Mango</span></li><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-pineapple"></use></svg><span class="hoc-micro">Pineapple</span></li><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-lemongrass"></use></svg><span class="hoc-micro">Lemongrass</span></li><li><span class="hoc-micro">Butterfly Pea Flower</span></li></ul>
+            <p class="hoc-range__price">
+              <span class="hoc-micro">From</span> €16
+            </p>
+            <div class="hoc-range__actions">
+              <button class="hoc-btn hoc-btn--solid" data-hoc="add" data-blend="mesmerize">Add to bag</button>
+              <a class="hoc-link" href="#blends">View blend</a>
+            </div>
+          </article>
+          <article class="hoc-range__panel"
+                   data-panel-index="3" style="--accent:#913B41;--accent-2:#BD7579;--accent-wash:#EDDEDF;--accent-ink:#542629;--liquid:#A8462F"
+                   aria-hidden="true">
+            <p class="hoc-micro hoc-range__count">
+              <span class="hoc-index">04</span> / 14
+            </p>
+            <h3 class="hoc-range__name">Sunset Valley</h3>
+            <p class="hoc-micro hoc-micro--accent">Soft · Sweet · Rounded</p>
+            <ul class="hoc-range__ings"><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-rooibos"></use></svg><span class="hoc-micro">Rooibos</span></li><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-strawberry"></use></svg><span class="hoc-micro">Strawberry</span></li><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-apple"></use></svg><span class="hoc-micro">Apple</span></li><li><span class="hoc-micro">Bourbon Vanilla</span></li></ul>
+            <p class="hoc-range__price">
+              <span class="hoc-micro">From</span> €14
+            </p>
+            <div class="hoc-range__actions">
+              <button class="hoc-btn hoc-btn--solid" data-hoc="add" data-blend="sunset-valley">Add to bag</button>
+              <a class="hoc-link" href="#blends">View blend</a>
+            </div>
+          </article>
+          <article class="hoc-range__panel"
+                   data-panel-index="4" style="--accent:#9B6231;--accent-2:#C6966C;--accent-wash:#EFE5DC;--accent-ink:#5A3B21;--liquid:#B4682A"
+                   aria-hidden="true">
+            <p class="hoc-micro hoc-range__count">
+              <span class="hoc-index">05</span> / 14
+            </p>
+            <h3 class="hoc-range__name">Asian Breeze</h3>
+            <p class="hoc-micro hoc-micro--accent">Tropical · Spiced · Warm</p>
+            <ul class="hoc-range__ings"><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-rooibos"></use></svg><span class="hoc-micro">Rooibos</span></li><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-mango"></use></svg><span class="hoc-micro">Mango</span></li><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-pineapple"></use></svg><span class="hoc-micro">Pineapple</span></li><li><span class="hoc-micro">Dried Ginger</span></li><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-cinnamon"></use></svg><span class="hoc-micro">Cinnamon Stick</span></li><li><span class="hoc-micro">Lemon Peel</span></li></ul>
+            <p class="hoc-range__price">
+              <span class="hoc-micro">From</span> €15
+            </p>
+            <div class="hoc-range__actions">
+              <button class="hoc-btn hoc-btn--solid" data-hoc="add" data-blend="asian-breeze">Add to bag</button>
+              <a class="hoc-link" href="#blends">View blend</a>
+            </div>
+          </article>
+          <article class="hoc-range__panel"
+                   data-panel-index="5" style="--accent:#85475E;--accent-2:#B37F92;--accent-wash:#EBE0E4;--accent-ink:#4E2D39;--liquid:#9E4A5E"
+                   aria-hidden="true">
+            <p class="hoc-micro hoc-range__count">
+              <span class="hoc-index">06</span> / 14
+            </p>
+            <h3 class="hoc-range__name">Soul's Rest</h3>
+            <p class="hoc-micro hoc-micro--accent">Floral · Delicate · Still</p>
+            <ul class="hoc-range__ings"><li><span class="hoc-micro">Oolong</span></li><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-rose"></use></svg><span class="hoc-micro">Dried Rose</span></li><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-hibiscus"></use></svg><span class="hoc-micro">Hibiscus</span></li><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-chamomile"></use></svg><span class="hoc-micro">Chamomile</span></li></ul>
+            <p class="hoc-range__price">
+              <span class="hoc-micro">From</span> €17
+            </p>
+            <div class="hoc-range__actions">
+              <button class="hoc-btn hoc-btn--solid" data-hoc="add" data-blend="souls-rest">Add to bag</button>
+              <a class="hoc-link" href="#blends">View blend</a>
+            </div>
+          </article>
+          <article class="hoc-range__panel"
+                   data-panel-index="6" style="--accent:#6B8B41;--accent-2:#9DB87A;--accent-wash:#E6ECDF;--accent-ink:#405129;--liquid:#6E8A3F"
+                   aria-hidden="true">
+            <p class="hoc-micro hoc-range__count">
+              <span class="hoc-index">07</span> / 14
+            </p>
+            <h3 class="hoc-range__name">Gold Skies</h3>
+            <p class="hoc-micro hoc-micro--accent">Berry · Grassy · Light</p>
+            <ul class="hoc-range__ings"><li><span class="hoc-micro">Green Tea</span></li><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-lemongrass"></use></svg><span class="hoc-micro">Lemongrass</span></li><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-strawberry"></use></svg><span class="hoc-micro">Strawberry</span></li><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-blackberry"></use></svg><span class="hoc-micro">Blackberry</span></li><li><span class="hoc-micro">Butterfly Pea Flower</span></li></ul>
+            <p class="hoc-range__price">
+              <span class="hoc-micro">From</span> €16
+            </p>
+            <div class="hoc-range__actions">
+              <button class="hoc-btn hoc-btn--solid" data-hoc="add" data-blend="gold-skies">Add to bag</button>
+              <a class="hoc-link" href="#blends">View blend</a>
+            </div>
+          </article>
+          <article class="hoc-range__panel"
+                   data-panel-index="7" style="--accent:#89436B;--accent-2:#B67C9D;--accent-wash:#ECDFE6;--accent-ink:#502A40;--liquid:#B04E77"
+                   aria-hidden="true">
+            <p class="hoc-micro hoc-range__count">
+              <span class="hoc-index">08</span> / 14
+            </p>
+            <h3 class="hoc-range__name">Pink Moon</h3>
+            <p class="hoc-micro hoc-micro--accent">Floral · Tropical · Fine</p>
+            <ul class="hoc-range__ings"><li><span class="hoc-micro">Jasmine</span></li><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-pineapple"></use></svg><span class="hoc-micro">Pineapple</span></li><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-hibiscus"></use></svg><span class="hoc-micro">Hibiscus</span></li><li><span class="hoc-micro">White Tea</span></li><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-cinnamon"></use></svg><span class="hoc-micro">Cinnamon Stick</span></li></ul>
+            <p class="hoc-range__price">
+              <span class="hoc-micro">From</span> €18
+            </p>
+            <div class="hoc-range__actions">
+              <button class="hoc-btn hoc-btn--solid" data-hoc="add" data-blend="pink-moon">Add to bag</button>
+              <a class="hoc-link" href="#blends">View blend</a>
+            </div>
+          </article>
+          <article class="hoc-range__panel"
+                   data-panel-index="8" style="--accent:#6C4983;--accent-2:#9E81B1;--accent-wash:#E7E0EB;--accent-ink:#402E4D;--liquid:#B9A44C"
+                   aria-hidden="true">
+            <p class="hoc-micro hoc-range__count">
+              <span class="hoc-index">09</span> / 14
+            </p>
+            <h3 class="hoc-range__name">Innerbloom</h3>
+            <p class="hoc-micro hoc-micro--accent">Floral · Soft · Calm</p>
+            <ul class="hoc-range__ings"><li><span class="hoc-micro">Jasmine</span></li><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-chamomile"></use></svg><span class="hoc-micro">Chamomile</span></li><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-lavender"></use></svg><span class="hoc-micro">Lavender</span></li><li><span class="hoc-micro">Lemon Balm</span></li></ul>
+            <p class="hoc-range__price">
+              <span class="hoc-micro">From</span> €15
+            </p>
+            <div class="hoc-range__actions">
+              <button class="hoc-btn hoc-btn--solid" data-hoc="add" data-blend="innerbloom">Add to bag</button>
+              <a class="hoc-link" href="#blends">View blend</a>
+            </div>
+          </article>
+          <article class="hoc-range__panel"
+                   data-panel-index="9" style="--accent:#8B5241;--accent-2:#B8887A;--accent-wash:#ECE2DF;--accent-ink:#513329;--liquid:#C06A4A"
+                   aria-hidden="true">
+            <p class="hoc-micro hoc-range__count">
+              <span class="hoc-index">10</span> / 14
+            </p>
+            <h3 class="hoc-range__name">White Tea Melody</h3>
+            <p class="hoc-micro hoc-micro--accent">Fruity · Light · Warm</p>
+            <ul class="hoc-range__ings"><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-strawberry"></use></svg><span class="hoc-micro">Strawberry</span></li><li><span class="hoc-micro">White Tea</span></li><li><span class="hoc-micro">Lemon Peel</span></li><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-apple"></use></svg><span class="hoc-micro">Apple</span></li><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-mango"></use></svg><span class="hoc-micro">Mango</span></li><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-cinnamon"></use></svg><span class="hoc-micro">Cinnamon Stick</span></li></ul>
+            <p class="hoc-range__price">
+              <span class="hoc-micro">From</span> €17
+            </p>
+            <div class="hoc-range__actions">
+              <button class="hoc-btn hoc-btn--solid" data-hoc="add" data-blend="white-tea-melody">Add to bag</button>
+              <a class="hoc-link" href="#blends">View blend</a>
+            </div>
+          </article>
+          <article class="hoc-range__panel"
+                   data-panel-index="10" style="--accent:#854785;--accent-2:#B37FB3;--accent-wash:#EBE0EB;--accent-ink:#4E2D4E;--liquid:#8A3B63"
+                   aria-hidden="true">
+            <p class="hoc-micro hoc-range__count">
+              <span class="hoc-index">11</span> / 14
+            </p>
+            <h3 class="hoc-range__name">Reflection</h3>
+            <p class="hoc-micro hoc-micro--accent">Fruity · Tart · Grounded</p>
+            <ul class="hoc-range__ings"><li><span class="hoc-micro">Passionflower</span></li><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-apple"></use></svg><span class="hoc-micro">Apple</span></li><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-lemongrass"></use></svg><span class="hoc-micro">Lemongrass</span></li><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-hibiscus"></use></svg><span class="hoc-micro">Hibiscus</span></li><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-blackberry"></use></svg><span class="hoc-micro">Blackberry</span></li></ul>
+            <p class="hoc-range__price">
+              <span class="hoc-micro">From</span> €15
+            </p>
+            <div class="hoc-range__actions">
+              <button class="hoc-btn hoc-btn--solid" data-hoc="add" data-blend="reflection">Add to bag</button>
+              <a class="hoc-link" href="#blends">View blend</a>
+            </div>
+          </article>
+          <article class="hoc-range__panel"
+                   data-panel-index="11" style="--accent:#975235;--accent-2:#C3886F;--accent-wash:#EEE2DD;--accent-ink:#583323;--liquid:#A85426"
+                   aria-hidden="true">
+            <p class="hoc-micro hoc-range__count">
+              <span class="hoc-index">12</span> / 14
+            </p>
+            <h3 class="hoc-range__name">Winter Tale</h3>
+            <p class="hoc-micro hoc-micro--accent">Spiced · Citrus · Warming</p>
+            <ul class="hoc-range__ings"><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-rooibos"></use></svg><span class="hoc-micro">Rooibos</span></li><li><span class="hoc-micro">Mate</span></li><li><span class="hoc-micro">Fresh Ginger</span></li><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-strawberry"></use></svg><span class="hoc-micro">Strawberry</span></li><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-orange-peel"></use></svg><span class="hoc-micro">Orange Peel</span></li></ul>
+            <p class="hoc-range__price">
+              <span class="hoc-micro">From</span> €16
+            </p>
+            <div class="hoc-range__actions">
+              <button class="hoc-btn hoc-btn--solid" data-hoc="add" data-blend="winter-tale">Add to bag</button>
+              <a class="hoc-link" href="#blends">View blend</a>
+            </div>
+          </article>
+          <article class="hoc-range__panel"
+                   data-panel-index="12" style="--accent:#997A33;--accent-2:#C4AA6E;--accent-wash:#EFE9DC;--accent-ink:#594822;--liquid:#C0752F"
+                   aria-hidden="true">
+            <p class="hoc-micro hoc-range__count">
+              <span class="hoc-index">13</span> / 14
+            </p>
+            <h3 class="hoc-range__name">Wintertide</h3>
+            <p class="hoc-micro hoc-micro--accent">Sweet · Aniseed · Tart</p>
+            <ul class="hoc-range__ings"><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-apple"></use></svg><span class="hoc-micro">Apple</span></li><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-mango"></use></svg><span class="hoc-micro">Mango</span></li><li><span class="hoc-micro">Rosehip</span></li><li><span class="hoc-micro">Fennel</span></li><li><span class="hoc-micro">Passionflower</span></li></ul>
+            <p class="hoc-range__price">
+              <span class="hoc-micro">From</span> €15
+            </p>
+            <div class="hoc-range__actions">
+              <button class="hoc-btn hoc-btn--solid" data-hoc="add" data-blend="wintertide">Add to bag</button>
+              <a class="hoc-link" href="#blends">View blend</a>
+            </div>
+          </article>
+          <article class="hoc-range__panel"
+                   data-panel-index="13" style="--accent:#954437;--accent-2:#C17C71;--accent-wash:#EEDFDD;--accent-ink:#572B24;--liquid:#B03C33"
+                   aria-hidden="true">
+            <p class="hoc-micro hoc-range__count">
+              <span class="hoc-index">14</span> / 14
+            </p>
+            <h3 class="hoc-range__name">Bloomera</h3>
+            <p class="hoc-micro hoc-micro--accent">Spiced · Fruity · Tart</p>
+            <ul class="hoc-range__ings"><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-apple"></use></svg><span class="hoc-micro">Apple</span></li><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-cinnamon"></use></svg><span class="hoc-micro">Cinnamon Stick</span></li><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-hibiscus"></use></svg><span class="hoc-micro">Hibiscus</span></li><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-orange-peel"></use></svg><span class="hoc-micro">Orange Peel</span></li></ul>
+            <p class="hoc-range__price">
+              <span class="hoc-micro">From</span> €14
+            </p>
+            <div class="hoc-range__actions">
+              <button class="hoc-btn hoc-btn--solid" data-hoc="add" data-blend="bloomera">Add to bag</button>
+              <a class="hoc-link" href="#blends">View blend</a>
+            </div>
+          </article>
+            </div>
+            <div class="hoc-range__notes"><p class="hoc-range__note" data-note-index="0">Tart · Cooling · Citrus</p><p class="hoc-range__note" data-note-index="1" aria-hidden="true">Floral · Tart · Warm spice</p><p class="hoc-range__note" data-note-index="2" aria-hidden="true">Mango · Sharp · Grassy</p><p class="hoc-range__note" data-note-index="3" aria-hidden="true">Vanilla · Berry · Woody</p><p class="hoc-range__note" data-note-index="4" aria-hidden="true">Ginger · Mango · Cinnamon</p><p class="hoc-range__note" data-note-index="5" aria-hidden="true">Rose · Tart · Honeyed</p><p class="hoc-range__note" data-note-index="6" aria-hidden="true">Berry · Green · Citrus</p><p class="hoc-range__note" data-note-index="7" aria-hidden="true">Jasmine · Pineapple · Cinnamon</p><p class="hoc-range__note" data-note-index="8" aria-hidden="true">Lavender · Chamomile · Herbal</p><p class="hoc-range__note" data-note-index="9" aria-hidden="true">Strawberry · Mango · Peel</p><p class="hoc-range__note" data-note-index="10" aria-hidden="true">Blackberry · Tart · Citrus</p><p class="hoc-range__note" data-note-index="11" aria-hidden="true">Ginger · Orange · Malty</p><p class="hoc-range__note" data-note-index="12" aria-hidden="true">Rosehip · Fennel · Apple</p><p class="hoc-range__note" data-note-index="13" aria-hidden="true">Cinnamon · Apple · Peel</p></div>
+          </div>
+        </div>
+
+        <ul class="hoc-range__col hoc-range__col--right" data-hoc="range-col" data-speed="0.13">
+          
+          <li class="hoc-range__cell" data-index="0">
+            <div class="hoc-range__pack hoc-shape" style="--accent:#47857D;--accent-2:#7FB3AD;--accent-wash:#E0EBEA;--accent-ink:#2D4E4A;--liquid:#B4324B">
+              <div class="hoc-range__packground" aria-hidden="true"></div>
+              <img
+        src="assets/img/pack-gift-of-nature-420.webp"
+        srcset="assets/img/pack-gift-of-nature-420.webp 420w, assets/img/pack-gift-of-nature-640.webp 640w, assets/img/pack-gift-of-nature-900.webp 900w, assets/img/pack-gift-of-nature-1200.webp 1200w"
+        sizes="(max-width: 899px) 52vw, 22vw"
+        width="900" height="1422"
+        alt="Gift of Nature pack"
+        loading="lazy" decoding="async">
+            </div>
+          </li>
+          <li class="hoc-range__cell" data-index="1">
+            <div class="hoc-range__pack hoc-shape" style="--accent:#553B91;--accent-2:#8A75BD;--accent-wash:#E2DEED;--accent-ink:#342654;--liquid:#2B3A8F">
+              <div class="hoc-range__packground" aria-hidden="true"></div>
+              <img
+        src="assets/img/pack-mystic-butterfly-420.webp"
+        srcset="assets/img/pack-mystic-butterfly-420.webp 420w, assets/img/pack-mystic-butterfly-640.webp 640w, assets/img/pack-mystic-butterfly-900.webp 900w, assets/img/pack-mystic-butterfly-1200.webp 1200w"
+        sizes="(max-width: 899px) 52vw, 22vw"
+        width="900" height="1422"
+        alt="Mystic Butterfly pack"
+        loading="lazy" decoding="async">
+            </div>
+          </li>
+          <li class="hoc-range__cell" data-index="2">
+            <div class="hoc-range__pack hoc-shape" style="--accent:#376395;--accent-2:#7196C1;--accent-wash:#DDE5EE;--accent-ink:#243C57;--liquid:#2F62A8">
+              <div class="hoc-range__packground" aria-hidden="true"></div>
+              <img
+        src="assets/img/pack-mesmerize-420.webp"
+        srcset="assets/img/pack-mesmerize-420.webp 420w, assets/img/pack-mesmerize-640.webp 640w, assets/img/pack-mesmerize-900.webp 900w, assets/img/pack-mesmerize-1200.webp 1200w"
+        sizes="(max-width: 899px) 52vw, 22vw"
+        width="900" height="1422"
+        alt="Mesmerize pack"
+        loading="lazy" decoding="async">
+            </div>
+          </li>
+          <li class="hoc-range__cell" data-index="3">
+            <div class="hoc-range__pack hoc-shape" style="--accent:#913B41;--accent-2:#BD7579;--accent-wash:#EDDEDF;--accent-ink:#542629;--liquid:#A8462F">
+              <div class="hoc-range__packground" aria-hidden="true"></div>
+              <img
+        src="assets/img/pack-sunset-valley-420.webp"
+        srcset="assets/img/pack-sunset-valley-420.webp 420w, assets/img/pack-sunset-valley-640.webp 640w, assets/img/pack-sunset-valley-900.webp 900w, assets/img/pack-sunset-valley-1200.webp 1200w"
+        sizes="(max-width: 899px) 52vw, 22vw"
+        width="900" height="1422"
+        alt="Sunset Valley pack"
+        loading="lazy" decoding="async">
+            </div>
+          </li>
+          <li class="hoc-range__cell" data-index="4">
+            <div class="hoc-range__pack hoc-shape" style="--accent:#9B6231;--accent-2:#C6966C;--accent-wash:#EFE5DC;--accent-ink:#5A3B21;--liquid:#B4682A">
+              <div class="hoc-range__packground" aria-hidden="true"></div>
+              <img
+        src="assets/img/pack-asian-breeze-420.webp"
+        srcset="assets/img/pack-asian-breeze-420.webp 420w, assets/img/pack-asian-breeze-640.webp 640w, assets/img/pack-asian-breeze-900.webp 900w, assets/img/pack-asian-breeze-1200.webp 1200w"
+        sizes="(max-width: 899px) 52vw, 22vw"
+        width="900" height="1422"
+        alt="Asian Breeze pack"
+        loading="lazy" decoding="async">
+            </div>
+          </li>
+          <li class="hoc-range__cell" data-index="5">
+            <div class="hoc-range__pack hoc-shape" style="--accent:#85475E;--accent-2:#B37F92;--accent-wash:#EBE0E4;--accent-ink:#4E2D39;--liquid:#9E4A5E">
+              <div class="hoc-range__packground" aria-hidden="true"></div>
+              <img
+        src="assets/img/pack-souls-rest-420.webp"
+        srcset="assets/img/pack-souls-rest-420.webp 420w, assets/img/pack-souls-rest-640.webp 640w, assets/img/pack-souls-rest-900.webp 900w, assets/img/pack-souls-rest-1200.webp 1200w"
+        sizes="(max-width: 899px) 52vw, 22vw"
+        width="900" height="1422"
+        alt="Soul's Rest pack"
+        loading="lazy" decoding="async">
+            </div>
+          </li>
+          <li class="hoc-range__cell" data-index="6">
+            <div class="hoc-range__pack hoc-shape" style="--accent:#6B8B41;--accent-2:#9DB87A;--accent-wash:#E6ECDF;--accent-ink:#405129;--liquid:#6E8A3F">
+              <div class="hoc-range__packground" aria-hidden="true"></div>
+              <img
+        src="assets/img/pack-gold-skies-420.webp"
+        srcset="assets/img/pack-gold-skies-420.webp 420w, assets/img/pack-gold-skies-640.webp 640w, assets/img/pack-gold-skies-900.webp 900w, assets/img/pack-gold-skies-1200.webp 1200w"
+        sizes="(max-width: 899px) 52vw, 22vw"
+        width="900" height="1422"
+        alt="Gold Skies pack"
+        loading="lazy" decoding="async">
+            </div>
+          </li>
+          <li class="hoc-range__cell" data-index="7">
+            <div class="hoc-range__pack hoc-shape" style="--accent:#89436B;--accent-2:#B67C9D;--accent-wash:#ECDFE6;--accent-ink:#502A40;--liquid:#B04E77">
+              <div class="hoc-range__packground" aria-hidden="true"></div>
+              <img
+        src="assets/img/pack-pink-moon-420.webp"
+        srcset="assets/img/pack-pink-moon-420.webp 420w, assets/img/pack-pink-moon-640.webp 640w, assets/img/pack-pink-moon-900.webp 900w, assets/img/pack-pink-moon-1200.webp 1200w"
+        sizes="(max-width: 899px) 52vw, 22vw"
+        width="900" height="1422"
+        alt="Pink Moon pack"
+        loading="lazy" decoding="async">
+            </div>
+          </li>
+          <li class="hoc-range__cell" data-index="8">
+            <div class="hoc-range__pack hoc-shape" style="--accent:#6C4983;--accent-2:#9E81B1;--accent-wash:#E7E0EB;--accent-ink:#402E4D;--liquid:#B9A44C">
+              <div class="hoc-range__packground" aria-hidden="true"></div>
+              <img
+        src="assets/img/pack-innerbloom-420.webp"
+        srcset="assets/img/pack-innerbloom-420.webp 420w, assets/img/pack-innerbloom-640.webp 640w, assets/img/pack-innerbloom-900.webp 900w, assets/img/pack-innerbloom-1200.webp 1200w"
+        sizes="(max-width: 899px) 52vw, 22vw"
+        width="900" height="1422"
+        alt="Innerbloom pack"
+        loading="lazy" decoding="async">
+            </div>
+          </li>
+          <li class="hoc-range__cell" data-index="9">
+            <div class="hoc-range__pack hoc-shape" style="--accent:#8B5241;--accent-2:#B8887A;--accent-wash:#ECE2DF;--accent-ink:#513329;--liquid:#C06A4A">
+              <div class="hoc-range__packground" aria-hidden="true"></div>
+              <img
+        src="assets/img/pack-white-tea-melody-420.webp"
+        srcset="assets/img/pack-white-tea-melody-420.webp 420w, assets/img/pack-white-tea-melody-640.webp 640w, assets/img/pack-white-tea-melody-900.webp 900w, assets/img/pack-white-tea-melody-1200.webp 1200w"
+        sizes="(max-width: 899px) 52vw, 22vw"
+        width="900" height="1422"
+        alt="White Tea Melody pack"
+        loading="lazy" decoding="async">
+            </div>
+          </li>
+          <li class="hoc-range__cell" data-index="10">
+            <div class="hoc-range__pack hoc-shape" style="--accent:#854785;--accent-2:#B37FB3;--accent-wash:#EBE0EB;--accent-ink:#4E2D4E;--liquid:#8A3B63">
+              <div class="hoc-range__packground" aria-hidden="true"></div>
+              <img
+        src="assets/img/pack-reflection-420.webp"
+        srcset="assets/img/pack-reflection-420.webp 420w, assets/img/pack-reflection-640.webp 640w, assets/img/pack-reflection-900.webp 900w, assets/img/pack-reflection-1200.webp 1200w"
+        sizes="(max-width: 899px) 52vw, 22vw"
+        width="900" height="1422"
+        alt="Reflection pack"
+        loading="lazy" decoding="async">
+            </div>
+          </li>
+          <li class="hoc-range__cell" data-index="11">
+            <div class="hoc-range__pack hoc-shape" style="--accent:#975235;--accent-2:#C3886F;--accent-wash:#EEE2DD;--accent-ink:#583323;--liquid:#A85426">
+              <div class="hoc-range__packground" aria-hidden="true"></div>
+              <img
+        src="assets/img/pack-winter-tale-420.webp"
+        srcset="assets/img/pack-winter-tale-420.webp 420w, assets/img/pack-winter-tale-640.webp 640w, assets/img/pack-winter-tale-900.webp 900w, assets/img/pack-winter-tale-1200.webp 1200w"
+        sizes="(max-width: 899px) 52vw, 22vw"
+        width="900" height="1422"
+        alt="Winter Tale pack"
+        loading="lazy" decoding="async">
+            </div>
+          </li>
+          <li class="hoc-range__cell" data-index="12">
+            <div class="hoc-range__pack hoc-shape" style="--accent:#997A33;--accent-2:#C4AA6E;--accent-wash:#EFE9DC;--accent-ink:#594822;--liquid:#C0752F">
+              <div class="hoc-range__packground" aria-hidden="true"></div>
+              <img
+        src="assets/img/pack-wintertide-420.webp"
+        srcset="assets/img/pack-wintertide-420.webp 420w, assets/img/pack-wintertide-640.webp 640w, assets/img/pack-wintertide-900.webp 900w, assets/img/pack-wintertide-1200.webp 1200w"
+        sizes="(max-width: 899px) 52vw, 22vw"
+        width="900" height="1422"
+        alt="Wintertide pack"
+        loading="lazy" decoding="async">
+            </div>
+          </li>
+          <li class="hoc-range__cell" data-index="13">
+            <div class="hoc-range__pack hoc-shape" style="--accent:#954437;--accent-2:#C17C71;--accent-wash:#EEDFDD;--accent-ink:#572B24;--liquid:#B03C33">
+              <div class="hoc-range__packground" aria-hidden="true"></div>
+              <img
+        src="assets/img/pack-bloomera-420.webp"
+        srcset="assets/img/pack-bloomera-420.webp 420w, assets/img/pack-bloomera-640.webp 640w, assets/img/pack-bloomera-900.webp 900w, assets/img/pack-bloomera-1200.webp 1200w"
+        sizes="(max-width: 899px) 52vw, 22vw"
+        width="900" height="1422"
+        alt="Bloomera pack"
+        loading="lazy" decoding="async">
+            </div>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="hoc-section hoc-horeca" id="hospitality" data-theme="ink"
+             data-header-theme="light">
+      <div class="hoc-horeca__grid">
+        <div class="hoc-horeca__media hoc-shape--lg" data-hoc="parallax">
+          <img class="hoc-par"
+        src="assets/img/scene-hospitality.jpg"
+        srcset="assets/img/scene-hospitality-640.webp 640w, assets/img/scene-hospitality-1024.webp 1024w, assets/img/scene-hospitality-1600.webp 1600w"
+        sizes="(max-width: 899px) 100vw, 58vw"
+        width="1024" height="756"
+        alt="HOC tins on a café counter"
+        loading="lazy" decoding="async">
+        </div>
+        <div class="hoc-horeca__copy">
+          <p class="hoc-micro" data-reveal>HOC / Hospitality</p>
+          <h2 class="hoc-display-l" data-split="lines">HOC, served here.</h2>
+          <p class="hoc-body" data-reveal="up">Botanical blends created for cafés, restaurants and hospitality — loose leaf by the kilo, brewing specs per blend, and iced service that holds through a lunch rush.</p>
+          <ul class="hoc-horeca__points hoc-micro" data-reveal="up">
+            <li>Wholesale pricing</li>
+            <li>Per-blend brew &amp; iced specs</li>
+            <li>Branded glassware &amp; menu assets</li>
+          </ul>
+          <div class="hoc-horeca__cta" data-reveal="up">
+            <a class="hoc-btn hoc-btn--solid" href="#newsletter">Explore HOC for hospitality</a>
+            <a class="hoc-btn" href="#newsletter">Request a sample</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="hoc-section hoc-ritual" id="ritual" data-header-theme="dark"
+             data-hoc="ritual">
+      <div class="hoc-wrap hoc-pad">
+        <header class="hoc-ritual__head">
+          <p class="hoc-micro" data-reveal>The ritual</p>
+          <h2 class="hoc-display-l" data-split="lines">Brew it. Chill it. Make it yours.</h2>
+        </header>
+
+        <div class="hoc-ritual__body">
+          <div class="hoc-ritual__viz" aria-hidden="true">
+            <div class="hoc-ritual__frame is-on" data-frame="0">
+              <svg class="hoc-bot hoc-ritual__bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-hibiscus"></use></svg>
+              <span class="hoc-ritual__data">03 G</span>
+            </div><div class="hoc-ritual__frame" data-frame="1">
+              <svg class="hoc-bot hoc-ritual__bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-lemongrass"></use></svg>
+              <span class="hoc-ritual__data">90 °C</span>
+            </div><div class="hoc-ritual__frame" data-frame="2">
+              <svg class="hoc-bot hoc-ritual__bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-mint"></use></svg>
+              <span class="hoc-ritual__data">05 MIN</span>
+            </div><div class="hoc-ritual__frame" data-frame="3">
+              <svg class="hoc-bot hoc-ritual__bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-butterfly-pea"></use></svg>
+              <span class="hoc-ritual__data">330 ML</span>
+            </div><div class="hoc-ritual__frame" data-frame="4">
+              <svg class="hoc-bot hoc-ritual__bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-orange-peel"></use></svg>
+              <span class="hoc-ritual__data">08 H</span>
+            </div>
+          </div>
+
+          <ol class="hoc-ritual__steps" data-hoc="ritual-steps">
+            
+            <li class="hoc-ritual__step is-on" data-step="0">
+              <button class="hoc-ritual__btn" data-hoc="ritual-step">
+                <span class="hoc-index hoc-micro">01</span>
+                <span class="hoc-ritual__label">Measure</span>
+                <span class="hoc-ritual__copy hoc-body">Three grams per cup. Whole leaf, whole flower — do not grind it.</span>
+              </button>
+            </li>
+            <li class="hoc-ritual__step" data-step="1">
+              <button class="hoc-ritual__btn" data-hoc="ritual-step">
+                <span class="hoc-index hoc-micro">02</span>
+                <span class="hoc-ritual__label">Brew</span>
+                <span class="hoc-ritual__copy hoc-body">Off the boil. Hibiscus and green tea both turn bitter at a rolling boil.</span>
+              </button>
+            </li>
+            <li class="hoc-ritual__step" data-step="2">
+              <button class="hoc-ritual__btn" data-hoc="ritual-step">
+                <span class="hoc-index hoc-micro">03</span>
+                <span class="hoc-ritual__label">Chill</span>
+                <span class="hoc-ritual__copy hoc-body">Steep five minutes, then straight over ice. It should dilute, not fade.</span>
+              </button>
+            </li>
+            <li class="hoc-ritual__step" data-step="3">
+              <button class="hoc-ritual__btn" data-hoc="ritual-step">
+                <span class="hoc-index hoc-micro">04</span>
+                <span class="hoc-ritual__label">Pour</span>
+                <span class="hoc-ritual__copy hoc-body">Tall glass, clear. Half the point of this range is what it looks like.</span>
+              </button>
+            </li>
+            <li class="hoc-ritual__step" data-step="4">
+              <button class="hoc-ritual__btn" data-hoc="ritual-step">
+                <span class="hoc-index hoc-micro">05</span>
+                <span class="hoc-ritual__label">Serve</span>
+                <span class="hoc-ritual__copy hoc-body">Or leave it cold-brewing overnight. Softer, rounder, no bitterness at all.</span>
+              </button>
+            </li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <section class="hoc-section hoc-journal" id="journal" data-header-theme="dark">
+      <div class="hoc-wrap hoc-pad">
+        <header class="hoc-journal__head">
+          <p class="hoc-micro" data-reveal>HOC Journal</p>
+          <h2 class="hoc-display-l" data-split="lines">More ways to drink differently.</h2>
+        </header>
+        <div class="hoc-journal__grid">
+          
+          <article class="hoc-jcard hoc-jcard--lead">
+            <a class="hoc-jcard__link" href="#journal">
+              <div class="hoc-jcard__media hoc-shape--lg">
+                <img class="hoc-jcard__img"
+        src="assets/img/scene-still.jpg"
+        srcset="assets/img/scene-still-640.webp 640w, assets/img/scene-still-1024.webp 1024w, assets/img/scene-still-1600.webp 1600w"
+        sizes="(max-width: 899px) 100vw, 52vw"
+        width="1024" height="700"
+        alt="The perfect cold brew"
+        loading="lazy" decoding="async">
+              </div>
+              <p class="hoc-micro">Method</p>
+              <h3 class="hoc-jcard__title">The perfect cold brew</h3>
+              <p class="hoc-body">Eight hours, no heat, four grams. Why cold water pulls a different tea out of the same leaf.</p>
+            </a>
+          </article>
+          <article class="hoc-jcard">
+            <a class="hoc-jcard__link" href="#journal">
+              <div class="hoc-jcard__media hoc-shape">
+                <img class="hoc-jcard__img"
+        src="assets/img/scene-trio.jpg"
+        srcset="assets/img/scene-trio-640.webp 640w, assets/img/scene-trio-1024.webp 1024w, assets/img/scene-trio-1600.webp 1600w"
+        sizes="(max-width: 899px) 100vw, 26vw"
+        width="1024" height="710"
+        alt="Hibiscus over ice"
+        loading="lazy" decoding="async">
+              </div>
+              <p class="hoc-micro">Serve</p>
+              <h3 class="hoc-jcard__title">Hibiscus over ice</h3>
+              <p class="hoc-body">The one blend that gets better as it dilutes — and how to build it in a tall glass.</p>
+            </a>
+          </article>
+          <article class="hoc-jcard">
+            <a class="hoc-jcard__link" href="#journal">
+              <div class="hoc-jcard__media hoc-shape">
+                <img class="hoc-jcard__img"
+        src="assets/img/scene-tin.jpg"
+        srcset="assets/img/scene-tin-640.webp 640w, assets/img/scene-tin-1024.webp 1024w, assets/img/scene-tin-1600.webp 1600w"
+        sizes="(max-width: 899px) 100vw, 26vw"
+        width="1024" height="1138"
+        alt="Tea pairings for long evenings"
+        loading="lazy" decoding="async">
+              </div>
+              <p class="hoc-micro">Table</p>
+              <h3 class="hoc-jcard__title">Tea pairings for long evenings</h3>
+              <p class="hoc-body">What to pour after the plates are cleared and nobody wants another coffee.</p>
+            </a>
+          </article>
+        </div>
+      </div>
+    </section>
+</main>
+
+
+    <section class="hoc-section hoc-news" id="newsletter" data-theme="ink"
+             data-header-theme="light">
+      <div class="hoc-wrap hoc-pad">
+        <div class="hoc-news__inner">
+          <h2 class="hoc-display-xl" data-split="lines">Stay steeped.</h2>
+          <form class="hoc-news__form" data-hoc="newsletter" novalidate>
+            <label class="hoc-micro" for="hoc-email">Join the HOC list.</label>
+            <div class="hoc-news__field">
+              <input id="hoc-email" name="email" type="email" autocomplete="email"
+                     placeholder="you@example.com" required>
+              <button class="hoc-btn" type="submit">Join</button>
+            </div>
+            <p class="hoc-news__msg hoc-micro" data-hoc="newsletter-msg" role="status"></p>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <footer class="hoc-section hoc-footer" data-theme="ink" data-header-theme="light">
+      <div class="hoc-wrap">
+        <div class="hoc-footer__grid">
+          <div class="hoc-footer__brand">
+            <a class="hoc-lockup" href="#hero" aria-label="HOC Tea — home">
+              <svg class="hoc-mark" viewBox="0 0 120 120" aria-hidden="true"><use href="#hoc-mark"></use></svg>
+              <span class="hoc-lockup__word">Hoctea</span>
+            </a>
+            <p class="hoc-micro hoc-footer__tag">Tea &amp; More</p>
+          </div>
+          
+          <nav class="hoc-footer__col" aria-label="Shop">
+            <p class="hoc-micro hoc-footer__h">Shop</p>
+            <ul><li><a href="#range">All blends</a></li><li><a href="#range">Iced tea</a></li><li><a href="#range">Gifting</a></li><li><a href="#range">Tins &amp; refills</a></li></ul>
+          </nav>
+          <nav class="hoc-footer__col" aria-label="Ritual">
+            <p class="hoc-micro hoc-footer__h">Ritual</p>
+            <ul><li><a href="#range">How to brew</a></li><li><a href="#range">Cold brew</a></li><li><a href="#range">Ingredient atlas</a></li><li><a href="#range">Journal</a></li></ul>
+          </nav>
+          <nav class="hoc-footer__col" aria-label="Hospitality">
+            <p class="hoc-micro hoc-footer__h">Hospitality</p>
+            <ul><li><a href="#range">For cafés</a></li><li><a href="#range">For hotels</a></li><li><a href="#range">Request a sample</a></li><li><a href="#range">Wholesale</a></li></ul>
+          </nav>
+          <nav class="hoc-footer__col" aria-label="Story">
+            <p class="hoc-micro hoc-footer__h">Story</p>
+            <ul><li><a href="#range">About HOC</a></li><li><a href="#range">Sourcing</a></li><li><a href="#range">Contact</a></li><li><a href="#range">Instagram</a></li></ul>
+          </nav>
+        </div>
+
+        <svg class="hoc-footer__sprig" viewBox="0 0 900 100" aria-hidden="true"
+             data-hoc="draw"><use href="#b-branch"></use></svg>
+
+        <div class="hoc-footer__legal hoc-micro">
+          <p>&copy; 2026 HOC Tea</p>
+          <p><a href="#newsletter">Legal</a> · <a href="#newsletter">Privacy</a> · <a href="#newsletter">Shipping</a></p>
+        </div>
+      </div>
+    </footer>
+
+  <div class="hoc-drawer" data-hoc="drawer" role="dialog" aria-modal="true"
+       aria-label="Bag" hidden>
+    <div class="hoc-drawer__scrim" data-hoc="drawer-close"></div>
+    <div class="hoc-drawer__panel">
+      <header class="hoc-drawer__head">
+        <p class="hoc-micro">Your bag (<span data-hoc="bag-count">0</span>)</p>
+        <button class="hoc-link" data-hoc="drawer-close">Close</button>
+      </header>
+      <div class="hoc-drawer__body" data-hoc="drawer-items">
+        <p class="hoc-drawer__empty hoc-body">Nothing steeping yet.</p>
+      </div>
+      <footer class="hoc-drawer__foot">
+        <div class="hoc-drawer__total hoc-micro">
+          <span>Subtotal</span><span data-hoc="bag-total">€0</span>
+        </div>
+        <button class="hoc-btn hoc-btn--solid" data-hoc="checkout">Checkout</button>
+      </footer>
+    </div>
+  </div>
+
+<!-- Icon sprites, inlined so the botanical line art is available to DrawSVG
+     without a network round-trip. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="hoc-mark" viewBox="0 0 120 120">
+  <!-- HOC mark, traced from Logo/black-png.png.
+
+       Plate: 120x120. Top-left and bottom-right rounded at 24 (20% of the
+       side); top-right and bottom-left square. That asymmetry is the brand
+       shape primitive reused across media frames, the cart drawer and CTAs (§4).
+
+       Letter geometry is measured, not eyeballed: H stems sit at x 12.2 / 35.5,
+       the tag runs x 48.5-71.5, the C is r12 about (95.5, 89.7), and every one
+       of them spans y 75.7-103.7. -->
+  <path class="hoc-mark__plate"
+        d="M24 0 H120 V96 A24 24 0 0 1 96 120 H0 V24 A24 24 0 0 1 24 0 Z"
+        fill="currentColor"/>
+  <g class="hoc-mark__art" fill="none" stroke="var(--hoc-mark-ink, #F1EFE8)"
+     stroke-linecap="round" stroke-linejoin="round">
+    <!-- sprout: two leaves meeting at the stem head -->
+    <g stroke-width="2.4">
+      <path d="M59 51 C41 51 29 41 27.5 26.5 C42 25 55 33 59 47 Z"/>
+      <path d="M61 51 C79 51 91 41 92.5 26.5 C78 25 65 33 61 47 Z"/>
+    </g>
+    <g stroke-width="1.5">
+      <path d="M31 29 L52 43"/>
+      <path d="M35.5 26 L35.5 35"/>
+      <path d="M43 27.5 L43 39.5"/>
+      <path d="M31.5 36 L41 36"/>
+      <path d="M89 29 L68 43"/>
+      <path d="M84.5 26 L84.5 35"/>
+      <path d="M77 27.5 L77 39.5"/>
+      <path d="M88.5 36 L79 36"/>
+    </g>
+    <!-- stem into the tag -->
+    <path d="M60 51 V74" stroke-width="2.6"/>
+    <!-- tag: the O of HOC -->
+    <path d="M60 74.2 L71.5 84 V102.4 H48.5 V84 Z" stroke-width="2.6"/>
+    <!-- H -->
+    <path d="M12.2 75.7 V103.7 M12.2 88 H35.5 M35.5 75.7 V103.7" stroke-width="3.1"/>
+    <!-- C -->
+    <path d="M104 81.2 A12 12 0 1 0 104 98.2" stroke-width="3.1"/>
+  </g>
+</symbol></svg>
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+<!-- ==========================================================================
+     HOC TEA — botanical sprite.
+
+     Single-stroke line art in the packaging illustration language. Every shape
+     is an open or closed <path> with no fill, so GSAP DrawSVG can draw it on
+     (§16, §22). viewBox is 100x100 for all symbols; stroke-width is set by the
+     consumer via CSS so the same drawing works at 40px and at 400px.
+
+     Production note §50: these are authored, not traced. When the packaging
+     vectors arrive as AI/PDF, swap the <path> data — the ids and viewBox are
+     the contract and nothing else has to change.
+     ========================================================================== -->
+
+<defs>
+  <g id="b-petal-hibiscus">
+    <path d="M50 50 C41 43 37 31 41 22 C44 15 56 15 59 22 C63 31 59 43 50 50 Z"/>
+  </g>
+</defs>
+
+<symbol id="b-hibiscus" viewBox="0 0 100 100">
+  <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+    <use href="#b-petal-hibiscus" transform="rotate(0 50 50)"/>
+    <use href="#b-petal-hibiscus" transform="rotate(72 50 50)"/>
+    <use href="#b-petal-hibiscus" transform="rotate(144 50 50)"/>
+    <use href="#b-petal-hibiscus" transform="rotate(216 50 50)"/>
+    <use href="#b-petal-hibiscus" transform="rotate(288 50 50)"/>
+    <!-- the long protruding staminal column hibiscus is known for -->
+    <path d="M50 50 C56 61 61 70 65 79"/>
+    <circle cx="66" cy="82" r="2"/>
+    <circle cx="60.5" cy="72.5" r="1.5"/>
+    <circle cx="70" cy="77" r="1.5"/>
+    <circle cx="50" cy="50" r="3.4"/>
+  </g>
+</symbol>
+
+<symbol id="b-mint" viewBox="0 0 100 100">
+  <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M50 92 C50 74 50 46 50 16"/>
+    <path d="M50 68 C40 68 30 62 26 51 C36 47 47 53 50 62 Z"/>
+    <path d="M50 68 C60 68 70 62 74 51 C64 47 53 53 50 62 Z"/>
+    <path d="M50 46 C42 46 33 41 29 32 C38 28 47 33 50 41 Z"/>
+    <path d="M50 46 C58 46 67 41 71 32 C62 28 53 33 50 41 Z"/>
+    <path d="M50 27 C44 27 38 23 35 17 C42 14 48 18 50 23 Z"/>
+    <path d="M50 27 C56 27 62 23 65 17 C58 14 52 18 50 23 Z"/>
+    <path d="M33 53 l14 8 M36 34 l12 7 M67 53 l-14 8 M64 34 l-12 7"/>
+  </g>
+</symbol>
+
+<symbol id="b-lemongrass" viewBox="0 0 100 100">
+  <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M46 94 C40 70 30 46 12 26 C34 36 46 60 50 88"/>
+    <path d="M50 94 C50 66 52 38 58 10 C62 40 58 70 54 94"/>
+    <path d="M54 94 C62 72 74 50 92 32 C76 54 66 72 58 92"/>
+    <path d="M48 94 C46 78 42 62 33 48"/>
+    <path d="M44 90 h14"/>
+  </g>
+</symbol>
+
+<symbol id="b-butterfly-pea" viewBox="0 0 100 100">
+  <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Clitoria ternatea: one broad fan-shaped standard petal that narrows to
+         the calyx, with the keel folded out below it. -->
+    <path d="M50 74 C29 70 15 55 16 38 C30 24 70 24 84 38 C85 55 71 70 50 74 Z"/>
+    <path d="M50 74 C47 60 46 46 48 33 M50 74 C53 60 54 46 52 33"/>
+    <path d="M26 33 C33 45 40 58 46 70 M74 33 C67 45 60 58 54 70"/>
+    <path d="M36 27 C40 42 43 57 47 72 M64 27 C60 42 57 57 53 72"/>
+    <!-- calyx + keel -->
+    <path d="M50 74 L50 84"/>
+    <path d="M43 82 C46 89 54 89 57 82"/>
+    <path d="M50 88 L50 96"/>
+  </g>
+</symbol>
+
+<symbol id="b-cinnamon" viewBox="0 0 100 100">
+  <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+    <!-- a quill, seen slightly from above so the roll is visible -->
+    <path d="M36 22 L40 84 C40 89 44 92 50 92 C56 92 60 89 60 84 L64 22"/>
+    <path d="M50 14 C58 14 64 17 64 21 C64 25 58 28 50 28 C42 28 36 25 36 21 C36 17 42 14 50 14 Z"/>
+    <path d="M44 21 C45 18 49 17 53 18 C56 19 57 21 55 22 C53 23 51 22 51 21"/>
+    <path d="M46 28 L48 86 M56 27 L54 86" stroke-opacity=".7"/>
+  </g>
+</symbol>
+
+<symbol id="b-mango" viewBox="0 0 100 100">
+  <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M62 22 C40 22 22 40 22 60 C22 76 34 86 50 86 C70 86 84 68 84 46 C84 32 76 22 62 22 Z"/>
+    <path d="M62 22 C58 30 54 42 54 56"/>
+    <path d="M62 22 C66 16 72 12 80 11 C79 18 74 22 68 23"/>
+    <path d="M62 22 L62 12"/>
+  </g>
+</symbol>
+
+<symbol id="b-pineapple" viewBox="0 0 100 100">
+  <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M50 36 C34 36 26 48 26 62 C26 78 36 90 50 90 C64 90 74 78 74 62 C74 48 66 36 50 36 Z"/>
+    <path d="M31 50 L69 74 M31 66 L60 86 M40 42 L74 62 M69 50 L31 74 M69 66 L40 86 M60 42 L26 62"/>
+    <path d="M50 36 C50 26 46 16 40 10 C48 12 52 20 52 30"/>
+    <path d="M50 36 C52 26 58 16 66 12 C64 22 58 30 52 34"/>
+    <path d="M50 36 C46 28 42 22 34 18 C38 26 42 32 47 36"/>
+  </g>
+</symbol>
+
+<symbol id="b-strawberry" viewBox="0 0 100 100">
+  <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M50 90 C32 78 24 62 24 48 C24 36 34 30 44 34 C47 35 49 36 50 38 C51 36 53 35 56 34 C66 30 76 36 76 48 C76 62 68 78 50 90 Z"/>
+    <path d="M50 34 L50 20"/>
+    <path d="M50 26 C44 22 36 21 30 24 C34 30 42 32 48 30"/>
+    <path d="M50 26 C56 22 64 21 70 24 C66 30 58 32 52 30"/>
+    <path d="M38 48 h.01 M50 52 h.01 M62 48 h.01 M44 62 h.01 M56 62 h.01 M50 74 h.01"
+          stroke-linecap="round" stroke-width="3"/>
+  </g>
+</symbol>
+
+<symbol id="b-apple" viewBox="0 0 100 100">
+  <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M50 32 C44 26 34 26 28 34 C20 44 22 62 32 76 C38 84 44 86 50 82 C56 86 62 84 68 76 C78 62 80 44 72 34 C66 26 56 26 50 32 Z"/>
+    <path d="M50 32 L50 16"/>
+    <path d="M50 22 C56 14 66 12 74 14 C72 24 62 28 54 26"/>
+  </g>
+</symbol>
+
+<symbol id="b-lavender" viewBox="0 0 100 100">
+  <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M50 94 L50 44"/>
+    <path d="M50 44 C43 42 40 36 43 31 C46 27 52 28 53 33"/>
+    <path d="M50 34 C43 32 40 26 43 21 C46 17 52 18 53 23"/>
+    <path d="M50 24 C44 22 42 17 44 13 C47 9 52 10 53 15"/>
+    <path d="M50 44 C57 42 60 36 57 31 C54 27 48 28 47 33"/>
+    <path d="M50 34 C57 32 60 26 57 21 C54 17 48 18 47 23"/>
+    <path d="M50 14 C51 10 50 6 48 4"/>
+    <path d="M50 66 C42 66 36 62 33 55 C40 54 47 58 50 63"/>
+    <path d="M50 66 C58 66 64 62 67 55 C60 54 53 58 50 63"/>
+  </g>
+</symbol>
+
+<symbol id="b-chamomile" viewBox="0 0 100 100">
+  <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+    <g id="b-cham-petals">
+      <path d="M50 38 C46 30 46 20 50 12 C54 20 54 30 50 38 Z" transform="rotate(0 50 46)"/>
+      <path d="M50 38 C46 30 46 20 50 12 C54 20 54 30 50 38 Z" transform="rotate(45 50 46)"/>
+      <path d="M50 38 C46 30 46 20 50 12 C54 20 54 30 50 38 Z" transform="rotate(90 50 46)"/>
+      <path d="M50 38 C46 30 46 20 50 12 C54 20 54 30 50 38 Z" transform="rotate(135 50 46)"/>
+      <path d="M50 38 C46 30 46 20 50 12 C54 20 54 30 50 38 Z" transform="rotate(180 50 46)"/>
+      <path d="M50 38 C46 30 46 20 50 12 C54 20 54 30 50 38 Z" transform="rotate(225 50 46)"/>
+      <path d="M50 38 C46 30 46 20 50 12 C54 20 54 30 50 38 Z" transform="rotate(270 50 46)"/>
+      <path d="M50 38 C46 30 46 20 50 12 C54 20 54 30 50 38 Z" transform="rotate(315 50 46)"/>
+    </g>
+    <circle cx="50" cy="46" r="7.5"/>
+    <path d="M50 80 L50 96 M50 86 C44 84 41 80 41 75 C46 75 49 78 50 82"/>
+  </g>
+</symbol>
+
+<symbol id="b-ginger" viewBox="0 0 100 100">
+  <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+    <!-- rhizome: one long body with knuckles and two finger shoots -->
+    <path d="M16 46 C12 38 17 30 26 30 C34 30 39 36 40 43
+             C46 38 56 37 62 41 C70 34 82 36 86 44
+             C90 52 85 61 76 61 C70 61 65 58 63 53
+             C58 60 48 62 41 58 C38 66 30 69 23 65 C16 61 14 53 16 46 Z"/>
+    <path d="M40 43 C41 48 41 54 41 58"/>
+    <path d="M62 41 C62 46 62 50 63 53"/>
+    <path d="M26 30 C25 24 27 18 32 15"/>
+    <path d="M76 61 C79 67 79 74 76 80"/>
+    <path d="M50 44 C50 48 50 52 49 56" stroke-opacity=".7"/>
+  </g>
+</symbol>
+
+<symbol id="b-orange-peel" viewBox="0 0 100 100">
+  <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M78 16 C58 12 34 22 26 42 C18 62 28 84 48 88 C62 91 74 82 76 70 C78 58 70 48 58 48 C48 48 42 56 44 64 C46 71 54 74 59 70"/>
+    <path d="M78 16 C68 20 60 26 54 34 C46 24 40 20 32 18"/>
+  </g>
+</symbol>
+
+<symbol id="b-rooibos" viewBox="0 0 100 100">
+  <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M50 94 C50 70 52 44 58 16"/>
+    <path d="M53 74 C44 70 34 66 24 66 M53 74 C60 66 68 60 78 56"/>
+    <path d="M54 60 C45 56 36 51 28 48 M54 60 C61 52 70 46 80 42"/>
+    <path d="M56 44 C48 40 40 35 33 31 M56 44 C63 37 71 31 80 27"/>
+    <path d="M58 28 C52 24 46 20 41 17 M58 28 C64 22 71 17 78 14"/>
+  </g>
+</symbol>
+
+<symbol id="b-rose" viewBox="0 0 100 100">
+  <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M50 20 C34 20 22 32 22 48 C22 64 34 76 50 76 C66 76 78 64 78 48 C78 32 66 20 50 20 Z"/>
+    <path d="M50 32 C41 32 34 39 34 48 C34 57 41 64 50 64 C59 64 66 57 66 48"/>
+    <path d="M50 42 C45 42 42 45 42 49 C42 53 45 56 50 56 C54 56 57 53 57 49"/>
+    <path d="M28 36 C34 30 42 26 50 26 M72 60 C66 68 58 72 50 72"/>
+    <path d="M50 76 L50 94 M50 84 C44 82 40 78 39 72 C45 72 49 76 50 80"/>
+  </g>
+</symbol>
+
+<symbol id="b-blackberry" viewBox="0 0 100 100">
+  <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="50" cy="34" r="9"/>
+    <circle cx="36" cy="46" r="9"/>
+    <circle cx="64" cy="46" r="9"/>
+    <circle cx="43" cy="62" r="9"/>
+    <circle cx="57" cy="62" r="9"/>
+    <circle cx="50" cy="48" r="8"/>
+    <path d="M50 25 L50 12"/>
+    <path d="M50 18 C43 16 38 12 36 6 C44 6 49 10 51 15"/>
+    <path d="M50 18 C57 16 62 12 64 6 C56 6 51 10 49 15"/>
+  </g>
+</symbol>
+
+<!-- Decorative sprig used as the footer / manifesto ground mark §22 -->
+<symbol id="b-sprig" viewBox="0 0 200 100">
+  <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M10 88 C50 84 96 68 128 42 C146 27 166 18 190 14"/>
+    <path d="M52 80 C48 70 50 58 58 51 C64 58 63 71 56 79 Z"/>
+    <path d="M78 70 C74 60 76 48 84 41 C90 48 89 61 82 69 Z"/>
+    <path d="M104 56 C100 46 102 34 110 27 C116 34 115 47 108 55 Z"/>
+    <path d="M130 40 C128 30 132 19 141 14 C145 22 142 34 134 39 Z"/>
+    <path d="M40 84 C32 80 26 72 26 62 C34 64 40 72 41 81 Z"/>
+    <path d="M66 74 C58 71 51 63 50 53 C58 55 65 62 67 71 Z"/>
+    <path d="M92 62 C84 59 77 51 76 41 C84 43 91 50 93 59 Z"/>
+    <circle cx="118" cy="49" r="3"/>
+    <circle cx="150" cy="26" r="3"/>
+    <circle cx="70" cy="80" r="3"/>
+  </g>
+</symbol>
+<symbol id="b-branch" viewBox="0 0 900 100">
+  <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M8.0 78.0 Q22.7 77.9 37.5 77.7 Q52.2 77.5 66.9 77.4 Q81.7 77.2 96.4 77.0 Q111.1 76.7 125.9 76.4 Q140.6 76.1 155.3 75.8 Q170.1 75.4 184.8 74.9 Q199.5 74.4 214.3 73.9 Q229.0 73.3 243.7 72.7 Q258.5 72.0 273.2 71.2 Q287.9 70.4 302.7 69.5 Q317.4 68.6 332.1 67.6 Q346.9 66.6 361.6 65.5 Q376.3 64.4 391.1 63.2 Q405.8 62.0 420.5 60.8 Q435.3 59.5 450.0 58.2 Q464.7 56.8 479.5 55.5 Q494.2 54.1 508.9 52.7 Q523.7 51.3 538.4 50.0 Q553.1 48.6 567.9 47.2 Q582.6 45.8 597.3 44.5 Q612.1 43.2 626.8 41.9 Q641.5 40.6 656.3 39.4 Q671.0 38.2 685.7 37.0 Q700.5 35.9 715.2 34.9 Q729.9 33.9 744.7 32.9 Q759.4 32.0 774.1 31.2 Q788.9 30.4 803.6 29.6 Q818.3 29.0 833.1 28.3 Q847.8 27.8 862.5 27.2 Q877.3 26.8 892.0 26.3"/>
+    <path d="M56.6 77.5 C61.0 85.8 65.8 89.1 69.3 86.4 C65.7 78.6 60.9 75.2 56.6 77.5 Z"/>
+    <path d="M109.7 76.7 C115.3 65.4 121.7 60.6 126.5 64.3 C121.9 74.9 115.5 79.6 109.7 76.7 Z"/>
+    <path d="M162.7 75.6 C166.8 83.0 171.2 86.0 174.4 83.5 C171.0 76.5 166.5 73.5 162.7 75.6 Z"/>
+    <path d="M215.7 73.8 C218.4 68.1 221.5 65.7 224.0 67.5 C221.8 72.8 218.7 75.2 215.7 73.8 Z"/>
+    <path d="M268.8 71.4 C274.3 80.9 280.2 84.7 284.1 81.2 C279.5 72.3 273.7 68.6 268.8 71.4 Z"/>
+    <path d="M321.8 68.3 C326.6 57.3 332.5 52.5 337.2 55.7 C333.3 66.0 327.5 70.8 321.8 68.3 Z"/>
+    <path d="M374.9 64.5 C378.6 70.5 382.3 72.8 384.8 70.5 C381.7 64.9 377.9 62.6 374.9 64.5 Z"/>
+    <path d="M427.9 60.1 C430.7 53.4 434.2 50.4 437.1 52.3 C434.9 58.6 431.4 61.6 427.9 60.1 Z"/>
+    <path d="M480.9 55.4 C487.5 65.7 494.2 69.5 498.4 65.5 C492.9 55.8 486.2 52.0 480.9 55.4 Z"/>
+    <path d="M534.0 50.4 C538.0 40.5 543.0 36.1 547.3 38.8 C544.2 48.0 539.1 52.4 534.0 50.4 Z"/>
+    <path d="M587.0 45.4 C590.3 50.6 593.7 52.6 595.8 50.6 C593.1 45.7 589.7 43.7 587.0 45.4 Z"/>
+    <path d="M640.1 40.7 C643.4 32.5 647.7 28.9 651.2 31.2 C648.5 38.9 644.3 42.5 640.1 40.7 Z"/>
+    <path d="M693.1 36.5 C699.7 47.3 706.6 51.4 711.1 47.4 C705.5 37.2 698.7 33.1 693.1 36.5 Z"/>
+    <path d="M746.1 32.8 C749.8 24.6 754.1 21.0 757.7 23.4 C754.8 31.1 750.4 34.7 746.1 32.8 Z"/>
+    <path d="M799.2 29.8 C802.3 35.2 805.5 37.2 807.7 35.3 C805.2 30.3 801.9 28.3 799.2 29.8 Z"/>
+    <path d="M852.2 27.6 C856.7 18.0 862.0 14.0 866.1 16.9 C862.4 25.9 857.1 29.9 852.2 27.6 Z"/>
+    <circle cx="177.3" cy="85.4" r="2.6"/>
+    <circle cx="439.4" cy="50.3" r="2.6"/>
+    <circle cx="715.5" cy="50.1" r="2.6"/>
+  </g>
+</symbol>
+</svg>
+
+
+<script src="assets/vendor/gsap.min.js"></script>
+<script src="assets/vendor/ScrollTrigger.min.js"></script>
+<script src="assets/vendor/SplitText.min.js"></script>
+<script src="assets/vendor/CustomEase.min.js"></script>
+<script src="assets/vendor/DrawSVGPlugin.min.js"></script>
+<script src="assets/vendor/Flip.min.js"></script>
+<script src="assets/vendor/ScrambleTextPlugin.min.js"></script>
+<script src="assets/vendor/Observer.min.js"></script>
+<script src="assets/vendor/lenis.min.js"></script>
+<script src="assets/vendor/embla-carousel.umd.js"></script>
+
+<script src="assets/js/hoc-data.js"></script>
+<script src="assets/js/hoc-core.js"></script>
+<script src="assets/js/hoc-webgl.js"></script>
+<script src="assets/js/hoc-motion.js"></script>
+</body>
+</html>

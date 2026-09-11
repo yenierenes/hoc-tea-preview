@@ -1,0 +1,2041 @@
+/* ==========================================================================
+   HOC TEA — hoc-sections.css
+   One block per homepage section, in page order. Depends on hoc-core.css.
+   ========================================================================== */
+
+/* ==========================================================================
+   01  HERO  §10
+
+   LIGHT-KEY. The delivered film is shot on a pale mint set — silver tins,
+   white doypack, crimson liquid as the only saturated note. Overlay type is
+   therefore INK, and the scrim lifts the plate toward bone rather than
+   crushing it toward black.
+
+   (The earlier dark treatment was a response to having no film. Grading this
+   footage down would have thrown away the art direction that makes it good.)
+   ========================================================================== */
+
+.hoc-hero {
+  position: relative;
+  height: 100svh;
+  min-height: 620px;
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+  /* Sampled off the film's set, so there is no colour jump before it paints. */
+  background: #bfcfcb;
+  color: var(--hoc-ink);
+}
+@media (min-width: 1024px) {
+  .hoc-hero {
+    min-height: 760px;
+  }
+}
+
+.hoc-hero__media {
+  position: absolute;
+  inset: 0;
+}
+.hoc-hero__media > picture,
+.hoc-hero__poster,
+.hoc-hero__video,
+.hoc-hero__gl {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.hoc-hero__poster,
+.hoc-hero__video {
+  object-fit: cover;
+}
+/* Portrait: the film is 16:9, so cover crops the sides hard. Bias the crop to
+   the product cluster — the same crop build-poster.py uses for the 3:4
+   poster, so the two never disagree (§42). */
+@media (max-width: 767px) {
+  .hoc-hero__poster,
+  .hoc-hero__video {
+    object-position: 55% center;
+  }
+}
+.hoc-hero__video {
+  opacity: 0;
+  transition: opacity var(--t-scene) var(--e-hoc);
+}
+.hoc-hero__video.is-playing {
+  opacity: 1;
+}
+/* The GL layer paints the plate back through a shader; it fades in only once
+   the first frame is up, so there is never a flash. */
+.hoc-hero__gl {
+  opacity: 0;
+  transition: opacity 0.9s var(--e-hoc);
+}
+.hoc-hero__gl.is-live {
+  opacity: 1;
+}
+
+/* Bone wash from the bottom-left, where the copy sits.
+
+   Three layers, not one. The two linear washes set the general falloff; the
+   radial is anchored on the copy block specifically, because the film has one
+   moment — crimson diffusing through the pitcher at ~4.8s — where a dark
+   ribbon crosses the headline. Measured with tools/hero-contrast.mjs: without
+   the radial, 8.2% of the area behind the headline drops under 4.5:1 at that
+   frame while every other frame sits at 0%. Washing the whole plate harder
+   would have fixed it too, at the cost of flattening the film for the other
+   nine seconds. */
+.hoc-hero__scrim {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+      64% 68% at 15% 70%,
+      rgb(241 239 232 / 0.78) 0%,
+      rgb(241 239 232 / 0.40) 44%,
+      rgb(241 239 232 / 0) 80%
+    ),
+    linear-gradient(
+      to top,
+      rgb(241 239 232 / 0.88) 0%,
+      rgb(241 239 232 / 0.66) 26%,
+      rgb(241 239 232 / 0.12) 58%,
+      rgb(241 239 232 / 0) 100%
+    ),
+    linear-gradient(to right, rgb(241 239 232 / 0.70), rgb(241 239 232 / 0) 52%);
+}
+@media (max-width: 767px) {
+  .hoc-hero__scrim {
+    background: linear-gradient(
+      to top,
+      rgb(241 239 232 / 0.95) 0%,
+      rgb(241 239 232 / 0.86) 30%,
+      rgb(241 239 232 / 0.28) 62%,
+      rgb(241 239 232 / 0) 100%
+    );
+  }
+}
+
+.hoc-hero__copy {
+  position: relative;
+  width: 100%;
+  padding-bottom: clamp(2.5rem, 12vh, 8rem);
+  color: var(--hoc-ink);
+}
+.hoc-hero__copy .hoc-micro {
+  color: rgb(35 35 34 / 0.62);
+  margin-bottom: clamp(1rem, 2vh, 1.75rem);
+}
+/* Three lines, not two. Keeps the headline clear of the centred logo card in
+   the film's closing beat, and stacks better in display serif.
+
+   Measured in em, not ch: `ch` is the width of "0", which in Instrument Serif
+   is far narrower than the average glyph — 12ch measured out at 636px and let
+   "Nature, steeped" (566px) sit on one line. 4.1em is just under the width of
+   that phrase and just over "differently.", which is exactly the break we
+   want, and it scales with the clamped font size instead of fighting it. */
+.hoc-hero__h1 {
+  max-width: 4.1em;
+  margin-bottom: clamp(1.25rem, 3vh, 2rem);
+}
+.hoc-hero__copy .hoc-lede {
+  color: rgb(35 35 34 / 0.78);
+  margin-bottom: clamp(1.75rem, 4vh, 2.75rem);
+}
+.hoc-hero__cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+.hoc-hero__cta .hoc-btn {
+  --btn-fg: var(--hoc-ink);
+  --btn-edge: rgb(35 35 34 / 0.42);
+}
+.hoc-hero__cta .hoc-btn:hover,
+.hoc-hero__cta .hoc-btn:focus-visible {
+  color: var(--hoc-bone);
+}
+.hoc-hero__cta .hoc-btn--solid {
+  --btn-bg: var(--hoc-ink);
+  --btn-edge: var(--hoc-ink);
+  color: var(--hoc-bone);
+}
+.hoc-hero__cta .hoc-btn--solid::before {
+  background: var(--hoc-teal);
+}
+.hoc-hero__cta .hoc-btn--solid:hover,
+.hoc-hero__cta .hoc-btn--solid:focus-visible {
+  color: #fff;
+  border-color: var(--hoc-teal);
+}
+
+.hoc-hero__foot {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: clamp(1.25rem, 3vh, 2rem);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.9rem;
+  color: rgb(35 35 34 / 0.5);
+  pointer-events: none;
+}
+.hoc-hero__rule {
+  display: block;
+  width: 64px;
+  height: 1px;
+  background: currentColor;
+  transform-origin: right;
+  animation: hoc-scrollrule 2.6s var(--e-hoc) infinite;
+}
+@keyframes hoc-scrollrule {
+  0%,
+  100% {
+    transform: scaleX(0.25);
+    opacity: 0.4;
+  }
+  50% {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+}
+@media (max-width: 767px) {
+  .hoc-hero__foot {
+    display: none;
+  }
+}
+
+/* ==========================================================================
+   02  FEATURED BLENDS  §11
+   ========================================================================== */
+
+.hoc-featured {
+  padding-block: var(--space-section) clamp(4rem, 8vh, 7rem);
+  overflow: hidden;
+  transition: background-color var(--t-scene) var(--e-hoc);
+}
+.hoc-featured__head {
+  margin-bottom: clamp(2.5rem, 6vh, 5rem);
+}
+.hoc-featured__head .hoc-micro {
+  margin-bottom: 1rem;
+}
+.hoc-featured__head h2 {
+  max-width: 12ch;
+}
+
+.hoc-featured__body {
+  display: grid;
+  gap: clamp(2rem, 4vw, 4rem);
+}
+@media (min-width: 1024px) {
+  .hoc-featured__body {
+    grid-template-columns: minmax(0, 1.28fr) minmax(0, 1fr);
+    align-items: start;
+  }
+}
+
+/* --- pack stage ---------------------------------------------------------- */
+.hoc-featured__stage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 46vh;
+}
+@media (min-width: 1024px) {
+  .hoc-featured__stage {
+    position: sticky;
+    top: calc(var(--header-h-scrolled) + 2rem);
+    height: min(72vh, 720px);
+  }
+}
+
+/* Soft accent ground behind the pack — reads as light, not as a card. */
+.hoc-featured__ground {
+  position: absolute;
+  inset: 6% 4% 10%;
+  background: radial-gradient(
+    62% 54% at 50% 46%,
+    var(--accent-wash, #e0ebea) 0%,
+    transparent 72%
+  );
+  transition: background var(--t-scene) var(--e-hoc);
+  pointer-events: none;
+}
+
+.hoc-featured__packs {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+}
+.hoc-pack {
+  grid-area: 1 / 1;
+  width: min(100%, 34vh);
+  opacity: 0;
+  visibility: hidden;
+  transform: translate3d(0, 2%, 0) scale(0.97);
+}
+@media (min-width: 1024px) {
+  .hoc-pack {
+    width: auto;
+    height: 100%;
+  }
+}
+.hoc-pack.is-active {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+}
+.hoc-pack__img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  /* physical shadow, not a card shadow §11 */
+  filter: drop-shadow(0 34px 40px rgb(35 35 34 / 0.14))
+    drop-shadow(0 6px 10px rgb(35 35 34 / 0.08));
+}
+/* Pointer tilt is applied to this wrapper by JS, max 2–3deg §11 */
+.hoc-featured__packs {
+  transform-style: preserve-3d;
+  perspective: 1400px;
+}
+
+/* --- selector + panels --------------------------------------------------- */
+.hoc-featured__side {
+  display: grid;
+  gap: clamp(1.5rem, 3vh, 2.5rem);
+  align-content: start;
+}
+
+.hoc-selector {
+  overflow: hidden;
+}
+.hoc-selector__list {
+  display: flex;
+  gap: 0.5rem;
+}
+@media (min-width: 1024px) {
+  .hoc-selector__list {
+    display: block;
+    border-top: 1px solid var(--hairline);
+  }
+}
+.hoc-selector__item {
+  flex: 0 0 auto;
+}
+.hoc-selector__btn {
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+  width: 100%;
+  padding: 0.9rem 0;
+  text-align: left;
+  color: var(--on-surface-dim);
+  border-bottom: 1px solid transparent;
+  transition: color var(--t-ui) var(--e-hoc),
+    border-color var(--t-ui) var(--e-hoc);
+}
+@media (max-width: 1023px) {
+  .hoc-selector__btn {
+    padding: 0.7rem 1rem;
+    border: 1px solid var(--hairline);
+    border-start-start-radius: var(--curve-sm);
+    border-end-end-radius: var(--curve-sm);
+    white-space: nowrap;
+  }
+}
+@media (min-width: 1024px) {
+  .hoc-selector__btn {
+    border-bottom-color: var(--hairline);
+  }
+}
+.hoc-selector__name {
+  font-family: var(--ff-display);
+  font-size: clamp(1.35rem, 2vw, 1.9rem);
+  line-height: 1.1;
+}
+.hoc-selector__btn[aria-selected="true"] {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+.hoc-selector__btn:hover {
+  color: var(--on-surface);
+}
+
+.hoc-featured__panels {
+  position: relative;
+}
+.hoc-blendpanel[hidden] {
+  display: none;
+}
+.hoc-blendpanel__name {
+  margin-bottom: 0.35rem;
+}
+.hoc-blendpanel__story {
+  margin-block: 1.15rem 1.5rem;
+  max-width: 44ch;
+}
+
+.hoc-inglist {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.4rem;
+  margin-bottom: 1.75rem;
+}
+.hoc-inglist__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: var(--fs-small);
+  color: var(--on-surface-dim);
+}
+.hoc-bot {
+  width: 1.9em;
+  height: 1.9em;
+  flex: none;
+  color: var(--accent);
+  stroke-width: 2.2;
+  overflow: visible;
+}
+
+.hoc-blendpanel__buy {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-block: 1.1rem;
+  border-block: 1px solid var(--hairline);
+  margin-bottom: 1.5rem;
+}
+.hoc-packsel {
+  display: flex;
+  gap: 0.5rem;
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+.hoc-packsel__opt {
+  position: relative;
+  display: grid;
+  gap: 0.1rem;
+  padding: 0.55rem 0.95rem;
+  border: 1px solid var(--hairline);
+  border-start-start-radius: var(--curve-sm);
+  border-end-end-radius: var(--curve-sm);
+  cursor: pointer;
+  transition: border-color var(--t-micro) var(--e-hoc),
+    color var(--t-micro) var(--e-hoc);
+}
+.hoc-packsel__opt input {
+  position: absolute;
+  opacity: 0;
+  inset: 0;
+  cursor: pointer;
+}
+.hoc-packsel__label {
+  font-size: var(--fs-small);
+  font-weight: 600;
+}
+.hoc-packsel__opt:has(input:checked) {
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+.hoc-packsel__opt:has(input:focus-visible) {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.hoc-price {
+  font-family: var(--ff-display);
+  font-size: 1.75rem;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.hoc-blendpanel__actions {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+.hoc-blendpanel__actions .hoc-btn--solid {
+  --btn-bg: var(--accent);
+  --btn-edge: var(--accent);
+  color: #fff;
+}
+.hoc-blendpanel__actions .hoc-btn--solid::before {
+  background: var(--accent-ink);
+}
+
+/* ==========================================================================
+   03  MANIFESTO  §12
+   ========================================================================== */
+
+.hoc-manifesto {
+  position: relative;
+  overflow: hidden;
+}
+.hoc-manifesto__sprig {
+  position: absolute;
+  right: -4%;
+  bottom: 6%;
+  width: 74%;
+  height: auto;
+  color: var(--hoc-bone);
+  opacity: 0.10;
+  stroke-width: 0.6;
+  pointer-events: none;
+}
+.hoc-manifesto .hoc-micro {
+  margin-bottom: clamp(1.5rem, 4vh, 2.5rem);
+}
+.hoc-manifesto__h2 {
+  max-width: 16ch;
+  white-space: pre-line;
+}
+.hoc-manifesto__body {
+  margin-top: clamp(1.75rem, 4vh, 2.75rem);
+  max-width: 46ch;
+  color: rgb(241 239 232 / 0.66);
+}
+
+/* ==========================================================================
+   04  FROM LEAF TO GLASS  §13
+   ========================================================================== */
+
+.hoc-l2g {
+  position: relative;
+}
+.hoc-l2g__track {
+  height: 420vh;
+}
+.hoc-l2g__stage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+}
+.hoc-l2g__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: clamp(1rem, 3vw, 3rem);
+  align-items: center;
+  width: 100%;
+}
+.hoc-l2g__col--left {
+  align-self: center;
+}
+.hoc-l2g__title {
+  margin-block: 0.75rem 2rem;
+}
+.hoc-l2g__ings {
+  display: grid;
+  gap: 0.9rem;
+}
+.hoc-l2g__ings li {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  opacity: 0.35;
+  transition: opacity var(--t-ui) var(--e-hoc);
+}
+.hoc-l2g__ings li.is-on {
+  opacity: 1;
+}
+.hoc-l2g__ings .hoc-bot {
+  width: 2.4em;
+  height: 2.4em;
+  color: var(--accent-2);
+}
+
+.hoc-l2g__glass {
+  position: relative;
+  width: 100%;
+  height: min(72svh, 700px);
+}
+.hoc-l2g__glass canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.hoc-l2g__col--right {
+  justify-self: end;
+  width: 100%;
+  max-width: 20rem;
+}
+.hoc-brewdata {
+  display: grid;
+  gap: 0.1rem;
+  margin: 0;
+}
+.hoc-brewdata__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-block: 0.85rem;
+  border-bottom: 1px solid var(--hairline);
+  opacity: 0.34;
+  transition: opacity var(--t-ui) var(--e-hoc),
+    color var(--t-ui) var(--e-hoc);
+}
+.hoc-brewdata__row.is-on {
+  opacity: 1;
+  color: var(--accent-2);
+}
+.hoc-brewdata__row dt {
+  margin: 0;
+}
+.hoc-brewdata__v {
+  margin: 0;
+  font-family: var(--ff-display);
+  font-size: clamp(1.5rem, 2.4vw, 2.25rem);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.hoc-brewdata__u {
+  font-size: 0.5em;
+  margin-left: 0.25em;
+  letter-spacing: 0.06em;
+}
+.hoc-l2g__cta {
+  margin-top: 2rem;
+}
+.hoc-l2g__cta .hoc-btn {
+  --btn-edge: rgb(241 239 232 / 0.4);
+}
+
+.hoc-l2g__progress {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: clamp(1.25rem, 4vh, 2.5rem);
+  display: flex;
+  justify-content: center;
+  gap: clamp(0.75rem, 2vw, 2rem);
+  padding-inline: var(--gutter);
+}
+.hoc-l2g__progress li {
+  opacity: 0.28;
+  transition: opacity var(--t-ui) var(--e-hoc);
+  position: relative;
+  padding-top: 0.75rem;
+}
+.hoc-l2g__progress li::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: currentColor;
+}
+.hoc-l2g__progress li.is-on {
+  opacity: 1;
+  color: var(--accent-2);
+}
+
+.hoc-l2g__mobile {
+  display: none;
+}
+@media (max-width: 899px) {
+  .hoc-l2g__track {
+    display: none;
+  }
+  .hoc-l2g__mobile {
+    display: block;
+    padding-block: var(--space-section);
+  }
+  .hoc-l2gm {
+    min-height: 82svh;
+    display: grid;
+    grid-template-rows: 1fr auto;
+    gap: 1.5rem;
+    align-content: center;
+    padding-inline: var(--gutter);
+    padding-block: 2rem;
+  }
+  .hoc-l2gm__glass {
+    min-height: 44svh;
+  }
+  .hoc-l2gm__glass canvas {
+    width: 100%;
+    height: 100%;
+  }
+  .hoc-l2gm__copy .hoc-micro {
+    margin-bottom: 0.6rem;
+  }
+  .hoc-l2gm__cta {
+    padding-inline: var(--gutter);
+    padding-top: 1rem;
+  }
+  .hoc-l2gm__cta .hoc-btn {
+    --btn-edge: rgb(241 239 232 / 0.4);
+  }
+}
+
+/* ==========================================================================
+   05  COLOR ALCHEMY  §14
+   ========================================================================== */
+
+.hoc-alchemy {
+  position: relative;
+  background: #0e0f17;
+}
+.hoc-alchemy__track {
+  height: 280vh;
+}
+@media (max-width: 899px) {
+  .hoc-alchemy__track {
+    height: 200vh;
+  }
+}
+.hoc-alchemy__stage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  cursor: none; /* replaced by the catalyst indicator, section-local only §14 */
+}
+@media (hover: none) {
+  .hoc-alchemy__stage {
+    cursor: auto;
+  }
+}
+.hoc-alchemy__gl,
+.hoc-alchemy__fallback {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.hoc-alchemy__fallback {
+  background: linear-gradient(
+    118deg,
+    #1b2a7a 0%,
+    #3d2f86 34%,
+    #7a3a86 68%,
+    #b0417e 100%
+  );
+  opacity: 0;
+  transition: opacity 0.6s var(--e-hoc);
+}
+.hoc-alchemy__fallback.is-on {
+  opacity: 1;
+}
+.hoc-alchemy__copy {
+  position: relative;
+  width: 100%;
+  color: var(--hoc-bone);
+  mix-blend-mode: normal;
+  pointer-events: none;
+}
+.hoc-alchemy__copy .hoc-micro {
+  color: rgb(241 239 232 / 0.72);
+  margin-bottom: 1.25rem;
+}
+.hoc-alchemy__copy h2 {
+  max-width: 13ch;
+  text-shadow: 0 2px 40px rgb(10 10 20 / 0.35);
+}
+.hoc-alchemy__hint {
+  margin-top: 1.75rem;
+  color: rgb(241 239 232 / 0.55);
+  transition: opacity var(--t-ui) var(--e-hoc);
+}
+.hoc-alchemy__hint.is-off {
+  opacity: 0;
+}
+
+.hoc-alchemy__chain {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: clamp(1.5rem, 5vh, 3rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(0.6rem, 1.6vw, 1.25rem);
+  padding-inline: var(--gutter);
+  color: rgb(241 239 232 / 0.8);
+  pointer-events: none;
+  flex-wrap: wrap;
+}
+.hoc-alchemy__chain li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.hoc-swatch {
+  width: 12px;
+  height: 12px;
+  background: var(--s);
+  border-start-start-radius: 3px;
+  border-end-end-radius: 3px;
+  flex: none;
+}
+.hoc-alchemy__plus,
+.hoc-alchemy__arrow {
+  opacity: 0.45;
+}
+
+/* Local catalyst indicator. Not a site-wide custom cursor §14, §59. */
+.hoc-alchemy__drop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 34px;
+  height: 34px;
+  margin: -17px 0 0 -17px;
+  border: 1px solid rgb(241 239 232 / 0.7);
+  border-start-start-radius: 50%;
+  border-end-end-radius: 50%;
+  border-start-end-radius: 50%;
+  border-end-start-radius: 50%;
+  opacity: 0;
+  transition: opacity var(--t-micro) var(--e-hoc),
+    transform var(--t-micro) var(--e-hoc);
+  pointer-events: none;
+  will-change: transform;
+}
+.hoc-alchemy__drop::after {
+  content: "";
+  position: absolute;
+  inset: 12px;
+  background: #b4324b;
+  border-radius: 50%;
+}
+.hoc-alchemy__stage:hover .hoc-alchemy__drop {
+  opacity: 1;
+}
+@media (hover: none) {
+  .hoc-alchemy__drop {
+    display: none;
+  }
+}
+
+/* ==========================================================================
+   06  FIND YOUR HOC  §15
+   ========================================================================== */
+
+.hoc-moods {
+  position: relative;
+  overflow: hidden;
+  transition: background-color var(--t-scene) var(--e-hoc);
+}
+.hoc-moods__head {
+  margin-bottom: clamp(2rem, 5vh, 4rem);
+}
+.hoc-moods__head .hoc-micro {
+  margin-bottom: 1rem;
+}
+.hoc-moods__head h2 {
+  max-width: 16ch;
+}
+.hoc-moods__list {
+  position: relative;
+  z-index: 2;
+  border-top: 1px solid var(--hairline);
+}
+.hoc-mood {
+  border-bottom: 1px solid var(--hairline);
+}
+.hoc-mood__btn {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1.5rem;
+  width: 100%;
+  padding-block: clamp(0.7rem, 1.8vh, 1.3rem);
+  text-align: left;
+  color: var(--on-surface);
+  transition: color var(--t-ui) var(--e-hoc);
+}
+/* Bigger than display-l: these six words are the section. */
+.hoc-mood__word {
+  font-family: var(--ff-display);
+  font-size: clamp(2.75rem, 7.4vw, 7rem);
+  line-height: 0.98;
+  letter-spacing: var(--ls-display);
+  transition: transform var(--t-ui) var(--e-hoc);
+  will-change: transform;
+}
+/* Metadata is always readable — it gives the right column something to hold
+   and it is not hover-only content (§45). It only brightens on hover. */
+.hoc-mood__meta {
+  flex: none;
+  align-self: center;
+  opacity: 0.42;
+  transition: opacity var(--t-ui) var(--e-hoc),
+    color var(--t-ui) var(--e-hoc);
+}
+@media (hover: hover) and (min-width: 900px) {
+  .hoc-mood.is-on .hoc-mood__word {
+    transform: translateX(clamp(0.75rem, 2vw, 2.25rem));
+  }
+  .hoc-mood.is-on .hoc-mood__btn {
+    color: var(--accent);
+  }
+  .hoc-mood.is-on .hoc-mood__meta {
+    opacity: 1;
+    color: var(--accent);
+  }
+  .hoc-moods__list:has(.hoc-mood.is-on) .hoc-mood:not(.is-on) .hoc-mood__btn {
+    color: var(--on-surface-dim);
+  }
+  .hoc-mood__reveal {
+    display: none;
+  }
+}
+
+/* Floating preview — desktop only, follows the pointer with lag §15 */
+.hoc-moods__preview {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 3;
+  width: clamp(190px, 17vw, 280px);
+  aspect-ratio: 3 / 4;
+  margin: -12% 0 0 -50%;
+  opacity: 0;
+  pointer-events: none;
+  will-change: transform;
+  transition: opacity var(--t-ui) var(--e-hoc);
+}
+.hoc-moods__preview.is-on {
+  opacity: 1;
+}
+.hoc-moods__previewinner {
+  width: 100%;
+  height: 100%;
+  background: var(--accent-wash, #e6e6e6);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  transition: background-color var(--t-ui) var(--e-hoc);
+}
+.hoc-moods__previewinner img {
+  width: 82%;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 18px 26px rgb(35 35 34 / 0.16));
+}
+@media (max-width: 899px), (hover: none) {
+  .hoc-moods__preview {
+    display: none;
+  }
+}
+
+/* Mobile: tap to reveal, stacked §15 */
+@media (max-width: 899px) {
+  .hoc-mood__reveal {
+    display: grid;
+    grid-template-columns: 34% 1fr;
+    gap: 1.25rem;
+    align-items: center;
+    overflow: hidden;
+    height: 0;
+    opacity: 0;
+    transition: height var(--t-ui) var(--e-hoc),
+      opacity var(--t-ui) var(--e-hoc);
+  }
+  .hoc-mood.is-open .hoc-mood__reveal {
+    height: auto;
+    opacity: 1;
+    padding-bottom: 1.5rem;
+  }
+  .hoc-mood__pack {
+    background: var(--accent-wash);
+    padding: 0.75rem;
+  }
+  .hoc-mood__name {
+    margin-block: 0.2rem 0.6rem;
+  }
+  .hoc-mood__ings {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 0.9rem;
+    margin-bottom: 0.9rem;
+  }
+  .hoc-mood__ings li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+  .hoc-mood__ings .hoc-bot {
+    width: 1.6em;
+    height: 1.6em;
+  }
+  .hoc-mood__meta {
+    opacity: 1;
+    font-size: 0.625rem;
+  }
+}
+
+/* ==========================================================================
+   07  INGREDIENT ATLAS  §16
+   A grid of botanicals driving one large lead panel.
+   ========================================================================== */
+
+.hoc-atlas {
+  background: var(--hoc-bone-soft);
+}
+.hoc-atlas__top {
+  display: grid;
+  gap: clamp(2.5rem, 5vw, 4rem);
+  margin-bottom: clamp(2.5rem, 6vh, 4.5rem);
+}
+@media (min-width: 900px) {
+  .hoc-atlas__top {
+    grid-template-columns: minmax(0, 47fr) minmax(0, 53fr);
+    align-items: center;
+  }
+}
+.hoc-atlas__head {
+  max-width: 16ch;
+}
+.hoc-atlas__head .hoc-micro {
+  margin-bottom: 1rem;
+}
+.hoc-atlas__head .hoc-body {
+  margin-top: 1.25rem;
+  max-width: 34ch;
+}
+
+.hoc-atlas__lead {
+  margin: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 40%) minmax(0, 1fr);
+  gap: clamp(1.25rem, 3vw, 2.5rem);
+  align-items: center;
+  padding: clamp(1.5rem, 3vw, 2.5rem);
+  background: #fff;
+  border-start-start-radius: var(--curve-lg);
+  border-end-end-radius: var(--curve-lg);
+}
+.hoc-atlas__leadart {
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+}
+.hoc-atlas__bigsvg {
+  width: 100%;
+  height: 100%;
+  color: var(--accent);
+  stroke-width: 1.15;
+}
+.hoc-atlas__leadname {
+  line-height: 1;
+}
+.hoc-atlas__bot {
+  font-style: italic;
+  text-transform: none;
+  letter-spacing: 0.02em;
+  color: var(--on-surface-dim);
+  margin-top: 0.35rem;
+}
+.hoc-atlas__facts {
+  display: grid;
+  gap: 0.35rem;
+  margin: 1.25rem 0;
+  padding-top: 1.1rem;
+  border-top: 1px solid var(--hairline);
+}
+.hoc-atlas__facts > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.hoc-atlas__facts dt {
+  color: var(--on-surface-dim);
+}
+.hoc-atlas__facts dd {
+  margin: 0;
+  font-size: var(--fs-small);
+  color: var(--accent-ink, var(--on-surface));
+  font-weight: 500;
+}
+.hoc-atlas__note {
+  font-size: var(--fs-small);
+  line-height: 1.55;
+  color: var(--on-surface-dim);
+  max-width: 40ch;
+}
+
+/* Fixed column counts — an auto-fill grid orphaned cells at 12 items. */
+.hoc-atlas__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--hairline);
+  border: 1px solid var(--hairline);
+}
+@media (min-width: 560px) {
+  .hoc-atlas__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (min-width: 900px) {
+  .hoc-atlas__grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+@media (min-width: 1200px) {
+  .hoc-atlas__grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+.hoc-atlas__item {
+  background: var(--hoc-bone);
+  transition: background-color var(--t-ui) var(--e-hoc);
+}
+.hoc-atlas__item.is-on,
+.hoc-atlas__item:hover {
+  background: #fff;
+}
+.hoc-atlas__btn {
+  display: grid;
+  gap: 0.7rem;
+  place-items: center;
+  width: 100%;
+  padding: clamp(1.1rem, 2.4vw, 1.75rem) 0.6rem;
+  text-align: center;
+}
+.hoc-atlas__art {
+  display: block;
+  width: clamp(40px, 4vw, 58px);
+  aspect-ratio: 1;
+  transition: transform var(--t-ui) var(--e-hoc);
+}
+.hoc-atlas__svg {
+  width: 100%;
+  height: 100%;
+  color: var(--accent);
+  stroke-width: 1.8;
+}
+.hoc-atlas__item.is-on .hoc-atlas__art,
+.hoc-atlas__item:hover .hoc-atlas__art {
+  transform: scale(1.06);
+}
+.hoc-atlas__name {
+  color: var(--on-surface-dim);
+  transition: color var(--t-micro) var(--e-hoc);
+}
+.hoc-atlas__item.is-on .hoc-atlas__name {
+  color: var(--on-surface);
+}
+
+/* ==========================================================================
+   08  SHOP THE COLLECTION  §17
+   ========================================================================== */
+
+.hoc-rail {
+  padding-block: var(--space-section);
+  overflow: hidden;
+}
+.hoc-rail__head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin-bottom: clamp(2rem, 5vh, 3.5rem);
+}
+.hoc-rail__head .hoc-micro {
+  margin-bottom: 0.9rem;
+}
+.hoc-rail__tools {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+.hoc-rail__nav {
+  display: flex;
+  gap: 0.5rem;
+}
+.hoc-rail__arrow {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--hairline);
+  border-start-start-radius: var(--curve-sm);
+  border-end-end-radius: var(--curve-sm);
+  transition: border-color var(--t-micro) var(--e-hoc),
+    background-color var(--t-micro) var(--e-hoc),
+    color var(--t-micro) var(--e-hoc);
+}
+.hoc-rail__arrow:hover:not([disabled]) {
+  background: var(--hoc-ink);
+  border-color: var(--hoc-ink);
+  color: var(--hoc-bone);
+}
+.hoc-rail__arrow[disabled] {
+  opacity: 0.3;
+  cursor: default;
+}
+@media (max-width: 767px) {
+  .hoc-rail__nav {
+    display: none;
+  }
+}
+
+.hoc-rail__viewport {
+  overflow: hidden;
+  padding-inline: var(--gutter);
+  max-width: var(--page-max);
+  margin-inline: auto;
+  cursor: grab;
+}
+.hoc-rail__viewport:active {
+  cursor: grabbing;
+}
+.hoc-rail__list {
+  display: flex;
+  gap: clamp(1rem, 2vw, 2rem);
+  backface-visibility: hidden;
+  touch-action: pan-y pinch-zoom;
+}
+.hoc-card {
+  flex: 0 0 auto;
+  width: 82vw;
+  position: relative;
+}
+@media (min-width: 600px) {
+  .hoc-card {
+    width: 42vw;
+  }
+}
+@media (min-width: 900px) {
+  /* 3.2 cards visible §17 */
+  .hoc-card {
+    width: calc((100% - 2 * clamp(1rem, 2vw, 2rem)) / 3.2);
+  }
+}
+.hoc-card__link {
+  display: block;
+}
+.hoc-card__media {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: var(--hoc-bone-soft);
+}
+.hoc-card__ground {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    70% 60% at 50% 44%,
+    var(--accent-wash) 0%,
+    transparent 74%
+  );
+}
+.hoc-card__img {
+  grid-area: 1 / 1;
+  position: relative;
+  width: 66%;
+  height: auto;
+  object-fit: contain;
+  transition: opacity var(--t-ui) var(--e-hoc),
+    transform var(--t-ui) var(--e-hoc);
+  filter: drop-shadow(0 18px 22px rgb(35 35 34 / 0.12));
+  will-change: transform;
+}
+.hoc-card__img--b {
+  opacity: 0;
+}
+@media (hover: hover) {
+  .hoc-card:hover .hoc-card__img--a {
+    opacity: 0;
+    transform: scale(1.03);
+  }
+  .hoc-card:hover .hoc-card__img--b {
+    opacity: 1;
+    transform: scale(1.03);
+  }
+}
+.hoc-card__body {
+  display: grid;
+  gap: 0.3rem;
+  padding-top: 1.1rem;
+}
+.hoc-card__name {
+  font-family: var(--ff-display);
+  font-size: clamp(1.35rem, 1.8vw, 1.75rem);
+  line-height: 1.05;
+  font-weight: 400;
+}
+.hoc-card__desc {
+  color: var(--accent-ink);
+}
+.hoc-card__price {
+  font-variant-numeric: tabular-nums;
+  font-size: var(--fs-small);
+  color: var(--on-surface-dim);
+}
+.hoc-card__add {
+  position: absolute;
+  top: 0.85rem;
+  right: 0.85rem;
+  padding: 0.55rem 0.9rem;
+  font-size: var(--fs-micro);
+  font-weight: 600;
+  letter-spacing: var(--ls-micro);
+  text-transform: uppercase;
+  background: var(--hoc-bone);
+  color: var(--hoc-ink);
+  border-start-start-radius: var(--curve-sm);
+  border-end-end-radius: var(--curve-sm);
+  transition: opacity var(--t-ui) var(--e-hoc),
+    transform var(--t-ui) var(--e-hoc), background-color var(--t-micro) var(--e-hoc);
+}
+.hoc-card__add:hover {
+  background: var(--accent);
+  color: #fff;
+}
+/* Desktop: appears on hover. Mobile: always available §56 */
+@media (hover: hover) and (min-width: 900px) {
+  .hoc-card__add {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  .hoc-card:hover .hoc-card__add,
+  .hoc-card:focus-within .hoc-card__add {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.hoc-rail__bar {
+  margin-top: clamp(1.5rem, 4vh, 2.5rem);
+  height: 1px;
+  background: var(--hairline);
+  position: relative;
+  overflow: hidden;
+}
+.hoc-rail__bar span {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 30%;
+  background: var(--hoc-ink);
+  transform-origin: left;
+}
+
+/* ==========================================================================
+   09  HOSPITALITY  §19
+   ========================================================================== */
+
+.hoc-horeca__grid {
+  display: grid;
+  gap: clamp(2rem, 4vw, 3.5rem);
+  align-items: center;
+  max-width: var(--page-max);
+  margin-inline: auto;
+  padding: var(--space-section) var(--gutter);
+}
+@media (min-width: 900px) {
+  .hoc-horeca__grid {
+    grid-template-columns: minmax(0, 58fr) minmax(0, 42fr);
+  }
+}
+.hoc-horeca__media {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: var(--hoc-ink-lift);
+}
+.hoc-horeca__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.08);
+}
+.hoc-horeca__copy .hoc-micro:first-child {
+  margin-bottom: 1rem;
+}
+.hoc-horeca__copy h2 {
+  margin-bottom: 1.5rem;
+}
+.hoc-horeca__copy .hoc-body {
+  color: rgb(241 239 232 / 0.68);
+}
+.hoc-horeca__points {
+  display: grid;
+  gap: 0.55rem;
+  margin-block: 1.75rem;
+}
+.hoc-horeca__points li {
+  padding-left: 1.1rem;
+  position: relative;
+  color: rgb(241 239 232 / 0.8);
+}
+.hoc-horeca__points li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.42em;
+  width: 6px;
+  height: 6px;
+  background: var(--hoc-teal-lift);
+  border-start-start-radius: 2px;
+  border-end-end-radius: 2px;
+}
+.hoc-horeca__cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+.hoc-horeca__cta .hoc-btn {
+  --btn-edge: rgb(241 239 232 / 0.4);
+}
+.hoc-horeca__cta .hoc-btn--solid {
+  --btn-bg: var(--hoc-teal);
+  --btn-edge: var(--hoc-teal);
+  color: #fff;
+}
+.hoc-horeca__cta .hoc-btn--solid::before {
+  background: var(--hoc-teal-lift);
+}
+.hoc-horeca__cta .hoc-btn--solid:hover {
+  color: #fff;
+  border-color: var(--hoc-teal-lift);
+}
+
+/* ==========================================================================
+   10  THE RITUAL  §20
+   ========================================================================== */
+
+.hoc-ritual__head {
+  margin-bottom: clamp(2.5rem, 6vh, 4rem);
+}
+.hoc-ritual__head .hoc-micro {
+  margin-bottom: 1rem;
+}
+.hoc-ritual__head h2 {
+  max-width: 18ch;
+}
+.hoc-ritual__body {
+  display: grid;
+  gap: clamp(2rem, 4vw, 4rem);
+}
+@media (min-width: 900px) {
+  .hoc-ritual__body {
+    grid-template-columns: minmax(0, 36fr) minmax(0, 64fr);
+    align-items: start;
+  }
+}
+.hoc-ritual__viz {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  display: grid;
+  place-items: center;
+  background: var(--hoc-bone-soft);
+  border-start-start-radius: var(--curve-lg);
+  border-end-end-radius: var(--curve-lg);
+  overflow: hidden;
+}
+@media (min-width: 900px) {
+  .hoc-ritual__viz {
+    position: sticky;
+    top: calc(var(--header-h-scrolled) + 2rem);
+  }
+}
+.hoc-ritual__frame {
+  grid-area: 1 / 1;
+  display: grid;
+  place-items: center;
+  gap: 1.25rem;
+  opacity: 0;
+  transform: scale(0.96);
+  transition: opacity var(--t-ui) var(--e-hoc),
+    transform var(--t-ui) var(--e-hoc);
+}
+.hoc-ritual__frame.is-on {
+  opacity: 1;
+  transform: none;
+}
+.hoc-ritual__bot {
+  width: clamp(120px, 17vw, 220px);
+  height: auto;
+  aspect-ratio: 1;
+  color: var(--hoc-teal);
+  stroke-width: 1.5;
+}
+.hoc-ritual__data {
+  font-family: var(--ff-display);
+  font-size: clamp(1.5rem, 2.4vw, 2.25rem);
+  line-height: 1;
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.hoc-ritual__steps {
+  border-top: 1px solid var(--hairline);
+}
+.hoc-ritual__step {
+  border-bottom: 1px solid var(--hairline);
+}
+.hoc-ritual__btn {
+  display: grid;
+  grid-template-columns: 3.5rem 1fr;
+  gap: 0.25rem 1rem;
+  width: 100%;
+  padding-block: clamp(1rem, 2.5vh, 1.6rem);
+  text-align: left;
+  color: var(--on-surface-dim);
+  transition: color var(--t-ui) var(--e-hoc);
+}
+.hoc-ritual__step.is-on .hoc-ritual__btn {
+  color: var(--on-surface);
+}
+.hoc-ritual__label {
+  font-family: var(--ff-display);
+  font-size: clamp(1.5rem, 2.6vw, 2.25rem);
+  line-height: 1;
+}
+.hoc-ritual__copy {
+  grid-column: 2;
+  max-width: 46ch;
+  overflow: hidden;
+  height: 0;
+  opacity: 0;
+  transition: height var(--t-ui) var(--e-hoc),
+    opacity var(--t-ui) var(--e-hoc), margin-top var(--t-ui) var(--e-hoc);
+}
+.hoc-ritual__step.is-on .hoc-ritual__copy {
+  height: auto;
+  opacity: 1;
+  margin-top: 0.6rem;
+}
+
+/* ==========================================================================
+   11  JOURNAL  §21
+   ========================================================================== */
+
+.hoc-journal__head {
+  margin-bottom: clamp(2.5rem, 6vh, 4rem);
+}
+.hoc-journal__head .hoc-micro {
+  margin-bottom: 1rem;
+}
+.hoc-journal__grid {
+  display: grid;
+  gap: clamp(1.5rem, 3vw, 3rem);
+}
+@media (min-width: 900px) {
+  /* one lead, two stacked §21 — a grid, not a carousel */
+  .hoc-journal__grid {
+    grid-template-columns: minmax(0, 52fr) minmax(0, 44fr);
+    grid-template-rows: auto auto;
+    align-items: start;
+  }
+  .hoc-jcard--lead {
+    grid-row: 1 / span 2;
+  }
+}
+.hoc-jcard__media {
+  overflow: hidden;
+  margin-bottom: 1.15rem;
+  aspect-ratio: 3 / 2;
+  background: var(--hoc-bone-soft);
+}
+/* The lead spans two rows; let its media absorb whatever height the two
+   stacked cards produce rather than leaving a gap under it. */
+.hoc-jcard--lead .hoc-jcard__media {
+  aspect-ratio: 4 / 3;
+}
+@media (min-width: 900px) {
+  .hoc-jcard--lead,
+  .hoc-jcard--lead .hoc-jcard__link {
+    height: 100%;
+  }
+  .hoc-jcard--lead .hoc-jcard__link {
+    display: flex;
+    flex-direction: column;
+  }
+  .hoc-jcard--lead .hoc-jcard__media {
+    aspect-ratio: auto;
+    flex: 1 1 auto;
+    min-height: 24rem;
+  }
+}
+.hoc-jcard__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: clip-path var(--t-scene) var(--e-hoc),
+    transform var(--t-scene) var(--e-hoc);
+  clip-path: inset(0 0 0 0);
+}
+@media (hover: hover) {
+  .hoc-jcard:hover .hoc-jcard__img {
+    clip-path: inset(0 0 0 6%);
+    transform: scale(1.04);
+  }
+}
+.hoc-jcard__title {
+  font-family: var(--ff-display);
+  font-size: clamp(1.5rem, 2.4vw, 2.25rem);
+  line-height: 1.06;
+  font-weight: 400;
+  margin-block: 0.35rem 0.6rem;
+}
+.hoc-jcard--lead .hoc-jcard__title {
+  font-size: clamp(1.85rem, 3.2vw, 3rem);
+}
+
+/* ==========================================================================
+   12  NEWSLETTER + FOOTER  §22
+   ========================================================================== */
+
+.hoc-news__inner {
+  display: grid;
+  gap: clamp(2rem, 5vw, 4rem);
+  align-items: end;
+}
+@media (min-width: 900px) {
+  .hoc-news__inner {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 26rem);
+  }
+}
+.hoc-news__form {
+  display: grid;
+  gap: 0.75rem;
+  width: 100%;
+}
+.hoc-news__field {
+  display: flex;
+  gap: 0.5rem;
+  border-bottom: 1px solid var(--hairline);
+  padding-bottom: 0.5rem;
+}
+.hoc-news__field input {
+  flex: 1;
+  min-width: 0;
+  background: none;
+  border: 0;
+  padding: 0.75rem 0;
+  font-size: var(--fs-body);
+}
+.hoc-news__field input::placeholder {
+  color: rgb(241 239 232 / 0.34);
+}
+.hoc-news__field input:focus {
+  outline: none;
+}
+.hoc-news__field:focus-within {
+  border-bottom-color: var(--hoc-teal-lift);
+}
+.hoc-news__form .hoc-btn {
+  --btn-edge: rgb(241 239 232 / 0.4);
+  padding-inline: 1.5rem;
+}
+.hoc-news__msg {
+  min-height: 1.2em;
+  color: var(--hoc-teal-lift);
+}
+
+.hoc-footer {
+  position: relative;
+  padding-bottom: 2rem;
+  overflow: hidden;
+}
+.hoc-footer__grid {
+  display: grid;
+  gap: clamp(1.75rem, 3vw, 2.5rem);
+  padding-top: clamp(2.5rem, 6vh, 4rem);
+  border-top: 1px solid var(--hairline);
+}
+@media (min-width: 700px) {
+  .hoc-footer__grid {
+    grid-template-columns: 1.4fr repeat(4, 1fr);
+  }
+}
+.hoc-footer__brand .hoc-lockup .hoc-mark {
+  height: 40px;
+  width: 40px;
+}
+.hoc-footer__tag {
+  margin-top: 0.9rem;
+}
+.hoc-footer__h {
+  margin-bottom: 0.9rem;
+  color: rgb(241 239 232 / 0.45);
+}
+.hoc-footer__col li {
+  padding-block: 0.28rem;
+}
+.hoc-footer__col a {
+  font-size: var(--fs-small);
+  color: rgb(241 239 232 / 0.8);
+  transition: color var(--t-micro) var(--e-hoc);
+}
+.hoc-footer__col a:hover {
+  color: var(--hoc-bone);
+}
+
+.hoc-footer__sprig {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-block: clamp(2.5rem, 7vh, 5rem) 1.5rem;
+  color: var(--hoc-teal-lift);
+  opacity: 0.55;
+  stroke-width: 0.55;
+}
+
+.hoc-footer__legal {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--hairline);
+  color: rgb(241 239 232 / 0.45);
+}
+.hoc-footer__legal a:hover {
+  color: var(--hoc-bone);
+}
+
+/* ==========================================================================
+   Cart drawer detail that depends on section tokens
+   ========================================================================== */
+
+.hoc-drawer__total {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--fs-small);
+  letter-spacing: 0;
+  text-transform: none;
+}
+.hoc-drawer__total span:last-child {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   SUPPORTING TEMPLATES
+   The brief is a homepage spec; these are the minimum styles the other routes
+   need so the theme installs and every page stays in the design system.
+   ========================================================================== */
+
+.hoc-pdp__grid {
+  display: grid;
+  gap: clamp(2rem, 4vw, 4rem);
+  align-items: start;
+}
+@media (min-width: 900px) {
+  .hoc-pdp__grid {
+    grid-template-columns: minmax(0, 52fr) minmax(0, 48fr);
+  }
+}
+.hoc-pdp__media {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: var(--hoc-bone-soft);
+}
+.hoc-pdp__img {
+  position: relative;
+  width: 70%;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 28px 34px rgb(35 35 34 / 0.14));
+}
+.hoc-pdp__info > .hoc-body {
+  margin-block: 1.25rem 1.75rem;
+}
+.hoc-pdp__info .hoc-brewdata {
+  margin-top: 2.5rem;
+}
+.hoc-pdp__info .hoc-brewdata__row {
+  opacity: 1;
+}
+
+/* Collection / search / list-collections share one grid. */
+.hoc-collection__grid {
+  display: grid;
+  gap: clamp(1.5rem, 3vw, 2.5rem);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: clamp(2rem, 5vh, 3.5rem);
+}
+@media (min-width: 768px) {
+  .hoc-collection__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (min-width: 1200px) {
+  .hoc-collection__grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+/* In a grid the cards are not carousel slides. */
+.hoc-collection__grid .hoc-card {
+  width: auto;
+}
+
+/* ==========================================================================
+   08b  THE RANGE  §17 (reworked)
+
+   Three columns. The outer two are image stacks parallaxing past each other;
+   the middle is a panel that holds position, drifts a beat behind the scroll
+   and swaps to whichever blend you are level with.
+
+   Motion intensity 3/5 — the movement is the outer columns sliding at
+   different rates, not the panel doing tricks.
+   ========================================================================== */
+
+.hoc-range {
+  padding-block: var(--space-section) 0;
+  overflow: clip;
+}
+.hoc-range__head {
+  margin-bottom: clamp(2rem, 5vh, 3.5rem);
+}
+.hoc-range__head .hoc-micro {
+  margin-bottom: 1rem;
+}
+.hoc-range__head h2 {
+  max-width: 16ch;
+}
+
+/* --- desktop three-column stage ---------------------------------------- */
+.hoc-range__stage {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 32fr) minmax(0, 36fr) minmax(0, 32fr);
+  gap: clamp(1rem, 3vw, 3rem);
+  align-items: start;
+  max-width: var(--page-max);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.hoc-range__col {
+  display: grid;
+  will-change: transform;
+}
+/* The right stack starts lower, so the two columns never line up and the
+   parallax has something to read against. */
+.hoc-range__col--right {
+  padding-top: 26vh;
+}
+
+.hoc-range__cell {
+  height: 52vh;
+  display: grid;
+  place-items: center;
+}
+
+.hoc-range__pile {
+  width: min(100%, 40vh);
+  aspect-ratio: 1;
+}
+.hoc-range__pile img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.hoc-range__pack {
+  position: relative;
+  width: min(100%, 32vh);
+  aspect-ratio: 3 / 4;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: var(--hoc-bone-soft);
+}
+.hoc-range__packground {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    70% 60% at 50% 44%,
+    var(--accent-wash) 0%,
+    transparent 74%
+  );
+}
+.hoc-range__pack img {
+  position: relative;
+  width: 70%;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 16px 20px rgb(35 35 34 / 0.12));
+}
+
+/* --- the centre panel --------------------------------------------------- */
+.hoc-range__centre {
+  position: relative;
+  height: 100%;
+}
+.hoc-range__sticky {
+  position: sticky;
+  top: 50%;
+  transform: translateY(-50%);
+  display: grid;
+  gap: 1.25rem;
+  justify-items: center;
+  will-change: transform;
+}
+
+.hoc-range__frame {
+  position: relative;
+  display: grid;
+  width: 100%;
+  min-height: 26rem;
+  padding: clamp(1.5rem, 3vw, 2.5rem);
+  border: 1px solid var(--hairline);
+  border-start-start-radius: var(--curve-lg);
+  border-end-end-radius: var(--curve-lg);
+  background: var(--hoc-bone);
+}
+
+.hoc-range__panel {
+  grid-area: 1 / 1;
+  display: grid;
+  gap: 0.55rem;
+  align-content: center;
+  justify-items: center;
+  text-align: center;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+}
+.hoc-range__panel.is-on {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+}
+html:not(.hoc-js) .hoc-range__panel {
+  /* Without JS nothing swaps, so show the first and stack the rest normally. */
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  position: static;
+}
+
+.hoc-range__count {
+  color: var(--accent);
+}
+.hoc-range__name {
+  font-family: var(--ff-display);
+  font-size: clamp(1.75rem, 3.2vw, 2.75rem);
+  line-height: 1.02;
+  font-weight: 400;
+}
+.hoc-range__ings {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.4rem 1rem;
+  margin-block: 0.5rem;
+}
+.hoc-range__ings li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--on-surface-dim);
+}
+.hoc-range__ings .hoc-bot {
+  width: 1.6em;
+  height: 1.6em;
+}
+.hoc-range__price {
+  font-family: var(--ff-display);
+  font-size: 1.5rem;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+.hoc-range__price .hoc-micro {
+  font-family: var(--ff-ui);
+}
+.hoc-range__actions {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 0.5rem;
+}
+.hoc-range__actions .hoc-btn--solid {
+  --btn-bg: var(--accent);
+  --btn-edge: var(--accent);
+  color: #fff;
+}
+.hoc-range__actions .hoc-btn--solid::before {
+  background: var(--accent-ink);
+}
+
+/* The tagline sits outside the frame, as in the reference. */
+.hoc-range__notes {
+  position: relative;
+  display: grid;
+  min-height: 1.5em;
+}
+.hoc-range__note {
+  grid-area: 1 / 1;
+  text-align: center;
+  font-size: var(--fs-small);
+  color: var(--on-surface-dim);
+  opacity: 0;
+  transition: opacity var(--t-ui) var(--e-hoc);
+}
+.hoc-range__note.is-on {
+  opacity: 1;
+}
+html:not(.hoc-js) .hoc-range__note {
+  opacity: 1;
+  position: static;
+}
+
+/* --- mobile: no parallax, no sticky, no 700vh trap (§44) ---------------- */
+@media (max-width: 899px) {
+  .hoc-range__stage {
+    display: block;
+    padding-bottom: var(--space-section);
+  }
+  .hoc-range__col--right,
+  .hoc-range__centre {
+    display: none;
+  }
+  .hoc-range__col--left {
+    display: grid;
+    gap: 0;
+  }
+  .hoc-range__cell {
+    height: auto;
+    padding-block: 1.5rem;
+  }
+  .hoc-range__pile {
+    width: min(62vw, 320px);
+  }
+  /* On mobile each blend is a plain card: pile, then its own copy. */
+  .hoc-range__mcopy {
+    text-align: center;
+    display: grid;
+    gap: 0.4rem;
+    justify-items: center;
+    padding-bottom: 2.5rem;
+    border-bottom: 1px solid var(--hairline);
+  }
+}
+@media (min-width: 900px) {
+  .hoc-range__mcopy {
+    display: none;
+  }
+}
