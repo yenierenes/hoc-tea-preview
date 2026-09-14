@@ -82,7 +82,7 @@
       var edge = smoothstep(radius / .28);
       // Expansion is proportional to distance: the core never becomes a ring.
       var turn = local * (.10 + edge * .18);
-      turn += Math.sin(time * .00072 + p.pulse * .3) * (.022 + hover * .038) * local * edge;
+      turn += Math.sin(time * .00072 + p.pulse * .3) * (.022 + hover * .052) * local * edge;
       var rx = p.x * Math.cos(turn) - p.y * Math.sin(turn);
       var ry = p.x * Math.sin(turn) + p.y * Math.cos(turn);
       var x = .5 + rx * (1 + local * .28 * edge);
@@ -90,13 +90,13 @@
       // A shared current carries the core too. Fine leaves have a little
       // independent drift; pointer speed never enters the motion equation.
       var buoyancy = local * (.35 + edge * .65);
-      x += (Math.sin(time * .0008 + p.pulse * .25) * (.005 + hover * .006) + handX * hover * .012) * buoyancy;
-      y += (Math.cos(time * .0007 + p.pulse * .3) * (.006 + hover * .006) + handY * hover * .009) * buoyancy;
+      x += (Math.sin(time * .0008 + p.pulse * .25) * (.005 + hover * .008) + handX * hover * .018) * buoyancy;
+      y += (Math.cos(time * .0007 + p.pulse * .3) * (.006 + hover * .008) + handY * hover * .013) * buoyancy;
       y += Math.sin(time * .001 + p.pulse) * .003 * p.float * local;
       var size = p.size * w;
       ctx.save();
       ctx.translate(x * w, y * h);
-      ctx.rotate(p.angle + p.turn * local * .12 + Math.sin(time * .0008 + p.pulse) * (.018 + hover * .035) * local);
+      ctx.rotate(p.angle + p.turn * local * .12 + Math.sin(time * .0008 + p.pulse) * (.018 + hover * .05) * local);
       ctx.drawImage(atlas.hocSprites[p.type], -size / 2, -size / 2, size, size);
       ctx.restore();
     });
@@ -140,40 +140,38 @@
   }
   function drawInfusion(canvas, pixels, color, origin, progress, time, hover) {
     var ctx = canvas.getContext("2d"), data = pixels.data, values = inkField();
-    var shift = time * .0007, ix = Math.floor(shift), mix = shift - ix;
+    var shift = time * .003, ix = Math.floor(shift), mix = shift - ix;
     var front = origin.x + .06 + (1.12 - origin.x) * progress;
-    var strength = smoothstep(progress * 2.2);
-    var bloom = smoothstep(progress * 3.3);
-    var ringRadius = .23 + progress * .15 + Math.sin(time * .0005) * .008;
+    var strength = smoothstep(progress * 3.3);
     var radiusX = origin.radiusX || .36, radiusY = origin.radiusY || .93;
     for (var y = 0; y < FH; y++) {
       var py = y / (FH - 1);
       for (var x = 0; x < FW; x++) {
         var px = x / (FW - 1), k = (y * FW + x) * 4;
-        var sx = (x + ix) % FW;
-        var a = values[y * FW + sx], b = values[y * FW + (sx + 1) % FW];
+        // Advect the pigment to the right, matching the direction of travel.
+        var sx = ((x - ix) % FW + FW) % FW;
+        var a = values[y * FW + sx], b = values[y * FW + (sx + FW - 1) % FW];
         var n = a + (b - a) * mix;
-        var ridge = Math.sin(px * 9.5 + n * 5) * .033;
-        var axis = origin.y + (n - .5) * .21 + ridge;
-        var half = .13 + progress * .10 + Math.max(0, px - origin.x) * .07;
-        var vertical = smoothstep((half - Math.abs(py - axis)) / .14);
         var right = smoothstep((front + (n - .5) * .32 - px) / .15);
-        var left = smoothstep((px - origin.x + .23 + progress * .04) / .16);
         var edges = smoothstep(px / .07) * smoothstep((1 - px) / .08);
         edges *= smoothstep(py / .09) * smoothstep((1 - py) / .09);
-        // Different local concentrations carry the tea's colour into the water.
-        var density = .36 + smoothstep((n - .24) * 1.8) * .64;
-        var trail = vertical * right * left * density * strength * .48;
-        // Distance is measured in physical pile widths, so the bloom stays
-        // round even though this canvas spans a very wide desktop row.
+        // An upstream source feeds a widening downstream plume. There is no
+        // radial distance, annulus or closed contour around the ingredients.
         var dx = (px - origin.x) / radiusX, dy = (py - origin.y) / radiusY;
-        var distance = Math.sqrt(dx * dx + dy * dy);
-        var organic = distance + (n - .5) * .075;
-        var ring = Math.exp(-Math.pow((organic - ringRadius) / .09, 2));
-        var body = smoothstep((.46 + progress * .04 - organic) / .28);
-        var localInk = (ring * .48 + body * .24) * bloom * (.86 + density * .14);
-        localInk *= 1 + (hover || 0) * .12;
-        var alpha = (1 - (1 - trail) * (1 - localInk)) * edges;
+        var downstream = Math.max(0, dx);
+        var left = smoothstep((dx + .42) / .22);
+        var bend = Math.sin(dx * 2.6 - time * .0006) * (.022 + downstream * .025);
+        var axis = bend + (n - .5) * (.12 + downstream * .055);
+        var width = .20 + progress * .04 + smoothstep(downstream / 1.8) * .09 + (n - .5) * .06;
+        var body = Math.exp(-Math.pow((dy - axis) / width, 2) * 1.5);
+        var upper = axis - .14 - Math.sin(dx * 3.2 - time * .00075) * .06;
+        var lower = axis + .12 + Math.sin(dx * 2.7 - time * .0006) * .065;
+        var wisps = Math.exp(-Math.pow((dy - upper) / .065, 2)) * .14;
+        wisps += Math.exp(-Math.pow((dy - lower) / .07, 2)) * .11;
+        var density = .60 + smoothstep((n - .24) * 1.8) * .40;
+        var concentration = .34 + .38 * Math.exp(-downstream * .95);
+        var plume = body * concentration + wisps * smoothstep((dx + .15) / .5);
+        var alpha = Math.min(.78, plume * density * (1 + (hover || 0) * .10)) * left * right * strength * edges;
         data[k] = color[0]; data[k + 1] = color[1]; data[k + 2] = color[2];
         data[k + 3] = Math.round(alpha * 255);
       }
