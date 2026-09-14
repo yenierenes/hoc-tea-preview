@@ -15,7 +15,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
 
 <link rel="stylesheet" href="assets/css/hoc-core.css?v=9dc81688f6">
-<link rel="stylesheet" href="assets/css/hoc-sections.css?v=1630eea14e">
+<link rel="stylesheet" href="assets/css/hoc-sections.css?v=909bfd5d4c">
 <script>document.documentElement.classList.add('hoc-js');</script>
 </head>
 <body>
@@ -1787,7 +1787,7 @@
       </div>
     </section>
 
-    <footer class="hoc-section hoc-footer" data-theme="ink" data-header-theme="light">
+    <footer class="hoc-section hoc-footer" id="footer" data-theme="ink" data-header-theme="light">
       <div class="hoc-wrap">
         <div class="hoc-footer__grid">
           <div class="hoc-footer__brand">
@@ -1816,8 +1816,199 @@
           </nav>
         </div>
 
-        <svg class="hoc-footer__sprig" viewBox="0 0 900 100" aria-hidden="true"
-             data-hoc="draw"><use href="#b-branch"></use></svg>
+        <div class="hoc-current" data-hoc="footer-current" data-atlas="assets/img/botanical-atlas.webp?v=6377b35b4b" aria-label="The HOC botanical collection">
+          <div class="hoc-current__head hoc-micro">
+            <p>Botanical by nature.</p>
+            <button class="hoc-current__pause" type="button" data-current-pause aria-pressed="false" hidden>Pause flow</button>
+          </div>
+          <div class="hoc-current__viewport">
+            <ul class="hoc-current__track">
+              <li class="hoc-current__item" data-ingredients="Hibiscus|Mint Leaf|Lemongrass" data-seed="gift-of-nature">
+                <a class="hoc-current__blend" href="#range" data-range-index="0">
+                  <span class="hoc-current__media"><img
+        src="assets/img/pile-gift-of-nature.webp?v=ecd68be307"
+        srcset="assets/img/pile-gift-of-nature-420.webp?v=6c2828f4b4 420w, assets/img/pile-gift-of-nature-640.webp?v=566a571770 640w, assets/img/pile-gift-of-nature-900.webp?v=ecd68be307 900w"
+        sizes="(max-width: 699px) 180px, 230px"
+        width="640" height="640"
+        alt=""
+        loading="lazy" decoding="async"></span>
+                  <span class="hoc-current__index hoc-micro">01 / 14</span>
+                  <span class="hoc-current__name">Gift of Nature</span>
+                </a>
+                <p class="hoc-current__saying">Nature, in a cup.</p>
+              </li><li class="hoc-current__item" data-ingredients="Butterfly Pea Flower|Hibiscus|Cinnamon Stick" data-seed="mystic-butterfly">
+                <a class="hoc-current__blend" href="#range" data-range-index="1">
+                  <span class="hoc-current__media"><img
+        src="assets/img/pile-mystic-butterfly.webp?v=42630e2230"
+        srcset="assets/img/pile-mystic-butterfly-420.webp?v=8edc1d8317 420w, assets/img/pile-mystic-butterfly-640.webp?v=42e47a9c87 640w, assets/img/pile-mystic-butterfly-900.webp?v=42630e2230 900w"
+        sizes="(max-width: 699px) 180px, 230px"
+        width="640" height="640"
+        alt=""
+        loading="lazy" decoding="async"></span>
+                  <span class="hoc-current__index hoc-micro">02 / 14</span>
+                  <span class="hoc-current__name">Mystic Butterfly</span>
+                </a>
+                <p class="hoc-current__saying">Steep something different.</p>
+              </li><li class="hoc-current__item" data-ingredients="Mango|Pineapple|Lemongrass|Butterfly Pea Flower" data-seed="mesmerize">
+                <a class="hoc-current__blend" href="#range" data-range-index="2">
+                  <span class="hoc-current__media"><img
+        src="assets/img/pile-mesmerize.webp?v=3c16522329"
+        srcset="assets/img/pile-mesmerize-420.webp?v=a94291ca96 420w, assets/img/pile-mesmerize-640.webp?v=c556801266 640w, assets/img/pile-mesmerize-900.webp?v=3c16522329 900w"
+        sizes="(max-width: 699px) 180px, 230px"
+        width="640" height="640"
+        alt=""
+        loading="lazy" decoding="async"></span>
+                  <span class="hoc-current__index hoc-micro">03 / 14</span>
+                  <span class="hoc-current__name">Mesmerize</span>
+                </a>
+                <p class="hoc-current__saying">A ritual of your own.</p>
+              </li><li class="hoc-current__item" data-ingredients="Rooibos|Strawberry|Apple|Bourbon Vanilla" data-seed="sunset-valley">
+                <a class="hoc-current__blend" href="#range" data-range-index="3">
+                  <span class="hoc-current__media"><img
+        src="assets/img/pile-sunset-valley.webp?v=7d27b155a1"
+        srcset="assets/img/pile-sunset-valley-420.webp?v=864ba5d17c 420w, assets/img/pile-sunset-valley-640.webp?v=b6e6c095d3 640w, assets/img/pile-sunset-valley-900.webp?v=7d27b155a1 900w"
+        sizes="(max-width: 699px) 180px, 230px"
+        width="640" height="640"
+        alt=""
+        loading="lazy" decoding="async"></span>
+                  <span class="hoc-current__index hoc-micro">04 / 14</span>
+                  <span class="hoc-current__name">Sunset Valley</span>
+                </a>
+                <p class="hoc-current__saying">Hot. Cold. HOC.</p>
+              </li><li class="hoc-current__item" data-ingredients="Rooibos|Mango|Pineapple|Dried Ginger|Cinnamon Stick|Lemon Peel" data-seed="asian-breeze">
+                <a class="hoc-current__blend" href="#range" data-range-index="4">
+                  <span class="hoc-current__media"><img
+        src="assets/img/pile-asian-breeze.webp?v=751eab5773"
+        srcset="assets/img/pile-asian-breeze-420.webp?v=124948781e 420w, assets/img/pile-asian-breeze-640.webp?v=1bc66cf35b 640w, assets/img/pile-asian-breeze-900.webp?v=751eab5773 900w"
+        sizes="(max-width: 699px) 180px, 230px"
+        width="640" height="640"
+        alt=""
+        loading="lazy" decoding="async"></span>
+                  <span class="hoc-current__index hoc-micro">05 / 14</span>
+                  <span class="hoc-current__name">Asian Breeze</span>
+                </a>
+                <p class="hoc-current__saying">Colour your everyday.</p>
+              </li><li class="hoc-current__item" data-ingredients="Oolong|Dried Rose|Hibiscus|Chamomile" data-seed="souls-rest">
+                <a class="hoc-current__blend" href="#range" data-range-index="5">
+                  <span class="hoc-current__media"><img
+        src="assets/img/pile-souls-rest.webp?v=c03384b3da"
+        srcset="assets/img/pile-souls-rest-420.webp?v=86b7b7a791 420w, assets/img/pile-souls-rest-640.webp?v=3a8ae868c1 640w, assets/img/pile-souls-rest-900.webp?v=c03384b3da 900w"
+        sizes="(max-width: 699px) 180px, 230px"
+        width="640" height="640"
+        alt=""
+        loading="lazy" decoding="async"></span>
+                  <span class="hoc-current__index hoc-micro">06 / 14</span>
+                  <span class="hoc-current__name">Soul's Rest</span>
+                </a>
+                <p class="hoc-current__saying">Let nature flow.</p>
+              </li><li class="hoc-current__item" data-ingredients="Green Tea|Lemongrass|Strawberry|Blackberry|Butterfly Pea Flower" data-seed="gold-skies">
+                <a class="hoc-current__blend" href="#range" data-range-index="6">
+                  <span class="hoc-current__media"><img
+        src="assets/img/pile-gold-skies.webp?v=19c950d00d"
+        srcset="assets/img/pile-gold-skies-420.webp?v=37b6445498 420w, assets/img/pile-gold-skies-640.webp?v=113e82a796 640w, assets/img/pile-gold-skies-900.webp?v=19c950d00d 900w"
+        sizes="(max-width: 699px) 180px, 230px"
+        width="640" height="640"
+        alt=""
+        loading="lazy" decoding="async"></span>
+                  <span class="hoc-current__index hoc-micro">07 / 14</span>
+                  <span class="hoc-current__name">Gold Skies</span>
+                </a>
+                <p class="hoc-current__saying">Nature, in a cup.</p>
+              </li><li class="hoc-current__item" data-ingredients="Jasmine|Pineapple|Hibiscus|White Tea|Cinnamon Stick" data-seed="pink-moon">
+                <a class="hoc-current__blend" href="#range" data-range-index="7">
+                  <span class="hoc-current__media"><img
+        src="assets/img/pile-pink-moon.webp?v=0eb61fd2c5"
+        srcset="assets/img/pile-pink-moon-420.webp?v=22166d043d 420w, assets/img/pile-pink-moon-640.webp?v=a0f375b76f 640w, assets/img/pile-pink-moon-900.webp?v=0eb61fd2c5 900w"
+        sizes="(max-width: 699px) 180px, 230px"
+        width="640" height="640"
+        alt=""
+        loading="lazy" decoding="async"></span>
+                  <span class="hoc-current__index hoc-micro">08 / 14</span>
+                  <span class="hoc-current__name">Pink Moon</span>
+                </a>
+                <p class="hoc-current__saying">Steep something different.</p>
+              </li><li class="hoc-current__item" data-ingredients="Jasmine|Chamomile|Lavender|Lemon Balm" data-seed="innerbloom">
+                <a class="hoc-current__blend" href="#range" data-range-index="8">
+                  <span class="hoc-current__media"><img
+        src="assets/img/pile-innerbloom.webp?v=5feecddc57"
+        srcset="assets/img/pile-innerbloom-420.webp?v=0d6bb9040d 420w, assets/img/pile-innerbloom-640.webp?v=e09cdf4c2a 640w, assets/img/pile-innerbloom-900.webp?v=5feecddc57 900w"
+        sizes="(max-width: 699px) 180px, 230px"
+        width="640" height="640"
+        alt=""
+        loading="lazy" decoding="async"></span>
+                  <span class="hoc-current__index hoc-micro">09 / 14</span>
+                  <span class="hoc-current__name">Innerbloom</span>
+                </a>
+                <p class="hoc-current__saying">A ritual of your own.</p>
+              </li><li class="hoc-current__item" data-ingredients="Strawberry|White Tea|Lemon Peel|Apple|Mango|Cinnamon Stick" data-seed="white-tea-melody">
+                <a class="hoc-current__blend" href="#range" data-range-index="9">
+                  <span class="hoc-current__media"><img
+        src="assets/img/pile-white-tea-melody.webp?v=aacaaa13e7"
+        srcset="assets/img/pile-white-tea-melody-420.webp?v=04be5cf67c 420w, assets/img/pile-white-tea-melody-640.webp?v=0e9a3ecb80 640w, assets/img/pile-white-tea-melody-900.webp?v=aacaaa13e7 900w"
+        sizes="(max-width: 699px) 180px, 230px"
+        width="640" height="640"
+        alt=""
+        loading="lazy" decoding="async"></span>
+                  <span class="hoc-current__index hoc-micro">10 / 14</span>
+                  <span class="hoc-current__name">White Tea Melody</span>
+                </a>
+                <p class="hoc-current__saying">Hot. Cold. HOC.</p>
+              </li><li class="hoc-current__item" data-ingredients="Passionflower|Apple|Lemongrass|Hibiscus|Blackberry" data-seed="reflection">
+                <a class="hoc-current__blend" href="#range" data-range-index="10">
+                  <span class="hoc-current__media"><img
+        src="assets/img/pile-reflection.webp?v=409dec8773"
+        srcset="assets/img/pile-reflection-420.webp?v=89dd859883 420w, assets/img/pile-reflection-640.webp?v=ad648beffc 640w, assets/img/pile-reflection-900.webp?v=409dec8773 900w"
+        sizes="(max-width: 699px) 180px, 230px"
+        width="640" height="640"
+        alt=""
+        loading="lazy" decoding="async"></span>
+                  <span class="hoc-current__index hoc-micro">11 / 14</span>
+                  <span class="hoc-current__name">Reflection</span>
+                </a>
+                <p class="hoc-current__saying">Colour your everyday.</p>
+              </li><li class="hoc-current__item" data-ingredients="Rooibos|Mate|Fresh Ginger|Strawberry|Orange Peel" data-seed="winter-tale">
+                <a class="hoc-current__blend" href="#range" data-range-index="11">
+                  <span class="hoc-current__media"><img
+        src="assets/img/pile-winter-tale.webp?v=f223005500"
+        srcset="assets/img/pile-winter-tale-420.webp?v=eccb94b7c0 420w, assets/img/pile-winter-tale-640.webp?v=bbcdfa4990 640w, assets/img/pile-winter-tale-900.webp?v=f223005500 900w"
+        sizes="(max-width: 699px) 180px, 230px"
+        width="640" height="640"
+        alt=""
+        loading="lazy" decoding="async"></span>
+                  <span class="hoc-current__index hoc-micro">12 / 14</span>
+                  <span class="hoc-current__name">Winter Tale</span>
+                </a>
+                <p class="hoc-current__saying">Let nature flow.</p>
+              </li><li class="hoc-current__item" data-ingredients="Apple|Mango|Rosehip|Fennel|Passionflower" data-seed="wintertide">
+                <a class="hoc-current__blend" href="#range" data-range-index="12">
+                  <span class="hoc-current__media"><img
+        src="assets/img/pile-wintertide.webp?v=b255bb89fb"
+        srcset="assets/img/pile-wintertide-420.webp?v=50593f5f81 420w, assets/img/pile-wintertide-640.webp?v=904b4d17e4 640w, assets/img/pile-wintertide-900.webp?v=b255bb89fb 900w"
+        sizes="(max-width: 699px) 180px, 230px"
+        width="640" height="640"
+        alt=""
+        loading="lazy" decoding="async"></span>
+                  <span class="hoc-current__index hoc-micro">13 / 14</span>
+                  <span class="hoc-current__name">Wintertide</span>
+                </a>
+                <p class="hoc-current__saying">Nature, in a cup.</p>
+              </li><li class="hoc-current__item" data-ingredients="Apple|Cinnamon Stick|Hibiscus|Orange Peel" data-seed="bloomera">
+                <a class="hoc-current__blend" href="#range" data-range-index="13">
+                  <span class="hoc-current__media"><img
+        src="assets/img/pile-bloomera.webp?v=9e0e81fef8"
+        srcset="assets/img/pile-bloomera-420.webp?v=d39bb382ac 420w, assets/img/pile-bloomera-640.webp?v=17962d92d0 640w, assets/img/pile-bloomera-900.webp?v=9e0e81fef8 900w"
+        sizes="(max-width: 699px) 180px, 230px"
+        width="640" height="640"
+        alt=""
+        loading="lazy" decoding="async"></span>
+                  <span class="hoc-current__index hoc-micro">14 / 14</span>
+                  <span class="hoc-current__name">Bloomera</span>
+                </a>
+                <p class="hoc-current__saying">Steep something different.</p>
+              </li>
+            </ul>
+          </div>
+        </div>
 
         <div class="hoc-footer__legal hoc-micro">
           <p>&copy; 2026 HOC Tea</p>
@@ -2153,7 +2344,7 @@
 
 <script src="assets/js/hoc-data.js?v=4ce215a2d4"></script>
 <script src="assets/js/hoc-core.js?v=e2e8d51c36"></script>
-<script src="assets/js/hoc-botanicals.js?v=69a6a3d849"></script>
+<script src="assets/js/hoc-botanicals.js?v=ee536a7107"></script>
 <script src="assets/js/hoc-webgl.js?v=e2d91a3e21"></script>
 <script src="assets/js/hoc-motion.js?v=99d0bd692e"></script>
 </body>

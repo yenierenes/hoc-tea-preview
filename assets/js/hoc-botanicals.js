@@ -74,23 +74,29 @@
       });
     }
     var time = flow ? flow.time : 0;
+    var hover = flow ? flow.hover || 0 : 0;
+    var handX = flow ? flow.x || 0 : 0, handY = flow ? flow.y || 0 : 0;
     items.forEach(function (p) {
       var local = smoothstep((spread - p.phase * .18) / .82);
       var radius = Math.hypot(p.x, p.y);
       var edge = smoothstep(radius / .28);
       // Expansion is proportional to distance: the core never becomes a ring.
       var turn = local * (.10 + edge * .18);
-      turn += Math.sin(time * .00022 + p.pulse) * .013 * local * edge;
+      turn += Math.sin(time * .00072 + p.pulse * .3) * (.022 + hover * .038) * local * edge;
       var rx = p.x * Math.cos(turn) - p.y * Math.sin(turn);
       var ry = p.x * Math.sin(turn) + p.y * Math.cos(turn);
       var x = .5 + rx * (1 + local * .28 * edge);
       var y = .5 + ry * (1 + local * .17 * edge);
-      x += Math.sin(time * .00027 * p.orbit + p.pulse) * .0025 * local * edge;
-      y += Math.cos(time * .00023 + p.pulse) * .002 * local * edge;
+      // A shared current carries the core too. Fine leaves have a little
+      // independent drift; pointer speed never enters the motion equation.
+      var buoyancy = local * (.35 + edge * .65);
+      x += (Math.sin(time * .0008 + p.pulse * .25) * (.005 + hover * .006) + handX * hover * .012) * buoyancy;
+      y += (Math.cos(time * .0007 + p.pulse * .3) * (.006 + hover * .006) + handY * hover * .009) * buoyancy;
+      y += Math.sin(time * .001 + p.pulse) * .003 * p.float * local;
       var size = p.size * w;
       ctx.save();
       ctx.translate(x * w, y * h);
-      ctx.rotate(p.angle + p.turn * local * .12);
+      ctx.rotate(p.angle + p.turn * local * .12 + Math.sin(time * .0008 + p.pulse) * (.018 + hover * .035) * local);
       ctx.drawImage(atlas.hocSprites[p.type], -size / 2, -size / 2, size, size);
       ctx.restore();
     });
@@ -132,11 +138,14 @@
     var n = match ? parseInt(match[1], 16) : 0xAD3450;
     return [n >> 16, n >> 8 & 255, n & 255];
   }
-  function drawInfusion(canvas, pixels, color, origin, progress, time) {
+  function drawInfusion(canvas, pixels, color, origin, progress, time, hover) {
     var ctx = canvas.getContext("2d"), data = pixels.data, values = inkField();
     var shift = time * .0007, ix = Math.floor(shift), mix = shift - ix;
     var front = origin.x + .06 + (1.12 - origin.x) * progress;
     var strength = smoothstep(progress * 2.2);
+    var bloom = smoothstep(progress * 3.3);
+    var ringRadius = .23 + progress * .15 + Math.sin(time * .0005) * .008;
+    var radiusX = origin.radiusX || .36, radiusY = origin.radiusY || .93;
     for (var y = 0; y < FH; y++) {
       var py = y / (FH - 1);
       for (var x = 0; x < FW; x++) {
@@ -154,7 +163,17 @@
         edges *= smoothstep(py / .09) * smoothstep((1 - py) / .09);
         // Different local concentrations carry the tea's colour into the water.
         var density = .36 + smoothstep((n - .24) * 1.8) * .64;
-        var alpha = vertical * right * left * edges * density * strength * .48;
+        var trail = vertical * right * left * density * strength * .48;
+        // Distance is measured in physical pile widths, so the bloom stays
+        // round even though this canvas spans a very wide desktop row.
+        var dx = (px - origin.x) / radiusX, dy = (py - origin.y) / radiusY;
+        var distance = Math.sqrt(dx * dx + dy * dy);
+        var organic = distance + (n - .5) * .075;
+        var ring = Math.exp(-Math.pow((organic - ringRadius) / .09, 2));
+        var body = smoothstep((.46 + progress * .04 - organic) / .28);
+        var localInk = (ring * .48 + body * .24) * bloom * (.86 + density * .14);
+        localInk *= 1 + (hover || 0) * .12;
+        var alpha = (1 - (1 - trail) * (1 - localInk)) * edges;
         data[k] = color[0]; data[k + 1] = color[1]; data[k + 2] = color[2];
         data[k + 3] = Math.round(alpha * 255);
       }
@@ -177,20 +196,24 @@
     var row = el.closest(".hoc-range__cell"), stage = el.closest(".hoc-range__stage");
     var canvas, ink, pixels, atlas, items, marker, visibleObserver, centerObserver, resizeObserver;
     var disposed = false, loading = false, visible = false, centered = false, armed = false;
-    var running = false, last = 0, age = 0, lastPaint = 0, progress = 0;
+    var running = false, last = 0, age = 0, lastPaint = 0, progress = 0, motionTime = 0;
+    var hover = 0, hoverTarget = 0;
+    var pointer = { x: 0, y: 0 }, target = { x: 0, y: 0 };
     var origin = { x: .17, y: .5 }, color = [173, 52, 80];
     var mq = root.matchMedia("(prefers-reduced-motion: reduce)");
     function reduced() { return mq.matches || HOC.env.tier === "reduced"; }
     function stop() { HOC.ticker.remove(tick); running = false; last = 0; }
     function reset() {
-      stop(); age = progress = lastPaint = 0; armed = false;
+      stop(); age = progress = lastPaint = motionTime = hover = hoverTarget = 0; armed = false;
+      pointer.x = pointer.y = target.x = target.y = 0;
       el.classList.remove("is-infusing");
       el.dataset.infusionProgress = "0";
+      el.dataset.hoverStrength = "0";
       if (canvas && atlas) draw(canvas, atlas, items, 0, null, { time: 0 });
       if (ink) ink.getContext("2d").clearRect(0, 0, FW, FH);
     }
     function wake() {
-      if (running || !visible || !armed || !atlas || reduced() || document.hidden) return;
+      if (running || !visible || (!armed && !hoverTarget && hover < .003) || !atlas || reduced() || document.hidden) return;
       running = true; last = 0; HOC.ticker.add(tick);
     }
     function start() {
@@ -203,15 +226,39 @@
       if (reduced()) { reset(); return; }
       if (!visible || document.hidden) { stop(); return; }
       var dt = last ? Math.min(t - last, 64) : 16;
-      last = t; age += dt;
+      last = t; motionTime += dt;
+      if (armed) age += dt;
+      hover += (hoverTarget - hover) * (1 - Math.exp(-dt / (hoverTarget ? 380 : 720)));
+      var follow = 1 - Math.exp(-dt / 420);
+      pointer.x += (target.x - pointer.x) * follow;
+      pointer.y += (target.y - pointer.y) * follow;
       // Independent of pointer position and frame rate. Colour continues to
       // travel right while this product remains on screen.
-      progress = 1 - Math.exp(-age / 4800);
+      progress = 1 - Math.exp(-age / 3550);
+      if (!armed && !hoverTarget && hover < .003) { reset(); return; }
       if (t - lastPaint < 33) return;
       lastPaint = t;
-      draw(canvas, atlas, items, smoothstep(Math.min(1, age / 2400)), null, { time: age });
-      drawInfusion(ink, pixels, color, origin, progress, age);
+      paint();
       el.dataset.infusionProgress = progress.toFixed(3);
+      el.dataset.hoverStrength = hover.toFixed(3);
+    }
+    function paint() {
+      var spread = Math.max(smoothstep(Math.min(1, age / 1750)), hover * .45);
+      draw(canvas, atlas, items, spread, null, { time: motionTime, hover: hover, x: pointer.x, y: pointer.y });
+      if (progress > 0) drawInfusion(ink, pixels, color, origin, progress, motionTime, hover);
+    }
+    function move(e) {
+      if (e.pointerType === "touch" || reduced()) return;
+      var box = el.getBoundingClientRect();
+      target.x = clamp((e.clientX - box.left) / box.width * 2 - 1, -1, 1);
+      target.y = clamp((e.clientY - box.top) / box.height * 2 - 1, -1, 1);
+    }
+    function enter(e) {
+      if (e.pointerType === "touch" || reduced()) return;
+      hoverTarget = 1; move(e); wake();
+    }
+    function leave() {
+      hoverTarget = 0; target.x = target.y = 0;
     }
     function measure() {
       if (!canvas || !stage || !row) return;
@@ -223,8 +270,9 @@
       ink.style.width = stageBox.width + "px";
       origin.x = clamp((pileBox.left + pileBox.width / 2 - stageBox.left) / stageBox.width, .1, .4);
       origin.y = clamp((pileBox.top + pileBox.height / 2 - rowBox.top) / rowBox.height, .2, .7);
-      draw(canvas, atlas, items, smoothstep(Math.min(1, age / 2400)), null, { time: age });
-      if (progress > 0) drawInfusion(ink, pixels, color, origin, progress, age);
+      origin.radiusX = pileBox.width / stageBox.width;
+      origin.radiusY = pileBox.width / rowBox.height;
+      paint();
     }
     function prepare() {
       if (loading || reduced()) return;
@@ -243,7 +291,7 @@
         row.prepend(ink); el.appendChild(canvas);
         measure(); el.classList.add("is-ready");
         if (armed) { el.classList.add("is-infusing"); wake(); }
-        else start();
+        else { start(); wake(); }
       }).catch(function () { loading = false; /* Static photo remains if the atlas fails. */ });
     }
     function visibility() { if (document.hidden) stop(); else wake(); }
@@ -255,12 +303,12 @@
       if (!marker || disposed) return;
       if (centerObserver) centerObserver.disconnect();
       centered = false;
-      // IO percentage margins use viewport width. Pixels keep this band at
-      // the vertical center on both portrait and wide desktop screens.
+      // Begin on the approach to center, while the pile is still in the
+      // lower third. Pixels keep this band independent of viewport width.
       centerObserver = new IntersectionObserver(function (entries) {
         entries.forEach(function (entry) { centered = entry.isIntersecting; if (centered) start(); });
       }, { rootMargin: "-" + Math.round(root.innerHeight * .44) + "px 0px -" +
-        Math.round(root.innerHeight * .40) + "px 0px" });
+        Math.round(root.innerHeight * .18) + "px 0px" });
       centerObserver.observe(marker);
     }
     return {
@@ -270,6 +318,7 @@
         marker.className = "hoc-range__center-marker"; marker.setAttribute("aria-hidden", "true");
         el.appendChild(marker);
         el.dataset.infusionProgress = "0";
+        el.dataset.hoverStrength = "0";
         visibleObserver = new IntersectionObserver(function (entries) {
           entries.forEach(function (entry) {
             visible = entry.isIntersecting;
@@ -283,6 +332,10 @@
         document.addEventListener("visibilitychange", visibility);
         mq.addEventListener("change", preference);
         HOC.on("tierchange", preference);
+        el.addEventListener("pointerenter", enter);
+        el.addEventListener("pointermove", move, { passive: true });
+        el.addEventListener("pointerleave", leave);
+        el.addEventListener("pointercancel", leave);
       },
       resize: function () { measure(); watchCenter(); },
       destroy: function () {
@@ -291,10 +344,160 @@
         if (centerObserver) centerObserver.disconnect();
         if (resizeObserver) resizeObserver.disconnect();
         if (canvas) canvas.remove(); if (ink) ink.remove(); if (marker) marker.remove();
-        el.classList.remove("is-ready"); delete el.dataset.infusionProgress;
+        el.classList.remove("is-ready"); delete el.dataset.infusionProgress; delete el.dataset.hoverStrength;
         document.removeEventListener("visibilitychange", visibility);
         mq.removeEventListener("change", preference);
         HOC.off("tierchange", preference);
+        el.removeEventListener("pointerenter", enter);
+        el.removeEventListener("pointermove", move);
+        el.removeEventListener("pointerleave", leave);
+        el.removeEventListener("pointercancel", leave);
+      }
+    };
+  });
+
+  // One continuous botanical procession. Real recipe fragments drift with
+  // each blend; no duplicated links, offscreen loops or second animation clock.
+  HOC.controller("footer-current", function (el) {
+    var viewport = el.querySelector(".hoc-current__viewport");
+    var entries = Array.prototype.slice.call(el.querySelectorAll(".hoc-current__item"));
+    var button = el.querySelector("[data-current-pause]");
+    var observer, visible = false, playing = false, paused = false, focused = false, hovering = false;
+    var decorated = false, enabled = false, width = 540, offset = 580, total = 0, viewportWidth = 0;
+    var last = 0, time = 0, speed = 0, lastPaint = 0, petals = [];
+    var mq = root.matchMedia("(prefers-reduced-motion: reduce)");
+    function reduced() { return mq.matches || HOC.env.reduced || HOC.env.tier === "reduced"; }
+    function stop() { HOC.ticker.remove(tick); playing = false; last = 0; }
+    function wake() {
+      if (playing || !enabled || !visible || paused || focused || document.hidden) return;
+      playing = true; last = 0; HOC.ticker.add(tick);
+    }
+    function decorate() {
+      if (decorated) return;
+      decorated = true;
+      entries.forEach(function (entry, index) {
+        var media = entry.querySelector(".hoc-current__media");
+        var recipe = (entry.dataset.ingredients || "").split("|").map(function (name) { return names.indexOf(name.trim()); }).filter(function (i) { return i >= 0; });
+        var rand = random(entry.dataset.seed || String(index));
+        var group = [];
+        if (media && recipe.length) for (var i = 0; i < 9; i++) {
+          var type = recipe[i % recipe.length], node = document.createElement("span");
+          node.className = "hoc-current__petal"; node.setAttribute("aria-hidden", "true");
+          node.style.backgroundImage = 'url("' + el.dataset.atlas + '")';
+          node.style.backgroundPosition = (type % 6 / 5 * 100) + "% " + (Math.floor(type / 6) / 4 * 100) + "%";
+          var size = 19 + rand() * 17;
+          node.style.width = node.style.height = size + "px";
+          media.appendChild(node);
+          group.push({ node: node, x: .05 + rand() * .85, y: .1 + rand() * .7, phase: rand() * 6.28, angle: rand() * 360, size: size });
+        }
+        petals.push(group);
+      });
+    }
+    function paint() {
+      entries.forEach(function (entry, i) {
+        // Negative index makes the catalogue follow Gift -> Mystic -> ... as
+        // it enters from the left, travelling toward the right.
+        var x = ((offset - i * width) % total + total) % total - width;
+        var on = x > -width + 8 && x < viewportWidth - 8;
+        entry.style.transform = "translate3d(" + x.toFixed(2) + "px,0,0)";
+        entry.style.visibility = on ? "visible" : "hidden";
+        entry.inert = !on;
+        if (on) entry.removeAttribute("aria-hidden"); else entry.setAttribute("aria-hidden", "true");
+        if (!on) return;
+        var wave = time * .00065 + i * 1.7;
+        entry.style.setProperty("--current-bob", (Math.sin(wave) * 5).toFixed(2) + "px");
+        entry.style.setProperty("--current-turn", (Math.sin(wave * .7) * 2).toFixed(2) + "deg");
+        var mediaWidth = width < 400 ? 180 : 240;
+        (petals[i] || []).forEach(function (p) {
+          var px = p.x * mediaWidth + Math.sin(wave + p.phase) * 12;
+          var py = p.y * (mediaWidth * .88) + Math.cos(wave * .85 + p.phase) * 8;
+          p.node.style.transform = "translate3d(" + px.toFixed(2) + "px," + py.toFixed(2) + "px,0) rotate(" + (p.angle + Math.sin(wave + p.phase) * 13).toFixed(2) + "deg)";
+        });
+      });
+      el.dataset.flowOffset = offset.toFixed(2);
+    }
+    function tick(t) {
+      if (reduced()) { mode(); return; }
+      if (!visible || paused || focused || document.hidden) { stop(); return; }
+      var dt = last ? Math.min(t - last, 64) : 16;
+      last = t; time += dt;
+      var target = hovering ? 13 : (viewportWidth < 700 ? 32 : 48);
+      speed += (target - speed) * (1 - Math.exp(-dt / 550));
+      offset = (offset + speed * dt / 1000) % total;
+      if (t - lastPaint < 33) return;
+      lastPaint = t; paint();
+    }
+    function measure() {
+      if (!entries.length) return;
+      var next = entries[0].getBoundingClientRect().width || 540;
+      offset = offset / width * next; width = next;
+      total = width * entries.length; viewportWidth = viewport.clientWidth;
+      if (enabled) paint();
+    }
+    function mode() {
+      enabled = !reduced() && entries.length > 1;
+      el.classList.toggle("is-flowing", enabled);
+      button.hidden = !enabled;
+      if (!enabled) {
+        stop();
+        entries.forEach(function (entry) { entry.style.transform = ""; entry.style.visibility = ""; entry.style.removeProperty("--current-bob"); entry.style.removeProperty("--current-turn"); entry.inert = false; entry.removeAttribute("aria-hidden"); });
+        petals.forEach(function (group) { group.forEach(function (p) { p.node.hidden = true; }); });
+      } else {
+        if (visible) decorate();
+        petals.forEach(function (group) { group.forEach(function (p) { p.node.hidden = false; }); });
+        measure(); wake();
+      }
+    }
+    function pause() {
+      paused = !paused;
+      button.setAttribute("aria-pressed", String(paused));
+      button.textContent = paused ? "Resume flow" : "Pause flow";
+      if (paused) stop(); else wake();
+    }
+    function enter(e) { if (e.pointerType !== "touch") hovering = true; }
+    function leave() { hovering = false; }
+    function focusIn() { focused = true; stop(); }
+    function focusOut(e) { if (!viewport.contains(e.relatedTarget)) { focused = false; wake(); } }
+    function visibility() { if (document.hidden) stop(); else wake(); }
+    function navigate(e) {
+      var link = e.target.closest("[data-range-index]");
+      if (!link) return;
+      var cells = document.querySelectorAll(".hoc-range__col--left .hoc-range__cell");
+      var cell = cells[Number(link.dataset.rangeIndex)];
+      if (!cell) return;
+      e.preventDefault();
+      var box = cell.getBoundingClientRect(), y = root.scrollY + box.top + box.height / 2 - (root.innerHeight / 2 + 31);
+      if (HOC.lenis) HOC.lenis.scrollTo(y); else root.scrollTo({ top: y, behavior: reduced() ? "instant" : "smooth" });
+    }
+    return {
+      init: function () {
+        if (!entries.length || !viewport || !button) return;
+        button.textContent = "Pause flow"; button.setAttribute("aria-pressed", "false");
+        mode();
+        observer = new IntersectionObserver(function (events) {
+          visible = events[0].isIntersecting;
+          if (visible && enabled) { decorate(); paint(); wake(); } else stop();
+        });
+        observer.observe(viewport);
+        button.addEventListener("click", pause);
+        viewport.addEventListener("pointerenter", enter); viewport.addEventListener("pointerleave", leave);
+        viewport.addEventListener("focusin", focusIn); viewport.addEventListener("focusout", focusOut);
+        viewport.addEventListener("click", navigate);
+        mq.addEventListener("change", mode); HOC.on("tierchange", mode);
+        document.addEventListener("visibilitychange", visibility);
+      },
+      resize: measure,
+      destroy: function () {
+        stop(); if (observer) observer.disconnect();
+        button.removeEventListener("click", pause);
+        viewport.removeEventListener("pointerenter", enter); viewport.removeEventListener("pointerleave", leave);
+        viewport.removeEventListener("focusin", focusIn); viewport.removeEventListener("focusout", focusOut);
+        viewport.removeEventListener("click", navigate);
+        mq.removeEventListener("change", mode); HOC.off("tierchange", mode);
+        document.removeEventListener("visibilitychange", visibility);
+        el.classList.remove("is-flowing"); delete el.dataset.flowOffset; button.hidden = true;
+        entries.forEach(function (entry) { entry.style.transform = ""; entry.style.visibility = ""; entry.style.removeProperty("--current-bob"); entry.style.removeProperty("--current-turn"); entry.inert = false; entry.removeAttribute("aria-hidden"); });
+        petals.forEach(function (group) { group.forEach(function (p) { p.node.remove(); }); });
       }
     };
   });
