@@ -1857,6 +1857,7 @@
   flex: none;
   border-radius: 50%;
   touch-action: pan-y;
+  contain: layout paint style;
 }
 .hoc-range__pile img, .hoc-range__pile canvas {
   display: block;
@@ -1865,6 +1866,18 @@
   object-fit: contain;
 }
 .hoc-range__pile canvas { position: absolute; inset: 0; pointer-events: none; }
+.hoc-range__pile::after {
+  content: "";
+  position: absolute;
+  inset: 12%;
+  z-index: -1;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--accent, #4c8984) 10%, transparent), transparent 66%);
+  opacity: 0;
+  transform: scale(.72);
+  transition: opacity .8s var(--e-hoc), transform 1.15s var(--e-hoc);
+}
+.hoc-range__pile.is-scattered::after { opacity: 1; transform: scale(1.2); }
 .hoc-range__pile.is-ready img { opacity: 0; }
 .hoc-range__pile[role="button"] { cursor: pointer; }
 .hoc-range__pile:focus-visible { outline: 1px solid var(--hoc-teal, #4c8984); outline-offset: -10px; }

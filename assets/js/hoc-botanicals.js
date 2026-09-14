@@ -9,6 +9,10 @@
     "Lemon Balm", "Passionflower", "Mate", "Fresh Ginger", "Orange Peel", "Rosehip", "Fennel"];
   var scales = [1, .82, .7, 1, .8, .85, .8, .9, 1, .85, .55, .85, .75, .7,
     .85, .85, .6, .75, .72, .65, .65, .8, .9, .85, .8, .8, .8, .65];
+  // Low values are light petals/leaves; high values are dense fruit, seed and
+  // bark. This makes each blend open in a believable physical order.
+  var liftOrder = [.12, .18, .35, .08, .75, .72, .68, .28, .62, .68, .78, .73,
+    .55, .38, .10, .06, .32, .70, .05, .22, .04, .16, .08, .30, .74, .58, .65, .62];
 
   function random(seed) {
     var n = 2166136261;
@@ -37,12 +41,22 @@
       var y = Math.sin(a) * radius * .85;
       result.push({ type: type, x: x, y: y, size: size, angle: rand() * Math.PI * 2,
         dx: Math.cos(a) * (.10 + rand() * .12), dy: Math.sin(a) * (.10 + rand() * .12),
-        turn: (rand() - .5) * 1.2, depth: .7 + rand() * .3 });
+        turn: (rand() - .5) * 1.2, depth: .7 + rand() * .3,
+        phase: clamp(liftOrder[type] + (rand() - .5) * .22, 0, 1),
+        spiral: .42 + rand() * .72,
+        float: .45 + rand() * .55, pulse: rand() * Math.PI * 2,
+        orbit: .7 + rand() * .65 });
     }
     return result;
   }
 
-  function draw(canvas, atlas, items, spread, pointer) {
+  function clamp(value, min, max) { return Math.max(min, Math.min(max, value)); }
+  function smoothstep(value) {
+    value = clamp(value, 0, 1);
+    return value * value * (3 - 2 * value);
+  }
+
+  function draw(canvas, atlas, items, spread, pointer, flow) {
     var ctx = canvas.getContext("2d");
     var w = canvas.width, h = canvas.height;
     ctx.clearRect(0, 0, w, h);
@@ -60,20 +74,39 @@
         return tile;
       });
     }
+    var time = flow ? flow.time : 0;
+    var energy = flow ? flow.energy : 0;
+    var spin = flow ? flow.spin : 0;
     items.forEach(function (p) {
-      var x = .5 + p.x + p.dx * spread;
-      var y = .5 + p.y + p.dy * spread;
-      if (pointer && spread > 0) {
-        var vx = x - pointer.x, vy = y - pointer.y;
-        var dist = Math.sqrt(vx * vx + vy * vy) || .001;
-        var force = Math.max(0, .18 - dist) * .17 * spread;
-        x += vx / dist * force;
-        y += vy / dist * force;
+      // Each layer lifts at a different moment. Reversing spread makes the
+      // same curve gather inward instead of popping back to the center.
+      var local = smoothstep((spread - p.phase * .22) / .78);
+      var baseAngle = Math.atan2(p.y, p.x);
+      var baseRadius = Math.sqrt(p.x * p.x + p.y * p.y);
+      var breathing = Math.sin(time * .0011 * p.orbit + p.pulse) * .010 * local;
+      var radius = baseRadius + local * (.075 + p.float * .095) + breathing;
+      var current = local * (p.spiral + spin * .18);
+      current += Math.sin(time * .00052 + p.pulse) * .045 * local;
+      var x = .5 + Math.cos(baseAngle + current) * radius;
+      var y = .5 + Math.sin(baseAngle + current) * radius * .84;
+
+      if (pointer && local > 0) {
+        var rx = x - pointer.x, ry = y - pointer.y;
+        var distance = Math.sqrt(rx * rx + ry * ry) || .001;
+        var reach = smoothstep(1 - distance / .42) * local * p.float;
+        // The pointer creates a current: velocity pulls pieces forward while
+        // a perpendicular component curls them around the gesture.
+        var wakeX = (flow.vx || 0) * reach * (1.15 + energy * .55);
+        var wakeY = (flow.vy || 0) * reach * (1.15 + energy * .55);
+        var curl = reach * (.010 + energy * .018);
+        x += wakeX - ry / distance * curl;
+        y += wakeY + rx / distance * curl;
       }
-      var size = p.size * w;
+      var size = p.size * w * (1 + local * (.025 + .025 * Math.sin(time * .0013 + p.pulse)));
       ctx.save();
       ctx.translate(x * w, y * h);
-      ctx.rotate(p.angle + p.turn * spread);
+      ctx.rotate(p.angle + p.turn * local + current * .45);
+      ctx.globalAlpha = .86 + p.depth * .14;
       ctx.drawImage(atlas.hocSprites[p.type], -size / 2, -size / 2, size, size);
       ctx.restore();
     });
@@ -96,40 +129,81 @@
   HOC.controller("botanical-pile", function (el) {
     var canvas, atlas, items, observer, disposed = false, loading = false;
     var progress = 0, target = 0, last = 0, running = false;
-    var pointer = null;
+    var transitionFrom = 0, transitionStarted = 0, transitionDuration = 900;
+    var pointer = null, pointerTarget = null, pointerLast = null;
+    var flow = { time: 0, vx: 0, vy: 0, energy: 0, spin: 0 };
     var mq = root.matchMedia("(prefers-reduced-motion: reduce)");
     var coarse = root.matchMedia("(hover: none)");
-    function paint() { if (canvas && atlas) draw(canvas, atlas, items, progress, pointer); }
+    function paint() { if (canvas && atlas) draw(canvas, atlas, items, progress, pointer, flow); }
     function stop() { HOC.ticker.remove(tick); running = false; last = 0; }
     function tick(t) {
       var dt = last ? Math.min(t - last, 50) : 16;
       last = t;
-      progress += (target - progress) * (1 - Math.exp(-dt / (target ? 180 : 220)));
-      if (Math.abs(progress - target) < .0008) progress = target;
+      if (progress !== target) {
+        if (!transitionStarted) transitionStarted = t;
+        var elapsed = Math.min(1, (t - transitionStarted) / transitionDuration);
+        var ease = 1 - Math.pow(1 - elapsed, target ? 3 : 4);
+        progress = transitionFrom + (target - transitionFrom) * ease;
+        if (elapsed === 1) progress = target;
+      }
+      if (pointerTarget) {
+        if (!pointer) pointer = { x: pointerTarget.x, y: pointerTarget.y };
+        pointer.x += (pointerTarget.x - pointer.x) * (1 - Math.exp(-dt / 85));
+        pointer.y += (pointerTarget.y - pointer.y) * (1 - Math.exp(-dt / 85));
+      }
+      flow.vx *= Math.exp(-dt / 190);
+      flow.vy *= Math.exp(-dt / 190);
+      flow.energy *= Math.exp(-dt / 310);
+      flow.spin += ((flow.vx * 5 + flow.vy * 2.5) - flow.spin) * (1 - Math.exp(-dt / 240));
+      flow.time += dt;
       paint();
-      if (progress === target) stop();
+      // While open, one visible heap keeps a very slow suspended current.
+      // Once gathered the canvas returns to its exact static frame and stops.
+      if (progress === 0 && target === 0) stop();
     }
     function wake() {
       if (!running) { running = true; last = 0; HOC.ticker.add(tick); }
     }
     function set(value) {
       if (!atlas || mq.matches || HOC.env.tier === "reduced") return;
+      if (value === target && progress === target) return;
+      transitionFrom = progress;
+      // The shared GSAP ticker uses its own time origin; arm the transition
+      // here and take that clock's value on the next frame.
+      transitionStarted = 0;
+      transitionDuration = value ? 900 : 1150;
       target = value;
       el.setAttribute("aria-pressed", value ? "true" : "false");
       el.classList.toggle("is-scattered", !!value);
       wake();
     }
-    function enter(e) { if (e.pointerType === "mouse") set(1); }
+    function enter(e) {
+      if (e.pointerType !== "mouse") return;
+      var box = el.getBoundingClientRect();
+      pointerTarget = { x: (e.clientX - box.left) / box.width, y: (e.clientY - box.top) / box.height };
+      pointerLast = { x: pointerTarget.x, y: pointerTarget.y, time: e.timeStamp };
+      set(1);
+    }
     function move(e) {
       if (!target || e.pointerType !== "mouse") return;
       var box = el.getBoundingClientRect();
-      pointer = { x: (e.clientX - box.left) / box.width, y: (e.clientY - box.top) / box.height };
+      var next = { x: (e.clientX - box.left) / box.width, y: (e.clientY - box.top) / box.height };
+      if (pointerLast) {
+        var dt = Math.max(8, e.timeStamp - pointerLast.time);
+        flow.vx = clamp((next.x - pointerLast.x) * 16 / dt, -.09, .09);
+        flow.vy = clamp((next.y - pointerLast.y) * 16 / dt, -.09, .09);
+        flow.energy = Math.min(1, Math.sqrt(flow.vx * flow.vx + flow.vy * flow.vy) * 11);
+      }
+      pointerTarget = next;
+      pointerLast = { x: next.x, y: next.y, time: e.timeStamp };
       wake();
     }
     function leave(e) {
       // Touch dispatches pointerleave before click; it must not reset a tap toggle.
       if (e && e.type === "pointerleave" && e.pointerType !== "mouse") return;
-      pointer = null; set(0);
+      pointer = pointerTarget = pointerLast = null;
+      flow.vx = flow.vy = flow.energy = flow.spin = 0;
+      set(0);
     }
     function click(e) { if (coarse.matches || e.detail === 0) set(target ? 0 : 1); }
     function key(e) {
@@ -180,7 +254,12 @@
         observer = new IntersectionObserver(function (entries) {
           entries.forEach(function (entry) {
             if (entry.isIntersecting) prepare();
-            else if (canvas) { target = progress = 0; stop(); paint(); el.classList.remove("is-scattered"); el.setAttribute("aria-pressed", "false"); }
+            else if (canvas) {
+              target = progress = transitionFrom = 0;
+              pointer = pointerTarget = pointerLast = null;
+              flow.vx = flow.vy = flow.energy = flow.spin = 0;
+              stop(); paint(); el.classList.remove("is-scattered"); el.setAttribute("aria-pressed", "false");
+            }
           });
         }, { rootMargin: "200px" });
         observer.observe(el);
