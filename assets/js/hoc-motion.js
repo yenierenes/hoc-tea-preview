@@ -917,11 +917,11 @@
          drifts a beat behind the scroll rather than tracking it exactly
        * whichever blend you are level with swaps into the panel
 
-     "Level with" is measured against the LEFT column's cells, because that is
-     the column the eye follows — the right column is deliberately offset.
+     "Level with" uses untransformed row centers. Both image stacks share
+     that geometry; only the individual images receive bounded parallax.
 
-     Everything here is enhancement. Without JS the columns sit still, the
-     panel shows all fourteen stacked, and the section still lists the range.
+     Without this enhancement all fourteen blends keep their own images,
+     description and add button in an ordinary vertical list.
      ====================================================================== */
 
   HOC.controller("range", function (el) {
@@ -932,11 +932,13 @@
     var panels = HOC.$$(".hoc-range__panel", el);
     var notes = HOC.$$(".hoc-range__note", el);
 
-    var st = null;
-    var active = -1;
-    var visible = false;
-    var progress = 0;
-    var lag = 0; // the panel's own delayed position
+    var observer = null;
+    var active = -1, visible = false, lastY = -1, lag = 0;
+    var dirty = true, lastTime = 0;
+    var media = root.matchMedia("(min-width: 900px) and (min-height: 620px)");
+    var piles = HOC.$$(".hoc-range__col--left .hoc-range__pile", el);
+    var packs = HOC.$$(".hoc-range__col--right .hoc-range__pack", el);
+    var rightCells = HOC.$$(".hoc-range__col--right .hoc-range__cell", el);
 
     function setActive(i) {
       if (i === active || i < 0 || i >= panels.length) return;
@@ -944,6 +946,7 @@
       panels.forEach(function (p, n) {
         var on = n === i;
         p.classList.toggle("is-on", on);
+        p.inert = !on;
         if (on) p.removeAttribute("aria-hidden");
         else p.setAttribute("aria-hidden", "true");
       });
@@ -962,82 +965,88 @@
       HOC.emit("rangechange", { index: i, el: el });
     }
 
-    function nearest() {
-      // Which left-column cell is closest to the middle of the viewport.
-      var mid = root.innerHeight * 0.5;
-      var best = 0;
-      var bestD = Infinity;
-      for (var i = 0; i < cells.length; i++) {
-        var r = cells[i].getBoundingClientRect();
-        var d = Math.abs(r.top + r.height * 0.5 - mid);
-        if (d < bestD) {
-          bestD = d;
-          best = i;
-        }
-      }
-      return best;
+    function resetTransforms() {
+      piles.concat(packs).forEach(function (item) { item.style.transform = ""; });
+      if (sticky) sticky.style.setProperty("--range-drift", "0px");
     }
 
-    function tick() {
-      if (!visible) return;
+    function tick(t) {
+      if (!visible || !media.matches) return;
+      var y = root.scrollY;
+      var dt = lastTime ? Math.min(t - lastTime, 50) : 16;
+      lastTime = t;
+      if (!dirty && Math.abs(y - lastY) < .1 && Math.abs(y - lag) < .1) return;
+      // Read untransformed row positions before writing. Both stacks share
+      // exactly the same row geometry, including the first and last product.
+      var boxes = cells.map(function (cell) { return cell.getBoundingClientRect(); });
+      var mid = root.innerHeight * .5 + 31;
+      var best = 0, distance = Infinity;
+      var still = reduced() || HOC.env.reduced;
+      boxes.forEach(function (r, i) {
+        var delta = r.top + r.height * .5 - mid;
+        if (Math.abs(delta) < distance) { best = i; distance = Math.abs(delta); }
+        [piles[i], packs[i]].forEach(function (item, n) {
+          if (!item) return;
+          var speed = parseFloat(cols[n].dataset.speed) || 0;
+          var offset = still ? 0 : Math.max(-32, Math.min(32, delta * speed));
+          item.style.transform = "translate3d(0," + offset.toFixed(2) + "px,0)";
+        });
+      });
+      lag += (y - lag) * (1 - Math.exp(-dt / 180));
+      if (still) lag = y;
+      var drift = Math.max(-12, Math.min(12, (y - lag) * .08));
+      if (sticky) sticky.style.setProperty("--range-drift", drift.toFixed(2) + "px");
+      setActive(best);
+      cells.forEach(function (cell, i) {
+        cell.classList.toggle("is-current", i === best);
+        if (rightCells[i]) rightCells[i].classList.toggle("is-current", i === best);
+      });
+      lastY = y; dirty = false;
+    }
 
-      // Parallax: each column is offset by a share of the scrolled distance.
-      // -0.5..0.5 so the columns sit centred at the midpoint of the section.
-      var p = progress - 0.5;
-      for (var i = 0; i < cols.length; i++) {
-        var speed = parseFloat(cols[i].getAttribute("data-speed")) || 0;
-        var amount = p * speed * stage.offsetHeight;
-        cols[i].style.transform = "translate3d(0," + amount.toFixed(1) + "px,0)";
+    function resize() {
+      dirty = true; lastY = -1; lag = root.scrollY;
+      el.classList.toggle("is-enhanced", media.matches);
+      if (!media.matches) resetTransforms();
+    }
+
+    function focus(e) {
+      // Tabbing to a botanical farther down the list brings its paired copy
+      // into the panel immediately, without waiting for a pointer gesture.
+      var cell = e.target.closest(".hoc-range__cell");
+      if (cell && media.matches) {
+        var i = Number(cell.dataset.index);
+        var r = cell.getBoundingClientRect();
+        var y = root.scrollY + r.top + r.height / 2 - (root.innerHeight / 2 + 31);
+        if (HOC.lenis) HOC.lenis.scrollTo(y, { immediate: true });
+        else root.scrollTo(0, y);
+        setActive(i); dirty = true;
       }
-
-      // The panel drifts behind: lerp toward the scroll position and render
-      // the difference as a small offset. This is the "delayed" feel.
-      lag += (progress - lag) * 0.07;
-      if (sticky) {
-        var drift = (progress - lag) * stage.offsetHeight * 0.10;
-        sticky.style.transform =
-          "translateY(calc(-50% + " + drift.toFixed(1) + "px))";
-      }
-
-      setActive(nearest());
     }
 
     return {
       init: function () {
-        if (!stage || !ScrollTrigger || HOC.env.narrow) {
-          // Mobile has no sticky panel and no parallax — the stack is the UI.
-          setActive(0);
-          return;
-        }
-        if (reduced()) {
-          setActive(0);
-          return;
-        }
-
-        st = ScrollTrigger.create({
-          trigger: stage,
-          start: "top bottom",
-          end: "bottom top",
-          onUpdate: function (self) {
-            progress = self.progress;
-          },
-          onToggle: function (self) {
-            visible = self.isActive;
-          }
+        if (!stage || !cells.length) return;
+        resize();
+        observer = new IntersectionObserver(function (entries) {
+          visible = entries[0].isIntersecting;
+          dirty = true; lag = root.scrollY; lastTime = 0;
         });
+        observer.observe(stage);
+        media.addEventListener("change", resize);
+        el.addEventListener("focusin", focus);
         HOC.ticker.add(tick);
         setActive(0);
       },
-      resize: function () {
-        if (ScrollTrigger) ScrollTrigger.refresh();
-      },
+      resize: resize,
       destroy: function () {
         HOC.ticker.remove(tick);
-        if (st) st.kill();
-        cols.forEach(function (c) {
-          c.style.transform = "";
-        });
-        if (sticky) sticky.style.transform = "";
+        if (observer) observer.disconnect();
+        media.removeEventListener("change", resize);
+        el.removeEventListener("focusin", focus);
+        el.classList.remove("is-enhanced");
+        resetTransforms();
+        panels.forEach(function (p) { p.inert = false; });
       }
     };
   });

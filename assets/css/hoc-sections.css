@@ -1798,26 +1798,36 @@
    ========================================================================== */
 
 .hoc-range {
-  padding-block: var(--space-section) 0;
+  --range-row: clamp(540px, calc(100svh - 62px), 880px);
+  padding-block: var(--space-section);
   overflow: clip;
 }
 .hoc-range__head {
-  margin-bottom: clamp(2rem, 5vh, 3.5rem);
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 2rem;
+  padding-bottom: 2.5rem;
+  border-bottom: 1px solid var(--hairline);
 }
 .hoc-range__head .hoc-micro {
   margin-bottom: 1rem;
 }
 .hoc-range__head h2 {
   max-width: 16ch;
+  font-size: clamp(3.25rem, 5.8vw, 6rem);
+  line-height: .97;
 }
+.hoc-range__intro { font-size: var(--fs-small); line-height: 1.7; padding-bottom: .3rem; }
+.hoc-range__intro span { color: var(--on-surface-dim); }
 
 /* --- desktop three-column stage ---------------------------------------- */
 .hoc-range__stage {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 32fr) minmax(0, 36fr) minmax(0, 32fr);
-  gap: clamp(1rem, 3vw, 3rem);
-  align-items: start;
+  grid-template-columns: minmax(0, 30fr) minmax(0, 40fr) minmax(0, 30fr);
+  gap: clamp(.75rem, 2vw, 2rem);
+  align-items: stretch;
   max-width: var(--page-max);
   margin-inline: auto;
   padding-inline: var(--gutter);
@@ -1825,52 +1835,59 @@
 
 .hoc-range__col {
   display: grid;
-  will-change: transform;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
-/* The right stack starts lower, so the two columns never line up and the
-   parallax has something to read against. */
+/* Both stacks share their first row and never accumulate a vertical offset. */
 .hoc-range__col--right {
-  padding-top: 26vh;
+  padding-top: 0;
 }
 
 .hoc-range__cell {
-  height: 52vh;
+  height: var(--range-row);
   display: grid;
   place-items: center;
 }
 
 .hoc-range__pile {
-  width: min(100%, 40vh);
+  position: relative;
+  width: min(136%, 520px);
   aspect-ratio: 1;
+  flex: none;
+  border-radius: 50%;
+  touch-action: pan-y;
 }
-.hoc-range__pile img {
+.hoc-range__pile img, .hoc-range__pile canvas {
+  display: block;
   width: 100%;
   height: 100%;
   object-fit: contain;
 }
+.hoc-range__pile canvas { position: absolute; inset: 0; pointer-events: none; }
+.hoc-range__pile.is-ready img { opacity: 0; }
+.hoc-range__pile[role="button"] { cursor: pointer; }
+.hoc-range__pile:focus-visible { outline: 1px solid var(--hoc-teal, #4c8984); outline-offset: -10px; }
 
 .hoc-range__pack {
   position: relative;
-  width: min(100%, 32vh);
+  width: min(94%, 330px);
   aspect-ratio: 3 / 4;
   display: grid;
   place-items: center;
-  overflow: hidden;
-  background: var(--hoc-bone-soft);
+  overflow: visible;
+  background: transparent;
 }
 .hoc-range__packground {
   position: absolute;
   inset: 0;
-  background: radial-gradient(
-    70% 60% at 50% 44%,
-    var(--accent-wash) 0%,
-    transparent 74%
-  );
+  background: transparent;
 }
 .hoc-range__pack img {
-  position: relative;
-  width: 70%;
-  height: auto;
+  position: absolute;
+  width: 88%;
+  height: 100%;
+  max-height: 100%;
   object-fit: contain;
   filter: drop-shadow(0 16px 20px rgb(35 35 34 / 0.12));
 }
@@ -1878,52 +1895,43 @@
 /* --- the centre panel --------------------------------------------------- */
 .hoc-range__centre {
   position: relative;
-  height: 100%;
+  min-width: 0;
 }
 .hoc-range__sticky {
   position: sticky;
-  top: 50%;
-  transform: translateY(-50%);
-  display: grid;
-  gap: 1.25rem;
-  justify-items: center;
-  will-change: transform;
+  top: max(62px, calc(50svh + 31px - var(--range-row) / 2));
+  height: var(--range-row);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .hoc-range__frame {
   position: relative;
   display: grid;
   width: 100%;
-  min-height: 26rem;
-  padding: clamp(1.5rem, 3vw, 2.5rem);
-  border: 1px solid var(--hairline);
-  border-start-start-radius: var(--curve-lg);
-  border-end-end-radius: var(--curve-lg);
-  background: var(--hoc-bone);
+  min-height: 24rem;
+  padding: clamp(1rem, 2vw, 2rem) .5rem;
+  transform: translateY(var(--range-drift, 0px));
 }
 
 .hoc-range__panel {
   grid-area: 1 / 1;
   display: grid;
-  gap: 0.55rem;
+  gap: .8rem;
   align-content: center;
   justify-items: center;
   text-align: center;
   opacity: 0;
   visibility: hidden;
   transform: translateY(10px);
+  transition: opacity .4s var(--e-hoc), transform .6s var(--e-hoc), visibility .4s;
 }
 .hoc-range__panel.is-on {
   opacity: 1;
   visibility: visible;
   transform: none;
-}
-html:not(.hoc-js) .hoc-range__panel {
-  /* Without JS nothing swaps, so show the first and stack the rest normally. */
-  opacity: 1;
-  visibility: visible;
-  transform: none;
-  position: static;
 }
 
 .hoc-range__count {
@@ -1931,7 +1939,7 @@ html:not(.hoc-js) .hoc-range__panel {
 }
 .hoc-range__name {
   font-family: var(--ff-display);
-  font-size: clamp(1.75rem, 3.2vw, 2.75rem);
+  font-size: clamp(2rem, 3.6vw, 3.5rem);
   line-height: 1.02;
   font-weight: 400;
 }
@@ -1986,6 +1994,7 @@ html:not(.hoc-js) .hoc-range__panel {
   position: relative;
   display: grid;
   min-height: 1.5em;
+  transform: translateY(var(--range-drift, 0px));
 }
 .hoc-range__note {
   grid-area: 1 / 1;
@@ -1998,13 +2007,14 @@ html:not(.hoc-js) .hoc-range__panel {
 .hoc-range__note.is-on {
   opacity: 1;
 }
-html:not(.hoc-js) .hoc-range__note {
-  opacity: 1;
-  position: static;
-}
+.hoc-range__mobile-pack { display: none; }
+.hoc-range__mcopy { display: none; }
+.hoc-range__mobile-pack img { width: 100%; height: auto; filter: drop-shadow(0 12px 12px rgb(35 35 34 / .1)); }
 
 /* --- mobile: no parallax, no sticky, no 700vh trap (§44) ---------------- */
-@media (max-width: 899px) {
+@media (max-width: 899px), (max-height: 619px) {
+  .hoc-range__head { align-items: start; flex-direction: column; gap: 1.5rem; }
+  .hoc-range__intro { max-width: 32ch; }
   .hoc-range__stage {
     display: block;
     padding-bottom: var(--space-section);
@@ -2019,23 +2029,34 @@ html:not(.hoc-js) .hoc-range__note {
   }
   .hoc-range__cell {
     height: auto;
-    padding-block: 1.5rem;
+    min-height: 480px;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    column-gap: .5rem;
+    padding-block: 2rem;
+    border-bottom: 1px solid var(--hairline);
   }
   .hoc-range__pile {
-    width: min(62vw, 320px);
+    width: 145%;
+    max-width: 400px;
   }
+  .hoc-range__mobile-pack { display: block; width: min(90%, 230px); }
   /* On mobile each blend is a plain card: pile, then its own copy. */
   .hoc-range__mcopy {
     text-align: center;
     display: grid;
-    gap: 0.4rem;
+    grid-column: 1 / -1;
+    gap: .8rem;
     justify-items: center;
-    padding-bottom: 2.5rem;
-    border-bottom: 1px solid var(--hairline);
+    padding-block: 1rem;
   }
 }
-@media (min-width: 900px) {
-  .hoc-range__mcopy {
-    display: none;
-  }
+/* Core content remains paired and readable if motion JS fails to load. */
+.hoc-range:not(.is-enhanced) .hoc-range__stage { display: block; }
+.hoc-range:not(.is-enhanced) .hoc-range__centre,
+.hoc-range:not(.is-enhanced) .hoc-range__col--right { display: none; }
+.hoc-range:not(.is-enhanced) .hoc-range__cell { height: auto; min-height: 480px; grid-template-columns: 1fr 1fr; padding-block: 2rem; }
+.hoc-range:not(.is-enhanced) .hoc-range__mcopy { display: grid; gap: .8rem; justify-items: center; grid-column: 1 / -1; text-align: center; }
+.hoc-range:not(.is-enhanced) .hoc-range__mobile-pack { display: block; width: min(90%, 230px); }
+@media (prefers-reduced-motion: reduce) {
+  .hoc-range__panel, .hoc-range__note { transition: none; }
 }
