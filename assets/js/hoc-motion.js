@@ -992,9 +992,9 @@
           item.style.transform = "translate3d(0," + offset.toFixed(2) + "px,0)";
         });
       });
-      lag += (y - lag) * (1 - Math.exp(-dt / 180));
+      lag += (y - lag) * (1 - Math.exp(-dt / 220));
       if (still) lag = y;
-      var drift = Math.max(-12, Math.min(12, (y - lag) * .08));
+      var drift = Math.max(-4, Math.min(4, (y - lag) * .04));
       if (sticky) sticky.style.setProperty("--range-drift", drift.toFixed(2) + "px");
       setActive(best);
       cells.forEach(function (cell, i) {

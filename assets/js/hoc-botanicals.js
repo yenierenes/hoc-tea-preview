@@ -1,5 +1,5 @@
 /* Photographic ingredient sprites, composed from each blend's own recipe.
-   Shared by the static-image build and the pointer interaction. No WebGL. */
+   Shared by the static-image build and the viewport-led infusion. No WebGL. */
 (function (root) {
   "use strict";
   var names = ["Hibiscus", "Mint Leaf", "Lemongrass", "Butterfly Pea Flower",
@@ -56,233 +56,245 @@
     return value * value * (3 - 2 * value);
   }
 
-  function draw(canvas, atlas, items, spread, pointer, flow) {
-    var ctx = canvas.getContext("2d");
-    var w = canvas.width, h = canvas.height;
+  // Cached photograph sprites are shared by every blend. The idle render is
+  // also used to build the WebP fallback.
+  function draw(canvas, atlas, items, spread, unusedPointer, flow) {
+    var ctx = canvas.getContext("2d"), w = canvas.width, h = canvas.height;
     ctx.clearRect(0, 0, w, h);
     if (!atlas.hocSprites) {
       var sw = atlas.width / 6, sh = atlas.height / 5;
       atlas.hocSprites = names.map(function (_, i) {
-        // Bake contact shadows once per ingredient, not 205 times per frame.
         var tile = document.createElement("canvas");
         tile.width = tile.height = 256;
         var tc = tile.getContext("2d");
         tc.shadowColor = "rgba(39,30,18,.19)";
-        tc.shadowBlur = 7;
-        tc.shadowOffsetY = 3;
+        tc.shadowBlur = 7; tc.shadowOffsetY = 3;
         tc.drawImage(atlas, i % 6 * sw, Math.floor(i / 6) * sh, sw, sh, 0, 0, 256, 256);
         return tile;
       });
     }
     var time = flow ? flow.time : 0;
-    var energy = flow ? flow.energy : 0;
-    var spin = flow ? flow.spin : 0;
     items.forEach(function (p) {
-      // Each layer lifts at a different moment. Reversing spread makes the
-      // same curve gather inward instead of popping back to the center.
-      var local = smoothstep((spread - p.phase * .22) / .78);
-      var baseAngle = Math.atan2(p.y, p.x);
-      var baseRadius = Math.sqrt(p.x * p.x + p.y * p.y);
-      var breathing = Math.sin(time * .0011 * p.orbit + p.pulse) * .010 * local;
-      var radius = baseRadius + local * (.075 + p.float * .095) + breathing;
-      var current = local * (p.spiral + spin * .18);
-      current += Math.sin(time * .00052 + p.pulse) * .045 * local;
-      var x = .5 + Math.cos(baseAngle + current) * radius;
-      var y = .5 + Math.sin(baseAngle + current) * radius * .84;
-
-      if (pointer && local > 0) {
-        var rx = x - pointer.x, ry = y - pointer.y;
-        var distance = Math.sqrt(rx * rx + ry * ry) || .001;
-        var reach = smoothstep(1 - distance / .42) * local * p.float;
-        // The pointer creates a current: velocity pulls pieces forward while
-        // a perpendicular component curls them around the gesture.
-        var wakeX = (flow.vx || 0) * reach * (1.15 + energy * .55);
-        var wakeY = (flow.vy || 0) * reach * (1.15 + energy * .55);
-        var curl = reach * (.010 + energy * .018);
-        x += wakeX - ry / distance * curl;
-        y += wakeY + rx / distance * curl;
-      }
-      var size = p.size * w * (1 + local * (.025 + .025 * Math.sin(time * .0013 + p.pulse)));
+      var local = smoothstep((spread - p.phase * .18) / .82);
+      var radius = Math.hypot(p.x, p.y);
+      var edge = smoothstep(radius / .28);
+      // Expansion is proportional to distance: the core never becomes a ring.
+      var turn = local * (.10 + edge * .18);
+      turn += Math.sin(time * .00022 + p.pulse) * .013 * local * edge;
+      var rx = p.x * Math.cos(turn) - p.y * Math.sin(turn);
+      var ry = p.x * Math.sin(turn) + p.y * Math.cos(turn);
+      var x = .5 + rx * (1 + local * .28 * edge);
+      var y = .5 + ry * (1 + local * .17 * edge);
+      x += Math.sin(time * .00027 * p.orbit + p.pulse) * .0025 * local * edge;
+      y += Math.cos(time * .00023 + p.pulse) * .002 * local * edge;
+      var size = p.size * w;
       ctx.save();
       ctx.translate(x * w, y * h);
-      ctx.rotate(p.angle + p.turn * local + current * .45);
-      ctx.globalAlpha = .86 + p.depth * .14;
+      ctx.rotate(p.angle + p.turn * local * .12);
       ctx.drawImage(atlas.hocSprites[p.type], -size / 2, -size / 2, size, size);
       ctx.restore();
     });
   }
 
-  root.HOCBotanicals = { names: names, pieces: pieces, draw: draw };
+  // A domain-warped noise field, computed once. Sampling this field makes the
+  // pigment front irregular without a fluid simulation or WebGL dependency.
+  var field = null, FW = 256, FH = 96;
+  function noise(x, y) {
+    var ix = Math.floor(x), iy = Math.floor(y), fx = x - ix, fy = y - iy;
+    fx = fx * fx * (3 - 2 * fx); fy = fy * fy * (3 - 2 * fy);
+    function hash(a, b) {
+      var n = Math.imul(a, 374761393) + Math.imul(b, 668265263);
+      n = Math.imul(n ^ n >>> 13, 1274126177);
+      return ((n ^ n >>> 16) >>> 0) / 4294967295;
+    }
+    var a = hash(ix, iy), b = hash(ix + 1, iy);
+    var c = hash(ix, iy + 1), d = hash(ix + 1, iy + 1);
+    return (a + (b - a) * fx) * (1 - fy) + (c + (d - c) * fx) * fy;
+  }
+  function fbm(x, y) {
+    return noise(x, y) * .54 + noise(x * 2.1 + 7, y * 2.1) * .28 +
+      noise(x * 4.3, y * 4.3 + 12) * .13 + noise(x * 8.6, y * 8.6) * .05;
+  }
+  function inkField() {
+    if (field) return field;
+    field = new Float32Array(FW * FH);
+    for (var y = 0; y < FH; y++) {
+      for (var x = 0; x < FW; x++) {
+        var u = x / FW * 6, v = y / FH * 4;
+        var warp = fbm(u + 21, v + 5);
+        field[y * FW + x] = fbm(u + warp * 2.7, v + warp * 2.1);
+      }
+    }
+    return field;
+  }
+  function rgb(value) {
+    var match = /^#([\da-f]{6})$/i.exec(value.trim());
+    var n = match ? parseInt(match[1], 16) : 0xAD3450;
+    return [n >> 16, n >> 8 & 255, n & 255];
+  }
+  function drawInfusion(canvas, pixels, color, origin, progress, time) {
+    var ctx = canvas.getContext("2d"), data = pixels.data, values = inkField();
+    var shift = time * .0007, ix = Math.floor(shift), mix = shift - ix;
+    var front = origin.x + .06 + (1.12 - origin.x) * progress;
+    var strength = smoothstep(progress * 2.2);
+    for (var y = 0; y < FH; y++) {
+      var py = y / (FH - 1);
+      for (var x = 0; x < FW; x++) {
+        var px = x / (FW - 1), k = (y * FW + x) * 4;
+        var sx = (x + ix) % FW;
+        var a = values[y * FW + sx], b = values[y * FW + (sx + 1) % FW];
+        var n = a + (b - a) * mix;
+        var ridge = Math.sin(px * 9.5 + n * 5) * .033;
+        var axis = origin.y + (n - .5) * .21 + ridge;
+        var half = .13 + progress * .10 + Math.max(0, px - origin.x) * .07;
+        var vertical = smoothstep((half - Math.abs(py - axis)) / .14);
+        var right = smoothstep((front + (n - .5) * .32 - px) / .15);
+        var left = smoothstep((px - origin.x + .23 + progress * .04) / .16);
+        var edges = smoothstep(px / .07) * smoothstep((1 - px) / .08);
+        edges *= smoothstep(py / .09) * smoothstep((1 - py) / .09);
+        // Different local concentrations carry the tea's colour into the water.
+        var density = .36 + smoothstep((n - .24) * 1.8) * .64;
+        var alpha = vertical * right * left * edges * density * strength * .48;
+        data[k] = color[0]; data[k + 1] = color[1]; data[k + 2] = color[2];
+        data[k + 3] = Math.round(alpha * 255);
+      }
+    }
+    ctx.putImageData(pixels, 0, 0);
+  }
+
+  root.HOCBotanicals = { names: names, pieces: pieces, draw: draw, drawInfusion: drawInfusion };
   if (!root.HOC || !root.HOC.controller) return;
-  var HOC = root.HOC;
-  var atlases = {};
+  var HOC = root.HOC, atlases = {};
   function load(url) {
     if (!atlases[url]) atlases[url] = new Promise(function (resolve, reject) {
       var img = new Image();
-      img.onload = function () { resolve(img); };
-      img.onerror = reject;
-      img.src = url;
+      img.onload = function () { resolve(img); }; img.onerror = reject; img.src = url;
     });
     return atlases[url];
   }
 
   HOC.controller("botanical-pile", function (el) {
-    var canvas, atlas, items, observer, disposed = false, loading = false;
-    var progress = 0, target = 0, last = 0, running = false;
-    var transitionFrom = 0, transitionStarted = 0, transitionDuration = 900;
-    var pointer = null, pointerTarget = null, pointerLast = null;
-    var flow = { time: 0, vx: 0, vy: 0, energy: 0, spin: 0 };
+    var row = el.closest(".hoc-range__cell"), stage = el.closest(".hoc-range__stage");
+    var canvas, ink, pixels, atlas, items, marker, visibleObserver, centerObserver, resizeObserver;
+    var disposed = false, loading = false, visible = false, centered = false, armed = false;
+    var running = false, last = 0, age = 0, lastPaint = 0, progress = 0;
+    var origin = { x: .17, y: .5 }, color = [173, 52, 80];
     var mq = root.matchMedia("(prefers-reduced-motion: reduce)");
-    var coarse = root.matchMedia("(hover: none)");
-    function paint() { if (canvas && atlas) draw(canvas, atlas, items, progress, pointer, flow); }
+    function reduced() { return mq.matches || HOC.env.tier === "reduced"; }
     function stop() { HOC.ticker.remove(tick); running = false; last = 0; }
-    function tick(t) {
-      var dt = last ? Math.min(t - last, 50) : 16;
-      last = t;
-      if (progress !== target) {
-        if (!transitionStarted) transitionStarted = t;
-        var elapsed = Math.min(1, (t - transitionStarted) / transitionDuration);
-        var ease = 1 - Math.pow(1 - elapsed, target ? 3 : 4);
-        progress = transitionFrom + (target - transitionFrom) * ease;
-        if (elapsed === 1) progress = target;
-      }
-      if (pointerTarget) {
-        if (!pointer) pointer = { x: pointerTarget.x, y: pointerTarget.y };
-        pointer.x += (pointerTarget.x - pointer.x) * (1 - Math.exp(-dt / 85));
-        pointer.y += (pointerTarget.y - pointer.y) * (1 - Math.exp(-dt / 85));
-      }
-      flow.vx *= Math.exp(-dt / 190);
-      flow.vy *= Math.exp(-dt / 190);
-      flow.energy *= Math.exp(-dt / 310);
-      flow.spin += ((flow.vx * 5 + flow.vy * 2.5) - flow.spin) * (1 - Math.exp(-dt / 240));
-      flow.time += dt;
-      paint();
-      // While open, one visible heap keeps a very slow suspended current.
-      // Once gathered the canvas returns to its exact static frame and stops.
-      if (progress === 0 && target === 0) stop();
+    function reset() {
+      stop(); age = progress = lastPaint = 0; armed = false;
+      el.classList.remove("is-infusing");
+      el.dataset.infusionProgress = "0";
+      if (canvas && atlas) draw(canvas, atlas, items, 0, null, { time: 0 });
+      if (ink) ink.getContext("2d").clearRect(0, 0, FW, FH);
     }
     function wake() {
-      if (!running) { running = true; last = 0; HOC.ticker.add(tick); }
+      if (running || !visible || !armed || !atlas || reduced() || document.hidden) return;
+      running = true; last = 0; HOC.ticker.add(tick);
     }
-    function set(value) {
-      if (!atlas || mq.matches || HOC.env.tier === "reduced") return;
-      if (value === target && progress === target) return;
-      transitionFrom = progress;
-      // The shared GSAP ticker uses its own time origin; arm the transition
-      // here and take that clock's value on the next frame.
-      transitionStarted = 0;
-      transitionDuration = value ? 900 : 1150;
-      target = value;
-      el.setAttribute("aria-pressed", value ? "true" : "false");
-      el.classList.toggle("is-scattered", !!value);
+    function start() {
+      if (!visible || !centered || reduced()) return;
+      armed = true;
+      if (atlas) el.classList.add("is-infusing");
       wake();
     }
-    function enter(e) {
-      if (e.pointerType !== "mouse") return;
-      var box = el.getBoundingClientRect();
-      pointerTarget = { x: (e.clientX - box.left) / box.width, y: (e.clientY - box.top) / box.height };
-      pointerLast = { x: pointerTarget.x, y: pointerTarget.y, time: e.timeStamp };
-      set(1);
+    function tick(t) {
+      if (reduced()) { reset(); return; }
+      if (!visible || document.hidden) { stop(); return; }
+      var dt = last ? Math.min(t - last, 64) : 16;
+      last = t; age += dt;
+      // Independent of pointer position and frame rate. Colour continues to
+      // travel right while this product remains on screen.
+      progress = 1 - Math.exp(-age / 4800);
+      if (t - lastPaint < 33) return;
+      lastPaint = t;
+      draw(canvas, atlas, items, smoothstep(Math.min(1, age / 2400)), null, { time: age });
+      drawInfusion(ink, pixels, color, origin, progress, age);
+      el.dataset.infusionProgress = progress.toFixed(3);
     }
-    function move(e) {
-      if (!target || e.pointerType !== "mouse") return;
-      var box = el.getBoundingClientRect();
-      var next = { x: (e.clientX - box.left) / box.width, y: (e.clientY - box.top) / box.height };
-      if (pointerLast) {
-        var dt = Math.max(8, e.timeStamp - pointerLast.time);
-        flow.vx = clamp((next.x - pointerLast.x) * 16 / dt, -.09, .09);
-        flow.vy = clamp((next.y - pointerLast.y) * 16 / dt, -.09, .09);
-        flow.energy = Math.min(1, Math.sqrt(flow.vx * flow.vx + flow.vy * flow.vy) * 11);
-      }
-      pointerTarget = next;
-      pointerLast = { x: next.x, y: next.y, time: e.timeStamp };
-      wake();
-    }
-    function leave(e) {
-      // Touch dispatches pointerleave before click; it must not reset a tap toggle.
-      if (e && e.type === "pointerleave" && e.pointerType !== "mouse") return;
-      pointer = pointerTarget = pointerLast = null;
-      flow.vx = flow.vy = flow.energy = flow.spin = 0;
-      set(0);
-    }
-    function click(e) { if (coarse.matches || e.detail === 0) set(target ? 0 : 1); }
-    function key(e) {
-      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); set(target ? 0 : 1); }
-      if (e.key === "Escape") leave();
-    }
-    function size() {
-      if (!canvas) return;
-      var width = Math.round(el.clientWidth * Math.min(root.devicePixelRatio || 1, 2));
-      canvas.width = canvas.height = Math.max(1, width);
-      paint();
+    function measure() {
+      if (!canvas || !stage || !row) return;
+      var stageBox = stage.getBoundingClientRect(), rowBox = row.getBoundingClientRect();
+      var pileBox = el.getBoundingClientRect();
+      var width = Math.max(1, Math.round(el.clientWidth * Math.min(root.devicePixelRatio || 1, 1.5)));
+      if (canvas.width !== width) canvas.width = canvas.height = width;
+      ink.style.left = (stageBox.left - rowBox.left) + "px";
+      ink.style.width = stageBox.width + "px";
+      origin.x = clamp((pileBox.left + pileBox.width / 2 - stageBox.left) / stageBox.width, .1, .4);
+      origin.y = clamp((pileBox.top + pileBox.height / 2 - rowBox.top) / rowBox.height, .2, .7);
+      draw(canvas, atlas, items, smoothstep(Math.min(1, age / 2400)), null, { time: age });
+      if (progress > 0) drawInfusion(ink, pixels, color, origin, progress, age);
     }
     function prepare() {
-      if (loading || mq.matches || HOC.env.tier === "reduced") return;
-      loading = true;
+      if (loading || reduced()) return;
       items = pieces((el.dataset.ingredients || "").split("|"), el.dataset.seed || "hoc");
       if (!items.length) return;
+      loading = true;
       load(el.dataset.atlas).then(function (image) {
         if (disposed) return;
+        loading = false;
         atlas = image;
-        canvas = document.createElement("canvas");
-        canvas.setAttribute("aria-hidden", "true");
-        el.appendChild(canvas);
-        size();
-        el.classList.add("is-ready");
-        el.setAttribute("tabindex", "0");
-        el.setAttribute("role", "button");
-        el.setAttribute("aria-pressed", "false");
-        el.setAttribute("aria-label", "Scatter and gather " + el.dataset.label + " ingredients");
-      }).catch(function () { /* The photograph remains visible if the texture fails. */ });
+        canvas = document.createElement("canvas"); canvas.setAttribute("aria-hidden", "true");
+        ink = document.createElement("canvas"); ink.className = "hoc-range__infusion";
+        ink.setAttribute("aria-hidden", "true"); ink.width = FW; ink.height = FH;
+        pixels = ink.getContext("2d").createImageData(FW, FH);
+        color = rgb(getComputedStyle(el).getPropertyValue("--liquid"));
+        row.prepend(ink); el.appendChild(canvas);
+        measure(); el.classList.add("is-ready");
+        if (armed) { el.classList.add("is-infusing"); wake(); }
+        else start();
+      }).catch(function () { loading = false; /* Static photo remains if the atlas fails. */ });
     }
+    function visibility() { if (document.hidden) stop(); else wake(); }
     function preference() {
-      if (mq.matches) {
-        target = progress = 0; stop(); paint();
-        el.classList.remove("is-scattered");
-        ["tabindex", "role", "aria-pressed", "aria-label"].forEach(function (a) { el.removeAttribute(a); });
-      } else if (canvas) {
-        el.setAttribute("tabindex", "0");
-        el.setAttribute("role", "button");
-        el.setAttribute("aria-pressed", "false");
-        el.setAttribute("aria-label", "Scatter and gather " + el.dataset.label + " ingredients");
-      } else {
-        prepare();
-      }
+      if (reduced()) reset();
+      else { if (visible && !atlas) prepare(); start(); }
+    }
+    function watchCenter() {
+      if (!marker || disposed) return;
+      if (centerObserver) centerObserver.disconnect();
+      centered = false;
+      // IO percentage margins use viewport width. Pixels keep this band at
+      // the vertical center on both portrait and wide desktop screens.
+      centerObserver = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) { centered = entry.isIntersecting; if (centered) start(); });
+      }, { rootMargin: "-" + Math.round(root.innerHeight * .44) + "px 0px -" +
+        Math.round(root.innerHeight * .40) + "px 0px" });
+      centerObserver.observe(marker);
     }
     return {
       init: function () {
-        observer = new IntersectionObserver(function (entries) {
+        if (!row || !stage) return;
+        marker = document.createElement("span");
+        marker.className = "hoc-range__center-marker"; marker.setAttribute("aria-hidden", "true");
+        el.appendChild(marker);
+        el.dataset.infusionProgress = "0";
+        visibleObserver = new IntersectionObserver(function (entries) {
           entries.forEach(function (entry) {
-            if (entry.isIntersecting) prepare();
-            else if (canvas) {
-              target = progress = transitionFrom = 0;
-              pointer = pointerTarget = pointerLast = null;
-              flow.vx = flow.vy = flow.energy = flow.spin = 0;
-              stop(); paint(); el.classList.remove("is-scattered"); el.setAttribute("aria-pressed", "false");
-            }
+            visible = entry.isIntersecting;
+            if (visible) { if (!atlas) prepare(); start(); }
+            else reset();
           });
-        }, { rootMargin: "200px" });
-        observer.observe(el);
-        el.addEventListener("pointerenter", enter);
-        el.addEventListener("pointermove", move);
-        el.addEventListener("pointerleave", leave);
-        el.addEventListener("pointercancel", leave);
-        el.addEventListener("click", click);
-        el.addEventListener("keydown", key);
-        el.addEventListener("blur", leave);
+        });
+        visibleObserver.observe(row);
+        watchCenter();
+        resizeObserver = new ResizeObserver(measure); resizeObserver.observe(row);
+        document.addEventListener("visibilitychange", visibility);
         mq.addEventListener("change", preference);
+        HOC.on("tierchange", preference);
       },
-      resize: size,
+      resize: function () { measure(); watchCenter(); },
       destroy: function () {
-        disposed = true; stop();
-        if (observer) observer.disconnect();
-        if (canvas) canvas.remove();
-        el.classList.remove("is-ready", "is-scattered");
-        ["tabindex", "role", "aria-pressed", "aria-label"].forEach(function (a) { el.removeAttribute(a); });
-        el.removeEventListener("pointerenter", enter); el.removeEventListener("pointermove", move);
-        el.removeEventListener("pointerleave", leave); el.removeEventListener("pointercancel", leave);
-        el.removeEventListener("click", click); el.removeEventListener("keydown", key); el.removeEventListener("blur", leave);
+        disposed = true; reset();
+        if (visibleObserver) visibleObserver.disconnect();
+        if (centerObserver) centerObserver.disconnect();
+        if (resizeObserver) resizeObserver.disconnect();
+        if (canvas) canvas.remove(); if (ink) ink.remove(); if (marker) marker.remove();
+        el.classList.remove("is-ready"); delete el.dataset.infusionProgress;
+        document.removeEventListener("visibilitychange", visibility);
         mq.removeEventListener("change", preference);
+        HOC.off("tierchange", preference);
       }
     };
   });
