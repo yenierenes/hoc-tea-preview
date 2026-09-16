@@ -1110,15 +1110,21 @@
     var offs = [];
     var steps = $$(".hoc-ritual__step", el);
     var frames = $$(".hoc-ritual__frame", el);
-    var io = null;
+    var progress = $('[data-hoc="ritual-progress"]', el);
 
     function set(i) {
+      if (i < 0 || i >= steps.length) return;
       steps.forEach(function (s, n) {
         s.classList.toggle("is-on", n === i);
+        var button = $("button", s);
+        if (button) button.setAttribute("aria-pressed", String(n === i));
       });
       frames.forEach(function (f, n) {
         f.classList.toggle("is-on", n === i);
       });
+      if (progress) {
+        progress.textContent = String(i + 1).padStart(2, "0") + " / " + String(steps.length).padStart(2, "0");
+      }
     }
 
     return {
@@ -1130,41 +1136,17 @@
             set(steps.indexOf(b.closest(".hoc-ritual__step")));
           })
         );
-        if (!HOC.env.touch) {
-          steps.forEach(function (s, i) {
-            offs.push(
-              on(s, "mouseenter", function () {
-                set(i);
-              })
-            );
-            offs.push(
-              on(s, "focusin", function () {
-                set(i);
-              })
-            );
-          });
-        }
-        // On mobile the active step follows scroll instead of hover §20
-        if (HOC.env.touch) {
-          io = new IntersectionObserver(
-            function (ents) {
-              ents.forEach(function (en) {
-                if (en.isIntersecting)
-                  set(steps.indexOf(en.target));
-              });
-            },
-            { rootMargin: "-45% 0px -45% 0px" }
-          );
-          steps.forEach(function (s) {
-            io.observe(s);
-          });
-        }
+        steps.forEach(function (s, i) {
+          if (!HOC.env.touch) {
+            offs.push(on(s, "mouseenter", function () { set(i); }));
+          }
+          offs.push(on(s, "focusin", function () { set(i); }));
+        });
       },
       destroy: function () {
         offs.forEach(function (f) {
           f();
         });
-        if (io) io.disconnect();
       }
     };
   });

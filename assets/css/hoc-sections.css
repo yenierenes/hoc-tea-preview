@@ -1556,48 +1556,70 @@
    10  THE RITUAL  §20
    ========================================================================== */
 
+.hoc-ritual > .hoc-wrap {
+  padding-block: clamp(4.5rem, 8vh, 7rem);
+}
 .hoc-ritual__head {
-  margin-bottom: clamp(2.5rem, 6vh, 4rem);
+  display: grid;
+  gap: 1.25rem clamp(2rem, 5vw, 5rem);
+  margin-bottom: clamp(2rem, 4vw, 3rem);
 }
 .hoc-ritual__head .hoc-micro {
-  margin-bottom: 1rem;
+  margin-bottom: 0.85rem;
 }
 .hoc-ritual__head h2 {
-  max-width: 18ch;
+  max-width: 12.5em;
+  font-size: clamp(3rem, 5.2vw, 5.25rem);
+}
+.hoc-ritual__intro {
+  max-width: 34ch;
+  font-size: clamp(1rem, 1.3vw, 1.25rem);
+  line-height: 1.5;
 }
 .hoc-ritual__body {
   display: grid;
-  gap: clamp(2rem, 4vw, 4rem);
+  gap: clamp(2rem, 4vw, 4.5rem);
 }
 @media (min-width: 900px) {
+  .hoc-ritual__head {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    align-items: end;
+  }
+  .hoc-ritual__intro {
+    justify-self: end;
+    margin-bottom: 0.35rem;
+  }
   .hoc-ritual__body {
-    grid-template-columns: minmax(0, 36fr) minmax(0, 64fr);
-    align-items: start;
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    align-items: stretch;
   }
 }
 .hoc-ritual__viz {
   position: relative;
-  aspect-ratio: 4 / 5;
   display: grid;
-  place-items: center;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  min-height: 390px;
+  padding: clamp(1.5rem, 2.6vw, 2.75rem);
   background: var(--hoc-bone-soft);
   border-start-start-radius: var(--curve-lg);
   border-end-end-radius: var(--curve-lg);
-  overflow: hidden;
 }
-@media (min-width: 900px) {
-  .hoc-ritual__viz {
-    position: sticky;
-    top: calc(var(--header-h-scrolled) + 2rem);
-  }
+.hoc-ritual__viztop {
+  color: var(--hoc-teal-deep);
+}
+.hoc-ritual__vizstage {
+  display: grid;
+  place-items: center;
+  min-width: 0;
 }
 .hoc-ritual__frame {
   grid-area: 1 / 1;
   display: grid;
   place-items: center;
-  gap: 1.25rem;
+  gap: 0.7rem;
+  width: 100%;
   opacity: 0;
-  transform: scale(0.96);
+  transform: translateY(0.6rem);
   transition: opacity var(--t-ui) var(--e-hoc),
     transform var(--t-ui) var(--e-hoc);
 }
@@ -1606,18 +1628,33 @@
   transform: none;
 }
 .hoc-ritual__bot {
-  width: clamp(120px, 17vw, 220px);
+  width: clamp(3rem, 5vw, 5.5rem);
   height: auto;
   aspect-ratio: 1;
   color: var(--hoc-teal);
-  stroke-width: 1.5;
+  stroke-width: 1.4;
 }
 .hoc-ritual__data {
   font-family: var(--ff-display);
-  font-size: clamp(1.5rem, 2.4vw, 2.25rem);
-  line-height: 1;
-  letter-spacing: 0.02em;
+  font-size: clamp(3rem, 5.5vw, 5.25rem);
+  line-height: 0.95;
+  letter-spacing: -0.025em;
   font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+.hoc-ritual__frame-label {
+  color: var(--on-surface-dim);
+}
+.hoc-ritual__vizfoot {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--hairline);
+  color: var(--on-surface-dim);
+}
+.hoc-ritual__instructions {
+  min-width: 0;
 }
 
 .hoc-ritual__steps {
@@ -1628,35 +1665,106 @@
 }
 .hoc-ritual__btn {
   display: grid;
-  grid-template-columns: 3.5rem 1fr;
-  gap: 0.25rem 1rem;
+  grid-template-columns: 2.25rem minmax(6rem, 0.4fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 0.35rem clamp(0.75rem, 1.5vw, 1.5rem);
   width: 100%;
-  padding-block: clamp(1rem, 2.5vh, 1.6rem);
+  padding-block: clamp(0.9rem, 1.65vh, 1.25rem);
   text-align: left;
-  color: var(--on-surface-dim);
-  transition: color var(--t-ui) var(--e-hoc);
-}
-.hoc-ritual__step.is-on .hoc-ritual__btn {
   color: var(--on-surface);
+}
+.hoc-ritual__btn:focus-visible {
+  outline-offset: 3px;
 }
 .hoc-ritual__label {
   font-family: var(--ff-display);
-  font-size: clamp(1.5rem, 2.6vw, 2.25rem);
+  font-size: clamp(1.65rem, 2.3vw, 2.15rem);
   line-height: 1;
+  color: var(--on-surface-dim);
+  transition: color var(--t-micro) var(--e-hoc);
+}
+.hoc-ritual__step.is-on .hoc-ritual__label,
+.hoc-ritual__btn:hover .hoc-ritual__label {
+  color: var(--hoc-ink);
+}
+.hoc-ritual__inline-data {
+  display: none;
 }
 .hoc-ritual__copy {
-  grid-column: 2;
-  max-width: 46ch;
-  overflow: hidden;
-  height: 0;
-  opacity: 0;
-  transition: height var(--t-ui) var(--e-hoc),
-    opacity var(--t-ui) var(--e-hoc), margin-top var(--t-ui) var(--e-hoc);
+  max-width: 52ch;
+  font-size: clamp(0.875rem, 1vw, 1rem);
+  line-height: 1.5;
 }
-.hoc-ritual__step.is-on .hoc-ritual__copy {
-  height: auto;
-  opacity: 1;
-  margin-top: 0.6rem;
+.hoc-ritual__cold {
+  display: grid;
+  grid-template-columns: minmax(6rem, 0.4fr) minmax(0, 1fr);
+  gap: clamp(0.75rem, 1.5vw, 1.5rem);
+  padding: 1.25rem 0 0 3rem;
+  font-size: clamp(0.875rem, 1vw, 1rem);
+  line-height: 1.5;
+  color: var(--on-surface-dim);
+}
+.hoc-ritual__cold .hoc-micro {
+  color: var(--hoc-teal-deep);
+}
+@media (min-width: 900px) and (max-width: 1199px) {
+  .hoc-ritual__btn {
+    grid-template-columns: 2rem minmax(0, 1fr);
+  }
+  .hoc-ritual__copy {
+    grid-column: 2;
+  }
+  .hoc-ritual__cold {
+    display: block;
+    padding-left: 3rem;
+  }
+  .hoc-ritual__cold .hoc-micro {
+    display: block;
+    margin-bottom: 0.35rem;
+  }
+}
+@media (max-width: 899px) {
+  .hoc-ritual__head h2 {
+    max-width: 16ch;
+    font-size: clamp(2.625rem, 8vw, 4rem);
+  }
+  .hoc-ritual__intro {
+    max-width: 40ch;
+  }
+  .hoc-ritual__viz {
+    display: none;
+  }
+  .hoc-ritual__body {
+    display: block;
+  }
+  .hoc-ritual__btn {
+    grid-template-columns: 2rem minmax(0, 1fr) auto;
+    padding-block: 1rem;
+  }
+  .hoc-ritual__label {
+    grid-column: 2;
+  }
+  .hoc-ritual__inline-data {
+    display: block;
+    grid-column: 3;
+    color: var(--hoc-teal-deep);
+    text-align: right;
+  }
+  .hoc-ritual__copy {
+    grid-column: 2 / -1;
+    max-width: 58ch;
+  }
+  .hoc-ritual__cold {
+    grid-template-columns: 1fr;
+    gap: 0.35rem;
+    padding-left: 3rem;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hoc-ritual__frame,
+  .hoc-ritual__label {
+    transition: none;
+  }
 }
 
 /* ==========================================================================

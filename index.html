@@ -15,7 +15,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
 
 <link rel="stylesheet" href="assets/css/hoc-core.css?v=9dc81688f6">
-<link rel="stylesheet" href="assets/css/hoc-sections.css?v=079e711e02">
+<link rel="stylesheet" href="assets/css/hoc-sections.css?v=439e08087d">
 <script>document.documentElement.classList.add('hoc-js');</script>
 </head>
 <body>
@@ -1641,68 +1641,88 @@
              data-hoc="ritual">
       <div class="hoc-wrap hoc-pad">
         <header class="hoc-ritual__head">
-          <p class="hoc-micro" data-reveal>The ritual</p>
-          <h2 class="hoc-display-l" data-split="lines">Brew it. Chill it. Make it yours.</h2>
+          <div>
+            <p class="hoc-micro" data-reveal>The ritual</p>
+            <h2 class="hoc-display-l" data-split="lines">Brew it. Chill it. Make it yours.</h2>
+          </div>
+          <p class="hoc-ritual__intro hoc-body" data-reveal="up">A starting recipe for Gift of Nature. Make one vivid cup, then choose how to serve it.</p>
         </header>
 
         <div class="hoc-ritual__body">
           <div class="hoc-ritual__viz" aria-hidden="true">
+            <p class="hoc-ritual__viztop hoc-micro">HOC / GIFT OF NATURE</p>
+            <div class="hoc-ritual__vizstage">
             <div class="hoc-ritual__frame is-on" data-frame="0">
               <svg class="hoc-bot hoc-ritual__bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-hibiscus"></use></svg>
               <span class="hoc-ritual__data">03 G</span>
-            </div><div class="hoc-ritual__frame" data-frame="1">
+              <span class="hoc-ritual__frame-label hoc-micro">Measure</span>
+             </div><div class="hoc-ritual__frame" data-frame="1">
               <svg class="hoc-bot hoc-ritual__bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-lemongrass"></use></svg>
               <span class="hoc-ritual__data">90 °C</span>
-            </div><div class="hoc-ritual__frame" data-frame="2">
+              <span class="hoc-ritual__frame-label hoc-micro">Brew</span>
+             </div><div class="hoc-ritual__frame" data-frame="2">
               <svg class="hoc-bot hoc-ritual__bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-mint"></use></svg>
               <span class="hoc-ritual__data">05 MIN</span>
-            </div><div class="hoc-ritual__frame" data-frame="3">
-              <svg class="hoc-bot hoc-ritual__bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-butterfly-pea"></use></svg>
-              <span class="hoc-ritual__data">330 ML</span>
-            </div><div class="hoc-ritual__frame" data-frame="4">
-              <svg class="hoc-bot hoc-ritual__bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-orange-peel"></use></svg>
-              <span class="hoc-ritual__data">08 H</span>
+              <span class="hoc-ritual__frame-label hoc-micro">Steep</span>
+             </div><div class="hoc-ritual__frame" data-frame="3">
+              <svg class="hoc-bot hoc-ritual__bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-hibiscus"></use></svg>
+              <span class="hoc-ritual__data">OVER ICE</span>
+              <span class="hoc-ritual__frame-label hoc-micro">Chill</span>
+             </div><div class="hoc-ritual__frame" data-frame="4">
+              <svg class="hoc-bot hoc-ritual__bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-mint"></use></svg>
+              <span class="hoc-ritual__data">YOUR WAY</span>
+              <span class="hoc-ritual__frame-label hoc-micro">Serve</span>
+             </div>
             </div>
+            <p class="hoc-ritual__vizfoot hoc-micro"><span>BOTANICAL BREW GUIDE</span><span data-hoc="ritual-progress">01 / 05</span></p>
           </div>
 
+          <div class="hoc-ritual__instructions">
           <ol class="hoc-ritual__steps" data-hoc="ritual-steps">
             
             <li class="hoc-ritual__step is-on" data-step="0">
-              <button class="hoc-ritual__btn" data-hoc="ritual-step">
+              <button class="hoc-ritual__btn" data-hoc="ritual-step" aria-pressed="true">
                 <span class="hoc-index hoc-micro">01</span>
                 <span class="hoc-ritual__label">Measure</span>
-                <span class="hoc-ritual__copy hoc-body">Three grams per cup. Whole leaf, whole flower — do not grind it.</span>
+                <span class="hoc-ritual__inline-data hoc-micro">03 G</span>
+                <span class="hoc-ritual__copy hoc-body">Use 3 g of Gift of Nature for one serving.</span>
               </button>
             </li>
             <li class="hoc-ritual__step" data-step="1">
-              <button class="hoc-ritual__btn" data-hoc="ritual-step">
+              <button class="hoc-ritual__btn" data-hoc="ritual-step" aria-pressed="false">
                 <span class="hoc-index hoc-micro">02</span>
                 <span class="hoc-ritual__label">Brew</span>
-                <span class="hoc-ritual__copy hoc-body">Off the boil. Hibiscus and green tea both turn bitter at a rolling boil.</span>
+                <span class="hoc-ritual__inline-data hoc-micro">90 °C</span>
+                <span class="hoc-ritual__copy hoc-body">Add 330 ml water at 90 °C.</span>
               </button>
             </li>
             <li class="hoc-ritual__step" data-step="2">
-              <button class="hoc-ritual__btn" data-hoc="ritual-step">
+              <button class="hoc-ritual__btn" data-hoc="ritual-step" aria-pressed="false">
                 <span class="hoc-index hoc-micro">03</span>
-                <span class="hoc-ritual__label">Chill</span>
-                <span class="hoc-ritual__copy hoc-body">Steep five minutes, then straight over ice. It should dilute, not fade.</span>
+                <span class="hoc-ritual__label">Steep</span>
+                <span class="hoc-ritual__inline-data hoc-micro">05 MIN</span>
+                <span class="hoc-ritual__copy hoc-body">Leave for 5 minutes, then strain.</span>
               </button>
             </li>
             <li class="hoc-ritual__step" data-step="3">
-              <button class="hoc-ritual__btn" data-hoc="ritual-step">
+              <button class="hoc-ritual__btn" data-hoc="ritual-step" aria-pressed="false">
                 <span class="hoc-index hoc-micro">04</span>
-                <span class="hoc-ritual__label">Pour</span>
-                <span class="hoc-ritual__copy hoc-body">Tall glass, clear. Half the point of this range is what it looks like.</span>
+                <span class="hoc-ritual__label">Chill</span>
+                <span class="hoc-ritual__inline-data hoc-micro">OVER ICE</span>
+                <span class="hoc-ritual__copy hoc-body">For an iced serve, pour over a glass of ice. Skip this step to drink it hot.</span>
               </button>
             </li>
             <li class="hoc-ritual__step" data-step="4">
-              <button class="hoc-ritual__btn" data-hoc="ritual-step">
+              <button class="hoc-ritual__btn" data-hoc="ritual-step" aria-pressed="false">
                 <span class="hoc-index hoc-micro">05</span>
                 <span class="hoc-ritual__label">Serve</span>
-                <span class="hoc-ritual__copy hoc-body">Or leave it cold-brewing overnight. Softer, rounder, no bitterness at all.</span>
+                <span class="hoc-ritual__inline-data hoc-micro">YOUR WAY</span>
+                <span class="hoc-ritual__copy hoc-body">Let the hibiscus colour show in a clear glass, or keep it warm in your favourite cup.</span>
               </button>
             </li>
           </ol>
+          <p class="hoc-ritual__cold"><span class="hoc-micro">Another way / cold brew</span><span>Use 4 g in 330 ml cold water; refrigerate for 8 hours, then strain.</span></p>
+          </div>
         </div>
       </div>
     </section>
@@ -2343,7 +2363,7 @@
 <script src="assets/vendor/embla-carousel.umd.js?v=f05b5dbfe3"></script>
 
 <script src="assets/js/hoc-data.js?v=4ce215a2d4"></script>
-<script src="assets/js/hoc-core.js?v=e2e8d51c36"></script>
+<script src="assets/js/hoc-core.js?v=3b0cf2b209"></script>
 <script src="assets/js/hoc-botanicals.js?v=7ee1015b7b"></script>
 <script src="assets/js/hoc-webgl.js?v=e2d91a3e21"></script>
 <script src="assets/js/hoc-motion.js?v=99d0bd692e"></script>
