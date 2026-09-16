@@ -987,38 +987,48 @@
 .hoc-atlas {
   background: var(--hoc-bone-soft);
 }
+.hoc-atlas > .hoc-wrap {
+  padding-block: clamp(4.5rem, 8vh, 7rem);
+}
 .hoc-atlas__top {
   display: grid;
-  gap: clamp(2.5rem, 5vw, 4rem);
-  margin-bottom: clamp(2.5rem, 6vh, 4.5rem);
+  gap: clamp(2rem, 4vw, 4.5rem);
+  margin-bottom: clamp(2rem, 4vw, 3.5rem);
 }
 @media (min-width: 900px) {
   .hoc-atlas__top {
-    grid-template-columns: minmax(0, 47fr) minmax(0, 53fr);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
     align-items: center;
   }
 }
 .hoc-atlas__head {
-  max-width: 16ch;
+  min-width: 0;
+}
+.hoc-atlas__head .hoc-display-l {
+  max-width: 100%;
+  overflow-wrap: normal;
 }
 .hoc-atlas__head .hoc-micro {
   margin-bottom: 1rem;
 }
 .hoc-atlas__head .hoc-body {
   margin-top: 1.25rem;
-  max-width: 34ch;
+  max-width: 38ch;
 }
 
 .hoc-atlas__lead {
   margin: 0;
   display: grid;
-  grid-template-columns: minmax(0, 40%) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 34%) minmax(0, 1fr);
   gap: clamp(1.25rem, 3vw, 2.5rem);
   align-items: center;
-  padding: clamp(1.5rem, 3vw, 2.5rem);
+  padding: clamp(1.5rem, 2.5vw, 2.25rem);
   background: #fff;
   border-start-start-radius: var(--curve-lg);
   border-end-end-radius: var(--curve-lg);
+}
+.hoc-atlas__leadinfo {
+  min-width: 0;
 }
 .hoc-atlas__leadart {
   aspect-ratio: 1;
@@ -1032,7 +1042,8 @@
   stroke-width: 1.15;
 }
 .hoc-atlas__leadname {
-  line-height: 1;
+  font-size: clamp(2.2rem, 3.4vw, 4rem);
+  line-height: 1.02;
 }
 .hoc-atlas__bot {
   font-style: italic;
@@ -1070,20 +1081,17 @@
   max-width: 40ch;
 }
 
-/* Fixed column counts — an auto-fill grid orphaned cells at 12 items. */
+/* Fixed column counts — an auto-fill grid orphaned cells at 12 items.
+   Three up on phones, not two: twelve tiles become four rows instead of six,
+   which is what lets the lead panel and the grid share a viewport. */
 .hoc-atlas__grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1px;
   background: var(--hairline);
   border: 1px solid var(--hairline);
 }
-@media (min-width: 560px) {
-  .hoc-atlas__grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-@media (min-width: 900px) {
+@media (min-width: 600px) {
   .hoc-atlas__grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
@@ -1106,7 +1114,7 @@
   gap: 0.7rem;
   place-items: center;
   width: 100%;
-  padding: clamp(1.1rem, 2.4vw, 1.75rem) 0.6rem;
+  padding: clamp(1rem, 1.5vw, 1.4rem) 0.6rem;
   text-align: center;
 }
 .hoc-atlas__art {
@@ -1131,6 +1139,139 @@
 }
 .hoc-atlas__item.is-on .hoc-atlas__name {
   color: var(--on-surface);
+}
+
+/* --- Atlas on phones -------------------------------------------------------
+
+   The panel is what changes when you tap a tile, so the panel has to be on
+   screen when you tap. Stacked at full size it is not: it ends ~50px above
+   where the grid begins.
+
+   So below 900px the panel becomes a horizontal band and sticks under the
+   header while the grid scrolls past it. `display: contents` on the wrapper is
+   what makes that possible — it promotes the head and the panel to children of
+   .hoc-wrap, whose box spans the grid as well, giving the sticky element
+   something long enough to stick within.
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 899px) {
+  .hoc-atlas__top {
+    display: contents;
+  }
+  .hoc-atlas__head {
+    margin-bottom: clamp(1.5rem, 4vh, 2.25rem);
+  }
+  .hoc-atlas__head .hoc-body {
+    margin-top: 0.9rem;
+  }
+
+  .hoc-atlas__lead {
+    position: sticky;
+    top: calc(var(--header-h-scrolled) + 0.5rem);
+    z-index: 2;
+    grid-template-columns: 4.75rem minmax(0, 1fr);
+    gap: 1rem;
+    align-items: start;
+    padding: 1rem 1.15rem 1.15rem;
+    margin-bottom: 1.25rem;
+    border: 1px solid var(--hairline);
+  }
+  .hoc-atlas__leadart {
+    aspect-ratio: 1;
+    align-self: center;
+  }
+  .hoc-atlas__bigsvg {
+    stroke-width: 1.6;
+  }
+  .hoc-atlas__leadname {
+    font-size: 1.5rem;
+  }
+  .hoc-atlas__bot {
+    margin-top: 0.2rem;
+  }
+  .hoc-atlas__facts {
+    gap: 0.25rem;
+    margin: 0.7rem 0 0.6rem;
+    padding-top: 0.6rem;
+  }
+  .hoc-atlas__facts dd {
+    font-size: 0.8125rem;
+    text-align: right;
+  }
+  .hoc-atlas__note {
+    font-size: 0.8125rem;
+    line-height: 1.5;
+  }
+
+  .hoc-atlas__svg {
+    stroke-width: 2;
+  }
+  /* One line is enough at every width from 360px up — measured, not assumed:
+     only "Cinnamon Stick" wraps, and only at 320. Centring in a one-line box
+     keeps the rows even without paying for a reserve nothing uses. */
+  .hoc-atlas__name {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 1.25em;
+    line-height: 1.2;
+  }
+}
+
+/* Phones: three up, so the marks come down and the box tightens. */
+@media (max-width: 599px) {
+  .hoc-atlas__btn {
+    gap: 0.5rem;
+    padding: 0.85rem 0.3rem 0.75rem;
+  }
+  .hoc-atlas__art {
+    width: 36px;
+  }
+  .hoc-atlas__name {
+    font-size: 0.625rem;
+    letter-spacing: 0.08em;
+  }
+}
+
+/* Small tablets: the lead panel is nearly 740px wide here, and with the facts
+   set space-between the label and its value ended up 500px apart — technically
+   aligned, unreadable in practice. Cap the text column instead of letting it
+   stretch, and give the drawing the width it can now afford. */
+@media (min-width: 600px) and (max-width: 899px) {
+  .hoc-atlas__lead {
+    grid-template-columns: 7.5rem minmax(0, 30rem);
+    justify-content: start;
+    gap: 1.75rem;
+    padding: 1.5rem 1.75rem;
+  }
+  .hoc-atlas__head {
+    max-width: none;
+  }
+  .hoc-atlas__head .hoc-body {
+    max-width: 52ch;
+  }
+
+  .hoc-atlas__btn {
+    gap: 0.65rem;
+    padding: 1.15rem 0.5rem 1rem;
+  }
+  .hoc-atlas__art {
+    width: 48px;
+  }
+}
+
+/* Very narrow phones: the one label that wraps needs the second line back,
+   and the marks give up a few pixels so three columns still breathe. */
+@media (max-width: 359px) {
+  .hoc-atlas__btn {
+    padding-inline: 0.15rem;
+  }
+  .hoc-atlas__art {
+    width: 32px;
+  }
+  .hoc-atlas__name {
+    min-height: 2.5em;
+  }
 }
 
 /* ==========================================================================
