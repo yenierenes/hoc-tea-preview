@@ -826,28 +826,50 @@
   HOC.controller("mood-preview", function (el) {
     var inner = HOC.$(".hoc-moods__previewinner", el);
     var section = el.closest(".hoc-moods");
-    var qx = null,
-      qy = null;
+    var stageY = null,
+      innerX = null,
+      innerY = null;
     var offs = [];
     var current = null;
 
+    function clamp(value, min, max) {
+      return Math.max(min, Math.min(max, value));
+    }
+
+    function place(li, immediate) {
+      if (!stageY || !li || !section) return;
+      var row = li.getBoundingClientRect();
+      var area = section.getBoundingClientRect();
+      var previewHeight = el.offsetHeight;
+      var y = row.top - area.top + (row.height - previewHeight) / 2;
+      var max = Math.max(24, section.scrollHeight - previewHeight - 24);
+      y = clamp(y, 24, max);
+      if (immediate && gsap) gsap.set(el, { y: y });
+      else stageY(y);
+    }
+
     function onMove(e) {
-      if (!qx) return;
-      qx(e.clientX);
-      qy(e.clientY);
+      if (!current || !innerX || !innerY) return;
+      var row = current.getBoundingClientRect();
+      var px = (e.clientX - (row.left + row.width / 2)) / Math.max(row.width / 2, 1);
+      var py = (e.clientY - (row.top + row.height / 2)) / Math.max(row.height / 2, 1);
+      innerX(clamp(px * 12, -12, 12));
+      innerY(clamp(py * 8, -8, 8));
     }
 
     return {
       init: function () {
         if (env.touch || reduced() || !section) return;
-        qx = gsap.quickTo(el, "x", { duration: 0.72, ease: EASE });
-        qy = gsap.quickTo(el, "y", { duration: 0.72, ease: EASE });
+        stageY = gsap.quickTo(el, "y", { duration: 0.5, ease: EASE });
+        innerX = gsap.quickTo(inner, "x", { duration: 0.65, ease: EASE });
+        innerY = gsap.quickTo(inner, "y", { duration: 0.65, ease: EASE });
 
         offs.push(
           HOC.bind("moodenter", function (e) {
           var li = e.detail;
           if (!li || li === current) return;
           current = li;
+          place(li, !el.classList.contains("is-on"));
           var src = HOC.$(".hoc-mood__pack img", li);
           if (src && inner) {
             inner.innerHTML = "";
@@ -875,6 +897,8 @@
           HOC.bind("moodleave", function () {
             current = null;
             el.classList.remove("is-on");
+            if (innerX) innerX(0);
+            if (innerY) innerY(0);
           })
         );
 
@@ -898,6 +922,9 @@
             );
           });
         }
+      },
+      resize: function () {
+        if (current) place(current, true);
       },
       destroy: function () {
         offs.forEach(function (f) {

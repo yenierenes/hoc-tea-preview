@@ -828,17 +828,23 @@
 
 .hoc-moods {
   position: relative;
-  overflow: hidden;
+  overflow: clip;
   transition: background-color var(--t-scene) var(--e-hoc);
 }
 .hoc-moods__head {
-  margin-bottom: clamp(2rem, 5vh, 4rem);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(15rem, 0.72fr);
+  align-items: end;
+  gap: 2rem;
+  margin-bottom: clamp(2.5rem, 6vh, 4.75rem);
 }
 .hoc-moods__head .hoc-micro {
+  grid-column: 1 / -1;
   margin-bottom: 1rem;
 }
 .hoc-moods__head h2 {
-  max-width: 16ch;
+  max-width: 13ch;
+  text-wrap: balance;
 }
 .hoc-moods__list {
   position: relative;
@@ -862,24 +868,55 @@
 /* Bigger than display-l: these six words are the section. */
 .hoc-mood__word {
   font-family: var(--ff-display);
-  font-size: clamp(2.75rem, 7.4vw, 7rem);
-  line-height: 0.98;
+  font-size: clamp(3.1rem, 6.2vw, 6.25rem);
+  line-height: 0.9;
   letter-spacing: var(--ls-display);
   transition: transform var(--t-ui) var(--e-hoc);
   will-change: transform;
+  white-space: nowrap;
 }
 /* Metadata is always readable — it gives the right column something to hold
    and it is not hover-only content (§45). It only brightens on hover. */
-.hoc-mood__meta {
+.hoc-mood__aside {
   flex: none;
   align-self: center;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.45rem;
+  max-width: 27ch;
+  text-align: right;
+}
+.hoc-mood__meta {
+  line-height: 1.45;
   opacity: 0.42;
   transition: opacity var(--t-ui) var(--e-hoc),
     color var(--t-ui) var(--e-hoc);
 }
+.hoc-mood__destination {
+  color: var(--accent);
+  opacity: 0;
+  transform: translateY(0.35rem);
+  transition: opacity var(--t-micro) var(--e-hoc),
+    transform var(--t-ui) var(--e-hoc);
+}
 @media (hover: hover) and (min-width: 900px) {
+  .hoc-mood__btn {
+    display: grid;
+    grid-template-columns: minmax(15rem, 0.88fr) minmax(13rem, 0.62fr) minmax(15rem, 0.5fr);
+    min-height: clamp(6.6rem, 10vw, 9.2rem);
+    padding-block: clamp(1rem, 1.8vh, 1.5rem);
+  }
+  .hoc-mood__word {
+    grid-column: 1;
+    align-self: center;
+  }
+  .hoc-mood__aside {
+    grid-column: 3;
+    justify-self: end;
+  }
   .hoc-mood.is-on .hoc-mood__word {
-    transform: translateX(clamp(0.75rem, 2vw, 2.25rem));
+    transform: translateX(clamp(0.45rem, 1vw, 1rem));
   }
   .hoc-mood.is-on .hoc-mood__btn {
     color: var(--accent);
@@ -887,6 +924,10 @@
   .hoc-mood.is-on .hoc-mood__meta {
     opacity: 1;
     color: var(--accent);
+  }
+  .hoc-mood.is-on .hoc-mood__destination {
+    opacity: 1;
+    transform: translateY(0);
   }
   .hoc-moods__list:has(.hoc-mood.is-on) .hoc-mood:not(.is-on) .hoc-mood__btn {
     color: var(--on-surface-dim);
@@ -896,37 +937,55 @@
   }
 }
 
-/* Floating preview — desktop only, follows the pointer with lag §15 */
+/* Desktop product stage. It locks to the active row; the pointer only adds a
+   restrained depth shift, so the pack never obscures the mood word. */
 .hoc-moods__preview {
-  position: fixed;
+  position: absolute;
   top: 0;
-  left: 0;
+  left: 54%;
   z-index: 3;
-  width: clamp(190px, 17vw, 280px);
-  aspect-ratio: 3 / 4;
-  margin: -12% 0 0 -50%;
+  width: clamp(210px, 17vw, 292px);
+  aspect-ratio: 4 / 5;
+  translate: -50% 0;
   opacity: 0;
   pointer-events: none;
   will-change: transform;
-  transition: opacity var(--t-ui) var(--e-hoc);
+  transition: opacity 0.35s var(--e-hoc);
 }
 .hoc-moods__preview.is-on {
   opacity: 1;
 }
 .hoc-moods__previewinner {
+  position: relative;
   width: 100%;
   height: 100%;
-  background: var(--accent-wash, #e6e6e6);
+  background:
+    radial-gradient(circle at 54% 38%, rgb(255 255 255 / 0.72), transparent 43%),
+    var(--accent-wash, #e6e6e6);
   display: grid;
   place-items: center;
   overflow: hidden;
-  transition: background-color var(--t-ui) var(--e-hoc);
+  border: 1px solid color-mix(in srgb, var(--accent, #777) 15%, transparent);
+  box-shadow: 0 28px 55px rgb(35 35 34 / 0.11);
+  will-change: transform;
+  transition: background-color var(--t-ui) var(--e-hoc),
+    border-color var(--t-ui) var(--e-hoc);
+}
+.hoc-moods__previewinner::after {
+  content: "";
+  position: absolute;
+  inset: 8%;
+  border: 1px solid rgb(255 255 255 / 0.42);
+  border-radius: inherit;
+  pointer-events: none;
 }
 .hoc-moods__previewinner img {
-  width: 82%;
+  position: relative;
+  z-index: 1;
+  width: 76%;
   height: auto;
   object-fit: contain;
-  filter: drop-shadow(0 18px 26px rgb(35 35 34 / 0.16));
+  filter: drop-shadow(0 20px 30px rgb(35 35 34 / 0.18));
 }
 @media (max-width: 899px), (hover: none) {
   .hoc-moods__preview {
@@ -936,6 +995,19 @@
 
 /* Mobile: tap to reveal, stacked §15 */
 @media (max-width: 899px) {
+  .hoc-moods__head {
+    display: block;
+    margin-bottom: clamp(2rem, 8vw, 3.5rem);
+  }
+  .hoc-mood__btn {
+    gap: 0.75rem;
+    padding-block: 1.15rem;
+  }
+  .hoc-mood__word {
+    min-width: 0;
+    font-size: clamp(2.75rem, 13vw, 5.4rem);
+    white-space: normal;
+  }
   .hoc-mood__reveal {
     display: grid;
     grid-template-columns: 34% 1fr;
@@ -977,6 +1049,26 @@
   .hoc-mood__meta {
     opacity: 1;
     font-size: 0.625rem;
+    max-width: 19ch;
+  }
+  .hoc-mood__destination {
+    display: none;
+  }
+}
+
+@media (max-width: 479px) {
+  .hoc-mood__btn {
+    align-items: center;
+  }
+  .hoc-mood__word {
+    font-size: clamp(2.6rem, 12.5vw, 3.6rem);
+  }
+  .hoc-mood__aside {
+    max-width: 13ch;
+  }
+  .hoc-mood__reveal {
+    grid-template-columns: minmax(7rem, 38%) minmax(0, 1fr);
+    gap: 1rem;
   }
 }
 

@@ -1116,6 +1116,11 @@
             var btn = e.target.closest('[data-hoc="mood"]');
             if (!btn) return;
             var li = btn.closest(".hoc-mood");
+            if (!HOC.env.touch && !HOC.env.narrow) {
+              var href = btn.getAttribute("data-product-url");
+              if (href) root.location.href = href;
+              return;
+            }
             // Desktop hover handles preview; click opens the inline panel,
             // which is the only mode on touch.
             var open = li.classList.toggle("is-open");
