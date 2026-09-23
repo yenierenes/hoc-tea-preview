@@ -415,67 +415,35 @@
     function paintStream() {
       if (!streamTiles || !streamContext || !enabled || !visible || !total) return;
       var ctx = streamContext, canvasHeight = viewport.clientHeight;
-      var cell = viewportWidth < 700 ? 23 : 25;
-      var rows = viewportWidth < 700 ? 5 : 6;
-      var rowGap = viewportWidth < 700 ? 25 : 26;
-      var bandTop = viewportWidth < 700 ? 26 : 31;
-      var first = Math.floor((offset - viewportWidth - cell) / cell);
-      var final = Math.ceil((offset + cell) / cell);
       var viewportRect = viewport.getBoundingClientRect();
-      var sloganBounds = [];
-      entries.forEach(function (entry) {
-        if (entry.inert) return;
-        var saying = entry.querySelector(".hoc-current__saying");
-        if (!saying) return;
-        var range = document.createRange();
-        range.selectNodeContents(saying);
-        Array.prototype.forEach.call(range.getClientRects(), function (rect) {
-          sloganBounds.push({
-            left: rect.left - viewportRect.left - 12,
-            right: rect.right - viewportRect.left + 12,
-            top: rect.top - viewportRect.top - 7,
-            bottom: rect.bottom - viewportRect.top + 7
-          });
-        });
-      });
       ctx.clearRect(0, 0, viewportWidth, canvasHeight);
-      for (var col = first; col <= final; col++) {
-        var source = ((col * cell) % total + total) % total;
-        var blend = Math.min(recipes.length - 1, Math.floor(source / width));
-        var next = (blend + 1) % recipes.length;
-        var phase = (source % width) / width;
-        var mix = smoothstep((phase - .53) / .44);
-        var primary = recipes[blend], secondary = recipes[next];
-        if (!primary.length) continue;
-        for (var row = 0; row < rows; row++) {
-          var seed = col * 17.13 + row * 127.7;
-          var jitter = hash(seed);
-          var x = offset - col * cell + (jitter - .5) * 7;
-          var y = bandTop + row * rowGap + (hash(seed + 3) - .5) * 10;
-          y += Math.sin(time * .00072 + seed) * 2.2;
-          var size = cell * (1.02 + hash(seed + 7) * .28);
-          var angle = (hash(seed + 11) - .5) * .48 + Math.sin(time * .0004 + seed) * .055;
-          // Omit the entire rotated tile if it would touch a slogan. Clearing
-          // pixels afterward sliced pieces in half at the text boundary.
+      entries.forEach(function (entry, index) {
+        if (entry.inert || !recipes[index].length) return;
+        var media = entry.querySelector(".hoc-current__media");
+        var rect = media.getBoundingClientRect();
+        var left = rect.left - viewportRect.left;
+        var top = rect.top - viewportRect.top;
+        var cols = viewportWidth < 700 ? 7 : 9;
+        var rows = viewportWidth < 700 ? 5 : 6;
+        var cell = Math.min(rect.width / cols, rect.height / rows);
+        for (var col = 0; col < cols; col++) for (var row = 0; row < rows; row++) {
+          var seed = index * 193.1 + col * 17.13 + row * 127.7;
+          var x = left + (col + .5) * rect.width / cols + (hash(seed) - .5) * 5;
+          var y = top + (row + .5) * rect.height / rows + (hash(seed + 3) - .5) * 5;
+          x += Math.sin(time * .00055 + seed) * 1.7;
+          y += Math.cos(time * .0007 + seed) * 1.7;
+          var size = cell * (.91 + hash(seed + 7) * .19);
           var radius = size * .71;
-          if (sloganBounds.some(function (rect) {
-            return x + radius > rect.left && x - radius < rect.right &&
-              y + radius > rect.top && y - radius < rect.bottom;
-          })) continue;
-          var type = primary[Math.floor(hash(seed + 13) * primary.length)];
+          if (x - radius < 0 || x + radius > viewportWidth) continue;
+          var type = recipes[index][Math.floor(hash(seed + 13) * recipes[index].length)];
           ctx.save();
           ctx.translate(x, y);
-          ctx.rotate(angle);
-          ctx.globalAlpha = .88 * (1 - mix);
+          ctx.rotate((hash(seed + 11) - .5) * .38);
+          ctx.globalAlpha = .94;
           ctx.drawImage(streamTiles[type], -size / 2, -size / 2, size, size);
-          if (secondary.length && mix > .01) {
-            var other = secondary[Math.floor(hash(seed + 23) * secondary.length)];
-            ctx.globalAlpha = .88 * mix;
-            ctx.drawImage(streamTiles[other], -size / 2, -size / 2, size, size);
-          }
           ctx.restore();
         }
-      }
+      });
       el.dataset.streamBlend = String(Math.floor((((offset - viewportWidth / 2) % total + total) % total) / width));
     }
     function decorate() {
