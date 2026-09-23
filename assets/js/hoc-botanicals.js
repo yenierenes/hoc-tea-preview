@@ -361,7 +361,7 @@
     var entries = Array.prototype.slice.call(el.querySelectorAll(".hoc-current__item"));
     var button = el.querySelector("[data-current-pause]");
     var observer, visible = false, playing = false, paused = false, focused = false, hovering = false;
-    var decorated = false, enabled = false, width = 540, offset = 580, total = 0, viewportWidth = 0;
+    var decorated = false, enabled = false, width = 520, offset = 560, total = 0, viewportWidth = 0;
     var last = 0, time = 0, speed = 0, lastPaint = 0, petals = [];
     var mq = root.matchMedia("(prefers-reduced-motion: reduce)");
     function reduced() { return mq.matches || HOC.env.reduced || HOC.env.tier === "reduced"; }
@@ -378,17 +378,41 @@
         var recipe = (entry.dataset.ingredients || "").split("|").map(function (name) { return names.indexOf(name.trim()); }).filter(function (i) { return i >= 0; });
         var rand = random(entry.dataset.seed || String(index));
         var group = [];
-        if (media && recipe.length) for (var i = 0; i < 9; i++) {
-          var type = recipe[i % recipe.length], node = document.createElement("span");
+        // A 7 x 4 specimen field: every botanical is an individual object,
+        // while every blend keeps the same calm rectangular silhouette.
+        if (media && recipe.length) for (var i = 0; i < 28; i++) {
+          var col = i % 7, row = Math.floor(i / 7);
+          var type = recipe[(i + row + index) % recipe.length], node = document.createElement("span");
           node.className = "hoc-current__petal"; node.setAttribute("aria-hidden", "true");
           node.style.backgroundImage = 'url("' + el.dataset.atlas + '")';
           node.style.backgroundPosition = (type % 6 / 5 * 100) + "% " + (Math.floor(type / 6) / 4 * 100) + "%";
-          var size = 19 + rand() * 17;
+          var size = 21 + rand() * 8;
           node.style.width = node.style.height = size + "px";
           media.appendChild(node);
-          group.push({ node: node, x: .05 + rand() * .85, y: .1 + rand() * .7, phase: rand() * 6.28, angle: rand() * 360, size: size });
+          group.push({
+            node: node,
+            x: (col + .5) / 7 + (rand() - .5) * .018,
+            y: (row + .5) / 4 + (rand() - .5) * .025,
+            phase: rand() * 6.28,
+            angle: (rand() - .5) * 20,
+            size: size
+          });
         }
         petals.push(group);
+      });
+      el.classList.add("is-matrix-ready");
+    }
+    function paintPetals(entry, group, wave, animate) {
+      var media = entry.querySelector(".hoc-current__media");
+      if (!media) return;
+      var mediaWidth = media.clientWidth || 232, mediaHeight = media.clientHeight || 154;
+      group.forEach(function (p) {
+        var driftX = animate ? Math.sin(wave + p.phase) * 2.7 : 0;
+        var driftY = animate ? Math.cos(wave * .85 + p.phase) * 2.1 : 0;
+        var turn = p.angle + (animate ? Math.sin(wave + p.phase) * 3.5 : 0);
+        var px = p.x * mediaWidth - p.size / 2 + driftX;
+        var py = p.y * mediaHeight - p.size / 2 + driftY;
+        p.node.style.transform = "translate3d(" + px.toFixed(2) + "px," + py.toFixed(2) + "px,0) rotate(" + turn.toFixed(2) + "deg)";
       });
     }
     function paint() {
@@ -405,12 +429,7 @@
         var wave = time * .00065 + i * 1.7;
         entry.style.setProperty("--current-bob", (Math.sin(wave) * 5).toFixed(2) + "px");
         entry.style.setProperty("--current-turn", (Math.sin(wave * .7) * 2).toFixed(2) + "deg");
-        var mediaWidth = width < 400 ? 180 : 240;
-        (petals[i] || []).forEach(function (p) {
-          var px = p.x * mediaWidth + Math.sin(wave + p.phase) * 12;
-          var py = p.y * (mediaWidth * .88) + Math.cos(wave * .85 + p.phase) * 8;
-          p.node.style.transform = "translate3d(" + px.toFixed(2) + "px," + py.toFixed(2) + "px,0) rotate(" + (p.angle + Math.sin(wave + p.phase) * 13).toFixed(2) + "deg)";
-        });
+        paintPetals(entry, petals[i] || [], wave, true);
       });
       el.dataset.flowOffset = offset.toFixed(2);
     }
@@ -427,7 +446,7 @@
     }
     function measure() {
       if (!entries.length) return;
-      var next = entries[0].getBoundingClientRect().width || 540;
+      var next = entries[0].getBoundingClientRect().width || 520;
       offset = offset / width * next; width = next;
       total = width * entries.length; viewportWidth = viewport.clientWidth;
       if (enabled) paint();
@@ -439,9 +458,13 @@
       if (!enabled) {
         stop();
         entries.forEach(function (entry) { entry.style.transform = ""; entry.style.visibility = ""; entry.style.removeProperty("--current-bob"); entry.style.removeProperty("--current-turn"); entry.inert = false; entry.removeAttribute("aria-hidden"); });
-        petals.forEach(function (group) { group.forEach(function (p) { p.node.hidden = true; }); });
+        decorate();
+        petals.forEach(function (group, i) {
+          group.forEach(function (p) { p.node.hidden = false; });
+          paintPetals(entries[i], group, 0, false);
+        });
       } else {
-        if (visible) decorate();
+        decorate();
         petals.forEach(function (group) { group.forEach(function (p) { p.node.hidden = false; }); });
         measure(); wake();
       }
@@ -471,7 +494,7 @@
       init: function () {
         if (!entries.length || !viewport || !button) return;
         button.textContent = "Pause flow"; button.setAttribute("aria-pressed", "false");
-        mode();
+        decorate(); mode();
         observer = new IntersectionObserver(function (events) {
           visible = events[0].isIntersecting;
           if (visible && enabled) { decorate(); paint(); wake(); } else stop();
@@ -493,7 +516,7 @@
         viewport.removeEventListener("click", navigate);
         mq.removeEventListener("change", mode); HOC.off("tierchange", mode);
         document.removeEventListener("visibilitychange", visibility);
-        el.classList.remove("is-flowing"); delete el.dataset.flowOffset; button.hidden = true;
+        el.classList.remove("is-flowing", "is-matrix-ready"); delete el.dataset.flowOffset; button.hidden = true;
         entries.forEach(function (entry) { entry.style.transform = ""; entry.style.visibility = ""; entry.style.removeProperty("--current-bob"); entry.style.removeProperty("--current-turn"); entry.inert = false; entry.removeAttribute("aria-hidden"); });
         petals.forEach(function (group) { group.forEach(function (p) { p.node.remove(); }); });
       }
