@@ -2080,20 +2080,6 @@
 .hoc-current.is-flowing .hoc-current__saying {
   position: relative;
   z-index: 1;
-  text-shadow: 0 2px 14px rgb(35 35 34 / .95), 0 2px 30px rgb(35 35 34 / .8);
-}
-.hoc-current.is-flowing .hoc-current__saying { isolation: isolate; }
-.hoc-current.is-flowing .hoc-current__saying::before {
-  content: "";
-  position: absolute;
-  z-index: -1;
-  inset: -1.2rem -1.65rem;
-  background: radial-gradient(ellipse at center,
-    var(--hoc-ink) 34%,
-    rgb(35 35 34 / .96) 52%,
-    rgb(35 35 34 / .7) 72%,
-    transparent 100%);
-  pointer-events: none;
 }
 @media (max-width: 699px) {
   .hoc-footer__grid { grid-template-columns: 1fr 1fr; }

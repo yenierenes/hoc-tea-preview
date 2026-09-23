@@ -452,6 +452,24 @@
           ctx.restore();
         }
       }
+      // Cut actual transparent space in the botanical canvas beneath each
+      // rendered line. Text wraps differently at every viewport width, so
+      // measure its live line boxes instead of painting a fixed overlay.
+      var viewportRect = viewport.getBoundingClientRect();
+      entries.forEach(function (entry) {
+        if (entry.inert) return;
+        var saying = entry.querySelector(".hoc-current__saying");
+        if (!saying) return;
+        var range = document.createRange();
+        range.selectNodeContents(saying);
+        Array.prototype.forEach.call(range.getClientRects(), function (rect) {
+          var x = rect.left - viewportRect.left - 12;
+          var y = rect.top - viewportRect.top - 7;
+          if (x < viewportWidth && x + rect.width + 24 > 0) {
+            ctx.clearRect(x, y, rect.width + 24, rect.height + 14);
+          }
+        });
+      });
       el.dataset.streamBlend = String(Math.floor((((offset - viewportWidth / 2) % total + total) % total) / width));
     }
     function decorate() {
