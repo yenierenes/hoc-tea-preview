@@ -363,12 +363,96 @@
     var observer, visible = false, playing = false, paused = false, focused = false, hovering = false;
     var decorated = false, enabled = false, width = 520, offset = 560, total = 0, viewportWidth = 0;
     var last = 0, time = 0, speed = 0, lastPaint = 0, petals = [];
+    var recipes = entries.map(function (entry) {
+      return (entry.dataset.ingredients || "").split("|").map(function (name) {
+        return names.indexOf(name.trim());
+      }).filter(function (i) { return i >= 0; });
+    });
+    var stream = null, streamContext = null, streamTiles = null, streamImage = null;
     var mq = root.matchMedia("(prefers-reduced-motion: reduce)");
     function reduced() { return mq.matches || HOC.env.reduced || HOC.env.tier === "reduced"; }
     function stop() { HOC.ticker.remove(tick); playing = false; last = 0; }
     function wake() {
       if (playing || !enabled || !visible || paused || focused || document.hidden) return;
       playing = true; last = 0; HOC.ticker.add(tick);
+    }
+    function hash(value) {
+      var n = Math.sin(value * 12.9898 + 78.233) * 43758.5453;
+      return n - Math.floor(n);
+    }
+    function streamSize() {
+      if (!stream || !viewport) return;
+      var ratio = Math.min(root.devicePixelRatio || 1, 1.5);
+      var height = viewport.clientHeight || 278;
+      stream.width = Math.max(1, Math.round(viewport.clientWidth * ratio));
+      stream.height = Math.max(1, Math.round(height * ratio));
+      streamContext.setTransform(ratio, 0, 0, ratio, 0, 0);
+    }
+    function prepareStream() {
+      if (stream || !viewport || !el.dataset.atlas) return;
+      stream = document.createElement("canvas");
+      stream.className = "hoc-current__stream";
+      stream.setAttribute("aria-hidden", "true");
+      streamContext = stream.getContext("2d", { alpha: true });
+      if (!streamContext) { stream.remove(); stream = null; return; }
+      viewport.insertBefore(stream, viewport.firstChild);
+      streamSize();
+      streamImage = new Image();
+      streamImage.onload = function () {
+        if (!stream || !streamContext) return;
+        var sw = streamImage.naturalWidth / 6, sh = streamImage.naturalHeight / 5;
+        streamTiles = names.map(function (_, i) {
+          var tile = document.createElement("canvas");
+          tile.width = tile.height = 96;
+          tile.getContext("2d").drawImage(streamImage, i % 6 * sw, Math.floor(i / 6) * sh, sw, sh, 0, 0, 96, 96);
+          return tile;
+        });
+        paintStream();
+        el.classList.add("is-stream-ready");
+      };
+      streamImage.src = el.dataset.atlas;
+    }
+    function paintStream() {
+      if (!streamTiles || !streamContext || !enabled || !visible || !total) return;
+      var ctx = streamContext, canvasHeight = viewport.clientHeight;
+      var cell = viewportWidth < 700 ? 23 : 25;
+      var rows = viewportWidth < 700 ? 5 : 6;
+      var rowGap = viewportWidth < 700 ? 25 : 26;
+      var bandTop = viewportWidth < 700 ? 26 : 31;
+      var first = Math.floor((offset - viewportWidth - cell) / cell);
+      var final = Math.ceil((offset + cell) / cell);
+      ctx.clearRect(0, 0, viewportWidth, canvasHeight);
+      for (var col = first; col <= final; col++) {
+        var source = ((col * cell) % total + total) % total;
+        var blend = Math.min(recipes.length - 1, Math.floor(source / width));
+        var next = (blend + 1) % recipes.length;
+        var phase = (source % width) / width;
+        var mix = smoothstep((phase - .53) / .44);
+        var primary = recipes[blend], secondary = recipes[next];
+        if (!primary.length) continue;
+        for (var row = 0; row < rows; row++) {
+          var seed = col * 17.13 + row * 127.7;
+          var jitter = hash(seed);
+          var x = offset - col * cell + (jitter - .5) * 7;
+          var y = bandTop + row * rowGap + (hash(seed + 3) - .5) * 10;
+          y += Math.sin(time * .00072 + seed) * 2.2;
+          var size = cell * (1.02 + hash(seed + 7) * .28);
+          var angle = (hash(seed + 11) - .5) * .48 + Math.sin(time * .0004 + seed) * .055;
+          var type = primary[Math.floor(hash(seed + 13) * primary.length)];
+          ctx.save();
+          ctx.translate(x, y);
+          ctx.rotate(angle);
+          ctx.globalAlpha = .88 * (1 - mix);
+          ctx.drawImage(streamTiles[type], -size / 2, -size / 2, size, size);
+          if (secondary.length && mix > .01) {
+            var other = secondary[Math.floor(hash(seed + 23) * secondary.length)];
+            ctx.globalAlpha = .88 * mix;
+            ctx.drawImage(streamTiles[other], -size / 2, -size / 2, size, size);
+          }
+          ctx.restore();
+        }
+      }
+      el.dataset.streamBlend = String(Math.floor((((offset - viewportWidth / 2) % total + total) % total) / width));
     }
     function decorate() {
       if (decorated) return;
@@ -436,8 +520,9 @@
         var wave = time * .00065 + i * 1.7;
         entry.style.setProperty("--current-bob", (Math.sin(wave) * 5).toFixed(2) + "px");
         entry.style.setProperty("--current-turn", (Math.sin(wave * .7) * 2).toFixed(2) + "deg");
-        paintPetals(entry, petals[i] || [], wave, true);
+        if (!streamTiles) paintPetals(entry, petals[i] || [], wave, true);
       });
+      paintStream();
       el.dataset.flowOffset = offset.toFixed(2);
     }
     function tick(t) {
@@ -456,6 +541,7 @@
       var next = entries[0].getBoundingClientRect().width || 520;
       offset = offset / width * next; width = next;
       total = width * entries.length; viewportWidth = viewport.clientWidth;
+      streamSize();
       if (enabled) paint();
     }
     function mode() {
@@ -472,6 +558,7 @@
         });
       } else {
         decorate();
+        prepareStream();
         petals.forEach(function (group) { group.forEach(function (p) { p.node.hidden = false; }); });
         measure(); wake();
       }
@@ -523,7 +610,10 @@
         viewport.removeEventListener("click", navigate);
         mq.removeEventListener("change", mode); HOC.off("tierchange", mode);
         document.removeEventListener("visibilitychange", visibility);
-        el.classList.remove("is-flowing", "is-matrix-ready"); delete el.dataset.flowOffset; button.hidden = true;
+        el.classList.remove("is-flowing", "is-matrix-ready", "is-stream-ready"); delete el.dataset.flowOffset; delete el.dataset.streamBlend; button.hidden = true;
+        if (streamImage) streamImage.onload = null;
+        if (stream) stream.remove();
+        stream = null; streamContext = null; streamTiles = null; streamImage = null;
         entries.forEach(function (entry) { entry.style.transform = ""; entry.style.visibility = ""; entry.style.removeProperty("--current-bob"); entry.style.removeProperty("--current-turn"); entry.inert = false; entry.removeAttribute("aria-hidden"); });
         petals.forEach(function (group) { group.forEach(function (p) { p.node.remove(); }); });
       }
