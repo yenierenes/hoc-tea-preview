@@ -480,13 +480,14 @@
 
   var bag = {
     items: [], // { slug, pack, qty }
-    add: function (slug, pack) {
+    add: function (slug, pack, quantity) {
+      quantity = Math.max(1, Math.min(99, parseInt(quantity, 10) || 1));
       var found = null;
       this.items.forEach(function (i) {
         if (i.slug === slug && i.pack === pack) found = i;
       });
-      if (found) found.qty++;
-      else this.items.push({ slug: slug, pack: pack, qty: 1 });
+      if (found) found.qty += quantity;
+      else this.items.push({ slug: slug, pack: pack, qty: quantity });
       HOC.emit("bagchange", this);
     },
     setQty: function (slug, pack, qty) {
@@ -534,12 +535,13 @@
         off = on(btn, "click", function (e) {
           e.preventDefault();
           var slug = btn.getAttribute("data-blend");
-          // Respect the packaging choice if this button sits inside a panel.
-          var panel = btn.closest("[data-panel]");
+          // Read the product page or featured packaging and quantity choice.
+          var panel = btn.closest("[data-panel], [data-hoc='product-detail']");
           var chosen = panel
-            ? $('[data-hoc="pack-option"]:checked', panel)
+            ? $('[data-hoc="pack-option"]:checked, [data-pdp-variant]:checked', panel)
             : null;
-          bag.add(slug, chosen ? chosen.value : "doypack");
+          var qty = panel && $('[name="quantity"]', panel);
+          bag.add(slug, chosen ? chosen.value : "doypack", qty ? qty.value : 1);
           HOC.emit("bagopen");
           var label = btn.querySelector("span:last-child") || btn;
           var prev = label.textContent;
@@ -552,6 +554,71 @@
       destroy: function () {
         if (off) off();
       }
+    };
+  });
+
+  /* Product pages share this small controller in the hosted preview and the
+     Liquid theme. Native radios and the real Shopify form remain functional
+     when JavaScript is unavailable. */
+  HOC.controller("product-detail", function (el) {
+    var offs = [];
+    var form = $('[data-pdp-form]', el);
+    var quantity = form && $('[name="quantity"]', form);
+    var packImage = $('[data-pdp-scene="pack"] > img', el);
+    var originalSrc = packImage && packImage.getAttribute("src");
+    var originalSrcset = packImage && packImage.getAttribute("srcset");
+    function show(view) {
+      $$('[data-pdp-scene]', el).forEach(function (scene) {
+        scene.hidden = scene.getAttribute('data-pdp-scene') !== view;
+      });
+      $$('[data-pdp-view]', el).forEach(function (button) {
+        var active = button.getAttribute('data-pdp-view') === view;
+        button.classList.toggle('is-active', active);
+        button.setAttribute('aria-pressed', String(active));
+      });
+    }
+    function variant() {
+      var input = $('[data-pdp-variant]:checked', el);
+      if (!input) return;
+      var price = $('[data-pdp-price]', el);
+      if (price && input.dataset.price) price.textContent = input.dataset.price;
+      var add = $('[data-hoc="add"]', el);
+      if (add) add.disabled = input.dataset.available === 'false';
+      if (packImage) {
+        if (input.dataset.imageUrl) {
+          packImage.removeAttribute('srcset');
+          packImage.src = input.dataset.imageUrl;
+        } else {
+          if (originalSrcset) packImage.setAttribute('srcset', originalSrcset);
+          if (originalSrc) packImage.src = originalSrc;
+        }
+      }
+      if (root.HOC.routes && input.value) {
+        var url = new URL(root.location.href);
+        url.searchParams.set('variant', input.value);
+        root.history.replaceState(null, '', url);
+      }
+    }
+    function changeQuantity(step) {
+      if (!quantity) return;
+      var current = parseInt(quantity.value, 10) || 1;
+      quantity.value = Math.max(1, Math.min(99, current + step));
+    }
+    return {
+      init: function () {
+        offs.push(on(el, 'click', function (e) {
+          var view = e.target.closest('[data-pdp-view]');
+          if (view) show(view.getAttribute('data-pdp-view'));
+          var step = e.target.closest('[data-pdp-qty]');
+          if (step) changeQuantity(parseInt(step.getAttribute('data-pdp-qty'), 10));
+        }));
+        offs.push(on(el, 'change', function (e) {
+          if (e.target.matches('[data-pdp-variant]')) variant();
+          if (e.target === quantity) changeQuantity(0);
+        }));
+        variant();
+      },
+      destroy: function () { offs.forEach(function (off) { off(); }); }
     };
   });
 
@@ -603,7 +670,7 @@
               '" data-pack="' +
               i.pack +
               '">' +
-              '<div class="hoc-cartitem__thumb"><img src="assets/img/pack-' +
+              '<div class="hoc-cartitem__thumb"><img src="' + (HOC.assetBase || '') + 'assets/img/pack-' +
               b.slug +
               '-420.webp" alt="" width="420" height="663" loading="lazy"></div>' +
               "<div>" +
@@ -648,7 +715,7 @@
       if (!pick) return "";
       return (
         '<div class="hoc-upsell">' +
-        '<img src="assets/img/pack-' +
+        '<img src="' + (HOC.assetBase || '') + 'assets/img/pack-' +
         pick.slug +
         '-420.webp" alt="" width="420" height="663" loading="lazy">' +
         "<div><p class=\"hoc-micro\">Try another ritual.</p>" +
@@ -693,15 +760,15 @@
             set(true);
           })
         );
-        offs.push(HOC.bind("bagchange", render));
+        if (!SHOPIFY) offs.push(HOC.bind("bagchange", render));
         offs.push(
           on(el, "click", function (e) {
             var t = e.target;
             if (t.closest('[data-hoc="drawer-close"]')) return set(false);
             var up = t.closest("[data-hoc-upsell]");
-            if (up) return bag.add(up.getAttribute("data-hoc-upsell"), "doypack");
+            if (up && !SHOPIFY) return bag.add(up.getAttribute("data-hoc-upsell"), "doypack");
             var step = t.closest("[data-step]");
-            if (step) {
+            if (step && !SHOPIFY) {
               var item = step.closest(".hoc-cartitem");
               var out = $("output", item);
               bag.setQty(
@@ -718,7 +785,7 @@
             if (e.key === "Escape" && open) set(false);
           })
         );
-        render();
+        if (!SHOPIFY) render();
       },
       destroy: function () {
         offs.forEach(function (f) {
@@ -744,7 +811,7 @@
     function select(slug, focus) {
       if (slug === current) return;
       current = slug;
-      var b = HOC.data.blend(slug);
+      var panel = $('[data-panel="' + slug + '"]', el);
 
       $$('[data-hoc="blend-select"]', el).forEach(function (t) {
         var on_ = t.getAttribute("data-blend") === slug;
@@ -759,10 +826,10 @@
       });
 
       // Section-level accent so the ground glow and CTA follow the blend.
-      el.style.setProperty("--accent", b.accent);
-      el.style.setProperty("--accent-2", b.accent2);
-      el.style.setProperty("--accent-wash", b.wash);
-      el.style.setProperty("--accent-ink", b.accentInk);
+      if (panel) ["--accent", "--accent-2", "--accent-wash", "--accent-ink"].forEach(function (name) {
+        var value = panel.style.getPropertyValue(name);
+        if (value) el.style.setProperty(name, value);
+      });
 
       HOC.emit("blendchange", { slug: slug, el: el });
 
@@ -781,7 +848,8 @@
       var out = $('[data-hoc="price"]', panel);
       var chosen = $('[data-hoc="pack-option"]:checked', panel);
       if (!out || !chosen) return;
-      out.textContent = HOC.data.money(
+      if (chosen.dataset.price) out.textContent = chosen.dataset.price;
+      else if (HOC.data) out.textContent = HOC.data.money(
         parseInt(out.getAttribute("data-base"), 10) +
           parseInt(chosen.getAttribute("data-delta"), 10)
       );
