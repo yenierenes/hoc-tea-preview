@@ -378,21 +378,28 @@
         var recipe = (entry.dataset.ingredients || "").split("|").map(function (name) { return names.indexOf(name.trim()); }).filter(function (i) { return i >= 0; });
         var rand = random(entry.dataset.seed || String(index));
         var group = [];
-        // A 7 x 4 specimen field: every botanical is an individual object,
-        // while every blend keeps the same calm rectangular silhouette.
-        if (media && recipe.length) for (var i = 0; i < 28; i++) {
-          var col = i % 7, row = Math.floor(i / 7);
-          var type = recipe[(i + row + index) % recipe.length], node = document.createElement("span");
+        // An 8 x 5 specimen field. Recipes are evenly represented, then
+        // shuffled so no ingredient turns into a mechanical row or stripe.
+        var slots = [];
+        for (var slot = 0; slot < 40; slot++) slots.push(recipe[slot % recipe.length]);
+        for (var shuffle = slots.length - 1; shuffle > 0; shuffle--) {
+          var swap = Math.floor(rand() * (shuffle + 1)), held = slots[shuffle];
+          slots[shuffle] = slots[swap]; slots[swap] = held;
+        }
+        if (media && recipe.length) for (var i = 0; i < 40; i++) {
+          var col = i % 8, row = Math.floor(i / 8);
+          var type = slots[i], node = document.createElement("span");
           node.className = "hoc-current__petal"; node.setAttribute("aria-hidden", "true");
+          node.dataset.botanical = names[type];
           node.style.backgroundImage = 'url("' + el.dataset.atlas + '")';
           node.style.backgroundPosition = (type % 6 / 5 * 100) + "% " + (Math.floor(type / 6) / 4 * 100) + "%";
-          var size = 21 + rand() * 8;
+          var size = 19 + rand() * 7;
           node.style.width = node.style.height = size + "px";
           media.appendChild(node);
           group.push({
             node: node,
-            x: (col + .5) / 7 + (rand() - .5) * .018,
-            y: (row + .5) / 4 + (rand() - .5) * .025,
+            x: (col + .5) / 8 + (rand() - .5) * .025,
+            y: (row + .5) / 5 + (rand() - .5) * .035,
             phase: rand() * 6.28,
             angle: (rand() - .5) * 20,
             size: size

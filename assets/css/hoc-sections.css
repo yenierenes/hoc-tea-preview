@@ -1956,7 +1956,7 @@
 .hoc-current.is-matrix-ready .hoc-current__media > img { opacity: 0; }
 .hoc-current__index { color: #a5b4aa; font-size: 10px; margin-bottom: .45rem; }
 .hoc-current__name { font-family: var(--ff-display); font-size: 29px; line-height: 1.06; color: var(--hoc-bone); text-align: center; }
-.hoc-current__saying { font-family: var(--ff-display); font-style: italic; font-size: clamp(2rem,3vw,2.8rem); line-height: 1.08; max-width: 9ch; color: #d1d9c9; }
+.hoc-current__saying { font-family: var(--ff-display); font-style: italic; font-size: clamp(2rem,3vw,2.8rem); line-height: 1.08; max-width: 9ch; color: #d1d9c9; transform: translateY(-1.85rem); }
 .hoc-current__petal {
   position: absolute;
   top: 0;
@@ -1978,7 +1978,7 @@
   .hoc-current__item { width: 350px; flex-basis: 350px; height: 235px; grid-template-columns: 174px 1fr; gap: .65rem; padding-right: 1rem; }
   .hoc-current__media { width: 170px; height: 116px; }
   .hoc-current__name { font-size: 24px; }
-  .hoc-current__saying { font-size: 30px; }
+  .hoc-current__saying { font-size: 30px; transform: translateY(-1.35rem); }
   .hoc-current.is-flowing .hoc-current__track { height: 235px; }
 }
 
