@@ -421,6 +421,23 @@
       var bandTop = viewportWidth < 700 ? 26 : 31;
       var first = Math.floor((offset - viewportWidth - cell) / cell);
       var final = Math.ceil((offset + cell) / cell);
+      var viewportRect = viewport.getBoundingClientRect();
+      var sloganBounds = [];
+      entries.forEach(function (entry) {
+        if (entry.inert) return;
+        var saying = entry.querySelector(".hoc-current__saying");
+        if (!saying) return;
+        var range = document.createRange();
+        range.selectNodeContents(saying);
+        Array.prototype.forEach.call(range.getClientRects(), function (rect) {
+          sloganBounds.push({
+            left: rect.left - viewportRect.left - 12,
+            right: rect.right - viewportRect.left + 12,
+            top: rect.top - viewportRect.top - 7,
+            bottom: rect.bottom - viewportRect.top + 7
+          });
+        });
+      });
       ctx.clearRect(0, 0, viewportWidth, canvasHeight);
       for (var col = first; col <= final; col++) {
         var source = ((col * cell) % total + total) % total;
@@ -438,6 +455,13 @@
           y += Math.sin(time * .00072 + seed) * 2.2;
           var size = cell * (1.02 + hash(seed + 7) * .28);
           var angle = (hash(seed + 11) - .5) * .48 + Math.sin(time * .0004 + seed) * .055;
+          // Omit the entire rotated tile if it would touch a slogan. Clearing
+          // pixels afterward sliced pieces in half at the text boundary.
+          var radius = size * .71;
+          if (sloganBounds.some(function (rect) {
+            return x + radius > rect.left && x - radius < rect.right &&
+              y + radius > rect.top && y - radius < rect.bottom;
+          })) continue;
           var type = primary[Math.floor(hash(seed + 13) * primary.length)];
           ctx.save();
           ctx.translate(x, y);
@@ -452,24 +476,6 @@
           ctx.restore();
         }
       }
-      // Cut actual transparent space in the botanical canvas beneath each
-      // rendered line. Text wraps differently at every viewport width, so
-      // measure its live line boxes instead of painting a fixed overlay.
-      var viewportRect = viewport.getBoundingClientRect();
-      entries.forEach(function (entry) {
-        if (entry.inert) return;
-        var saying = entry.querySelector(".hoc-current__saying");
-        if (!saying) return;
-        var range = document.createRange();
-        range.selectNodeContents(saying);
-        Array.prototype.forEach.call(range.getClientRects(), function (rect) {
-          var x = rect.left - viewportRect.left - 12;
-          var y = rect.top - viewportRect.top - 7;
-          if (x < viewportWidth && x + rect.width + 24 > 0) {
-            ctx.clearRect(x, y, rect.width + 24, rect.height + 14);
-          }
-        });
-      });
       el.dataset.streamBlend = String(Math.floor((((offset - viewportWidth / 2) % total + total) % total) / width));
     }
     function decorate() {
