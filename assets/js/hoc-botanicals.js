@@ -418,23 +418,33 @@
       var viewportRect = viewport.getBoundingClientRect();
       ctx.clearRect(0, 0, viewportWidth, canvasHeight);
       entries.forEach(function (entry, index) {
-        if (entry.inert || !recipes[index].length) return;
+        if (!recipes[index].length) return;
+        var itemRect = entry.getBoundingClientRect();
+        if (itemRect.right < viewportRect.left - 40 || itemRect.left > viewportRect.right + 40) return;
         var media = entry.querySelector(".hoc-current__media");
         var rect = media.getBoundingClientRect();
-        var left = rect.left - viewportRect.left;
+        var left = itemRect.left - viewportRect.left;
         var top = rect.top - viewportRect.top;
-        var cols = viewportWidth < 700 ? 7 : 9;
+        var cols = Math.ceil(itemRect.width / (viewportWidth < 700 ? 23 : 25));
         var rows = viewportWidth < 700 ? 5 : 6;
-        var cell = Math.min(rect.width / cols, rect.height / rows);
+        var cell = Math.min(itemRect.width / cols, rect.height / rows);
+        var saying = entry.querySelector(".hoc-current__saying");
+        var range = document.createRange();
+        range.selectNodeContents(saying);
+        var clear = Array.prototype.map.call(range.getClientRects(), function (line) {
+          return { left: line.left - viewportRect.left - 10, right: line.right - viewportRect.left + 10,
+            top: line.top - viewportRect.top - 5, bottom: line.bottom - viewportRect.top + 5 };
+        });
         for (var col = 0; col < cols; col++) for (var row = 0; row < rows; row++) {
           var seed = index * 193.1 + col * 17.13 + row * 127.7;
-          var x = left + (col + .5) * rect.width / cols + (hash(seed) - .5) * 5;
+          var x = left + (col + .5) * itemRect.width / cols + (hash(seed) - .5) * 5;
           var y = top + (row + .5) * rect.height / rows + (hash(seed + 3) - .5) * 5;
           x += Math.sin(time * .00055 + seed) * 1.7;
           y += Math.cos(time * .0007 + seed) * 1.7;
           var size = cell * (.91 + hash(seed + 7) * .19);
           var radius = size * .71;
-          if (x - radius < 0 || x + radius > viewportWidth) continue;
+          if (clear.some(function (line) { return x + radius > line.left && x - radius < line.right &&
+            y + radius > line.top && y - radius < line.bottom; })) continue;
           var type = recipes[index][Math.floor(hash(seed + 13) * recipes[index].length)];
           ctx.save();
           ctx.translate(x, y);
