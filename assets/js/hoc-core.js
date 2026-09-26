@@ -805,7 +805,6 @@
 
   HOC.controller("featured", function (el) {
     var offs = [];
-    var embla = null;
     var current = null;
 
     function select(slug, focus) {
@@ -840,6 +839,7 @@
           var on_ = p.getAttribute("data-pack") === slug;
           p.classList.toggle("is-active", on_);
           p.setAttribute("aria-hidden", String(!on_));
+          p.inert = !on_;
         });
       }
     }
@@ -867,21 +867,10 @@
           })
         );
 
-        // Hover-to-preview on pointer devices §11
-        if (!HOC.env.touch) {
-          tabs.forEach(function (t) {
-            offs.push(
-              on(t, "mouseenter", function () {
-                select(t.getAttribute("data-blend"));
-              })
-            );
-          });
-        }
-
         // Roving tabindex §45
         offs.push(
           on(el, "keydown", function (e) {
-            if (["ArrowLeft", "ArrowRight", "Home", "End"].indexOf(e.key) < 0)
+            if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"].indexOf(e.key) < 0)
               return;
             if (!e.target.closest('[data-hoc="blend-select"]')) return;
             e.preventDefault();
@@ -891,7 +880,7 @@
                 ? 0
                 : e.key === "End"
                 ? tabs.length - 1
-                : (i + (e.key === "ArrowRight" ? 1 : -1) + tabs.length) %
+                : (i + (["ArrowRight", "ArrowDown"].indexOf(e.key) >= 0 ? 1 : -1) + tabs.length) %
                   tabs.length;
             select(tabs[n].getAttribute("data-blend"), true);
           })
@@ -906,35 +895,16 @@
         });
         $$("[data-panel]", el).forEach(price);
 
-        // Mobile: the tab strip is a carousel §11
-        if (root.EmblaCarousel) {
-          var vp = $('[data-hoc="selector-embla"]', el);
-          if (vp && HOC.env.narrow) {
-            embla = root.EmblaCarousel(vp, {
-              align: "start",
-              containScroll: "trimSnaps",
-              dragFree: true
-            });
-          }
-        }
-
         offs.push(
           HOC.bind("blendselect", function (e) {
             select(e.detail);
           })
         );
       },
-      resize: function () {
-        if (embla && !HOC.env.narrow) {
-          embla.destroy();
-          embla = null;
-        }
-      },
       destroy: function () {
         offs.forEach(function (f) {
           f();
         });
-        if (embla) embla.destroy();
       }
     };
   });

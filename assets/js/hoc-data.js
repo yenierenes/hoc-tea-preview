@@ -38,6 +38,7 @@
       accentInk: "#2D4E4A",
       liquid: "#B4324B",
       price: 1400,
+      featureLine: "Hibiscus brings the tartness, mint the cool edge, and lemongrass a clean citrus finish. Made for ice as much as a warm cup.",
       story:
         "Hibiscus carries the tartness, mint leaf the cool edge, lemongrass the thin line of citrus that holds the two apart. Steeped hot it turns deep crimson; over ice it stays sharp and clean.",
       hot: { g: 3, ml: 330, c: 90, min: 5 },
@@ -58,6 +59,7 @@
       accentInk: "#342654",
       liquid: "#2B3A8F",
       price: 1600,
+      featureLine: "Butterfly pea steeps deep blue. Hibiscus draws it towards violet, with cinnamon warming the finish.",
       story:
         "Butterfly pea steeps a deep, saturated blue. Add hibiscus — an acid — and the blue turns. Violet first, then magenta, spreading unevenly through the glass. Cinnamon sits underneath the whole thing.",
       hot: { g: 3, ml: 330, c: 90, min: 4 },
@@ -84,6 +86,7 @@
       accentInk: "#243C57",
       liquid: "#2F62A8",
       price: 1600,
+      featureLine: "Mango and pineapple meet lemongrass and butterfly pea. A bright, tropical blend best served over ice.",
       story:
         "Mango and pineapple do the sweetness, lemongrass keeps it from turning syrupy, and butterfly pea pulls the whole glass toward deep blue. Best over a lot of ice.",
       hot: { g: 3, ml: 330, c: 90, min: 5 },

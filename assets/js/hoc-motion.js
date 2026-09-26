@@ -370,19 +370,29 @@
     var stack = HOC.$('[data-hoc="pack-stack"]', el);
     var quickX = null,
       quickY = null;
+    var timeline = null;
+    var displayed = HOC.$(".hoc-pack.is-active", el);
 
     function swap(slug) {
       var packs = HOC.$$(".hoc-pack", el);
-      var incoming = null,
-        outgoing = null;
+      var incoming = null;
       packs.forEach(function (p) {
         if (p.getAttribute("data-pack") === slug) incoming = p;
-        else if (p.classList.contains("is-active")) outgoing = p;
       });
-      if (!incoming || incoming === outgoing) return;
+      if (!incoming || incoming === displayed) return;
+
+      if (timeline) timeline.kill();
+      var outgoing = displayed;
+      displayed = incoming;
+      packs.forEach(function (p) {
+        gsap.killTweensOf(p);
+        gsap.set(p, { clearProps: "transform,opacity" });
+        p.classList.toggle("is-active", p === outgoing);
+      });
 
       packs.forEach(function (p) {
         p.setAttribute("aria-hidden", String(p !== incoming));
+        p.inert = p !== incoming;
       });
 
       if (reduced()) {
@@ -393,7 +403,8 @@
         return;
       }
 
-      var tl = gsap.timeline();
+      var tl = gsap.timeline({ onComplete: function () { timeline = null; } });
+      timeline = tl;
       if (outgoing) {
         tl.to(outgoing, {
           yPercent: -3,
@@ -424,17 +435,6 @@
         outgoing ? "-=0.12" : 0
       );
 
-      // ingredient labels arrive after the pack has settled
-      var panel = HOC.$('[data-panel="' + slug + '"]', el);
-      if (panel) {
-        var items = HOC.$$(".hoc-inglist__item", panel);
-        if (items.length)
-          tl.from(
-            items,
-            { y: 8, opacity: 0, duration: 0.5, stagger: 0.05 },
-            "-=0.5"
-          );
-      }
     }
 
     /* Pointer tilt, max 2.5deg. Not a 15-degree card flip (§11). */
@@ -468,14 +468,16 @@
             duration: 0.7,
             ease: EASE
           });
-          offs.push(HOC.onEl(el, "pointermove", tilt));
-          offs.push(HOC.onEl(el, "pointerleave", untilt));
+          offs.push(HOC.onEl(stack, "pointermove", tilt));
+          offs.push(HOC.onEl(stack, "pointerleave", untilt));
         }
       },
       destroy: function () {
         offs.forEach(function (f) {
           f();
         });
+        if (timeline) timeline.kill();
+        if (stack) gsap.killTweensOf(stack);
       }
     };
   });
