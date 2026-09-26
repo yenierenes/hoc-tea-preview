@@ -354,21 +354,21 @@
     };
   });
 
-  // One continuous botanical procession. Real recipe fragments drift with
-  // each blend; no duplicated links, offscreen loops or second animation clock.
+  // Every blend carries one fixed specimen field. Only the complete blend
+  // moves, so resizing never changes a recipe's particle count or pattern.
   HOC.controller("footer-current", function (el) {
     var viewport = el.querySelector(".hoc-current__viewport");
     var entries = Array.prototype.slice.call(el.querySelectorAll(".hoc-current__item"));
     var button = el.querySelector("[data-current-pause]");
     var observer, visible = false, playing = false, paused = false, focused = false, hovering = false;
-    var decorated = false, enabled = false, width = 520, offset = 560, total = 0, viewportWidth = 0;
-    var last = 0, time = 0, speed = 0, lastPaint = 0, petals = [];
+    var decorated = false, enabled = false, width = 600, offset = 620, total = 0, viewportWidth = 0;
+    var last = 0, speed = 0, lastPaint = 0, petals = [];
+    var columns = 14, rows = 6, cellWidth = 23, cellHeight = 25, particleSize = 22;
     var recipes = entries.map(function (entry) {
       return (entry.dataset.ingredients || "").split("|").map(function (name) {
         return names.indexOf(name.trim());
       }).filter(function (i) { return i >= 0; });
     });
-    var stream = null, streamContext = null, streamTiles = null, streamImage = null;
     var mq = root.matchMedia("(prefers-reduced-motion: reduce)");
     function reduced() { return mq.matches || HOC.env.reduced || HOC.env.tier === "reduced"; }
     function stop() { HOC.ticker.remove(tick); playing = false; last = 0; }
@@ -376,169 +376,60 @@
       if (playing || !enabled || !visible || paused || focused || document.hidden) return;
       playing = true; last = 0; HOC.ticker.add(tick);
     }
-    function hash(value) {
-      var n = Math.sin(value * 12.9898 + 78.233) * 43758.5453;
-      return n - Math.floor(n);
-    }
-    function streamSize() {
-      if (!stream || !viewport) return;
-      var ratio = Math.min(root.devicePixelRatio || 1, 1.5);
-      var height = viewport.clientHeight || 278;
-      stream.width = Math.max(1, Math.round(viewport.clientWidth * ratio));
-      stream.height = Math.max(1, Math.round(height * ratio));
-      streamContext.setTransform(ratio, 0, 0, ratio, 0, 0);
-    }
-    function prepareStream() {
-      if (stream || !viewport || !el.dataset.atlas) return;
-      stream = document.createElement("canvas");
-      stream.className = "hoc-current__stream";
-      stream.setAttribute("aria-hidden", "true");
-      streamContext = stream.getContext("2d", { alpha: true });
-      if (!streamContext) { stream.remove(); stream = null; return; }
-      viewport.insertBefore(stream, viewport.firstChild);
-      streamSize();
-      streamImage = new Image();
-      streamImage.onload = function () {
-        if (!stream || !streamContext) return;
-        var sw = streamImage.naturalWidth / 6, sh = streamImage.naturalHeight / 5;
-        streamTiles = names.map(function (_, i) {
-          var tile = document.createElement("canvas");
-          tile.width = tile.height = 96;
-          tile.getContext("2d").drawImage(streamImage, i % 6 * sw, Math.floor(i / 6) * sh, sw, sh, 0, 0, 96, 96);
-          return tile;
-        });
-        paintStream();
-        el.classList.add("is-stream-ready");
-      };
-      streamImage.src = el.dataset.atlas;
-    }
-    function paintStream() {
-      if (!streamTiles || !streamContext || !enabled || !visible || !total) return;
-      var ctx = streamContext, canvasHeight = viewport.clientHeight;
-      var viewportRect = viewport.getBoundingClientRect();
-      var sloganBounds = entries.map(function (entry) {
-        var itemRect = entry.getBoundingClientRect();
-        if (itemRect.right < viewportRect.left - 40 || itemRect.left > viewportRect.right + 40) return null;
-        var range = document.createRange();
-        range.selectNodeContents(entry.querySelector(".hoc-current__saying"));
-        var textLeft = Infinity, textRight = -Infinity;
-        Array.prototype.forEach.call(range.getClientRects(), function (line) {
-          textLeft = Math.min(textLeft, line.left - viewportRect.left);
-          textRight = Math.max(textRight, line.right - viewportRect.left);
-        });
-        return textLeft < textRight ? { left: textLeft - 18, right: textRight + 3 } : null;
-      });
-      ctx.clearRect(0, 0, viewportWidth, canvasHeight);
-      entries.forEach(function (entry, index) {
-        if (!recipes[index].length) return;
-        var itemRect = entry.getBoundingClientRect();
-        if (itemRect.right < viewportRect.left - 40 || itemRect.left > viewportRect.right + 40) return;
-        var media = entry.querySelector(".hoc-current__media");
-        var rect = media.getBoundingClientRect();
-        var left = itemRect.left - viewportRect.left;
-        var top = rect.top - viewportRect.top;
-        var cols = Math.ceil(itemRect.width / (viewportWidth < 700 ? 20 : 25));
-        var rows = 7;
-        var cell = Math.min(itemRect.width / cols, rect.height / rows);
-        for (var col = 0; col < cols; col++) for (var row = 0; row < rows; row++) {
-          var seed = index * 193.1 + col * 17.13 + row * 127.7;
-          var baseX = left + (col + .5) * itemRect.width / cols + (hash(seed) - .5) * 5;
-          var baseY = top + (row + .5) * rect.height / rows + (hash(seed + 3) - .5) * 5;
-          var size = cell * (.91 + hash(seed + 7) * .19);
-          var radius = size * .6 + 2;
-          // Every recipe stays above its own product name and fills right up
-          // to its slogan. Never carry one blend's tiles beyond the slogan
-          // into the next blend's visual group.
-          if (sloganBounds[index] && baseX + radius > sloganBounds[index].left) continue;
-          var x = baseX + Math.sin(time * .00055 + seed) * 1.7;
-          var y = baseY + Math.cos(time * .0007 + seed) * 1.7;
-          var type = recipes[index][Math.floor(hash(seed + 13) * recipes[index].length)];
-          ctx.save();
-          ctx.translate(x, y);
-          ctx.rotate((hash(seed + 11) - .5) * .38);
-          ctx.globalAlpha = .94;
-          ctx.drawImage(streamTiles[type], -size / 2, -size / 2, size, size);
-          ctx.restore();
-        }
-      });
-      el.dataset.streamBlend = String(Math.floor((((offset - viewportWidth / 2) % total + total) % total) / width));
-    }
     function decorate() {
       if (decorated) return;
       decorated = true;
       entries.forEach(function (entry, index) {
         var media = entry.querySelector(".hoc-current__media");
-        var recipe = (entry.dataset.ingredients || "").split("|").map(function (name) { return names.indexOf(name.trim()); }).filter(function (i) { return i >= 0; });
+        var recipe = recipes[index];
         var rand = random(entry.dataset.seed || String(index));
         var group = [];
-        // An 8 x 5 specimen field. Recipes are evenly represented, then
-        // shuffled so no ingredient turns into a mechanical row or stripe.
         var slots = [];
-        for (var slot = 0; slot < 40; slot++) slots.push(recipe[slot % recipe.length]);
+        if (!media || !recipe.length) { petals.push(group); return; }
+        // Even representation, seeded once. Position and size never depend on
+        // the viewport or the animation clock.
+        for (var slot = 0; slot < columns * rows; slot++) slots.push(recipe[slot % recipe.length]);
         for (var shuffle = slots.length - 1; shuffle > 0; shuffle--) {
           var swap = Math.floor(rand() * (shuffle + 1)), held = slots[shuffle];
           slots[shuffle] = slots[swap]; slots[swap] = held;
         }
-        if (media && recipe.length) for (var i = 0; i < 40; i++) {
-          var col = i % 8, row = Math.floor(i / 8);
+        var fragment = document.createDocumentFragment();
+        for (var i = 0; i < slots.length; i++) {
+          var col = i % columns, row = Math.floor(i / columns);
           var type = slots[i], node = document.createElement("span");
           node.className = "hoc-current__petal"; node.setAttribute("aria-hidden", "true");
           node.dataset.botanical = names[type];
           node.style.backgroundImage = 'url("' + el.dataset.atlas + '")';
           node.style.backgroundPosition = (type % 6 / 5 * 100) + "% " + (Math.floor(type / 6) / 4 * 100) + "%";
-          var size = 19 + rand() * 7;
-          node.style.width = node.style.height = size + "px";
-          media.appendChild(node);
-          group.push({
-            node: node,
-            x: (col + .5) / 8 + (rand() - .5) * .025,
-            y: (row + .5) / 5 + (rand() - .5) * .035,
-            phase: rand() * 6.28,
-            angle: (rand() - .5) * 20,
-            size: size
-          });
+          var x = col * cellWidth + (cellWidth - particleSize) / 2 + (rand() - .5) * 1.5;
+          var y = row * cellHeight + (cellHeight - particleSize) / 2 + (rand() - .5) * 2;
+          node.style.transform = "translate3d(" + x.toFixed(2) + "px," + y.toFixed(2) + "px,0) rotate(" + ((rand() - .5) * 16).toFixed(2) + "deg)";
+          fragment.appendChild(node);
+          group.push(node);
         }
+        media.appendChild(fragment);
         petals.push(group);
       });
       el.classList.add("is-matrix-ready");
-    }
-    function paintPetals(entry, group, wave, animate) {
-      var media = entry.querySelector(".hoc-current__media");
-      if (!media) return;
-      var mediaWidth = media.clientWidth || 232, mediaHeight = media.clientHeight || 154;
-      group.forEach(function (p) {
-        var driftX = animate ? Math.sin(wave + p.phase) * 2.7 : 0;
-        var driftY = animate ? Math.cos(wave * .85 + p.phase) * 2.1 : 0;
-        var turn = p.angle + (animate ? Math.sin(wave + p.phase) * 3.5 : 0);
-        var px = p.x * mediaWidth - p.size / 2 + driftX;
-        var py = p.y * mediaHeight - p.size / 2 + driftY;
-        p.node.style.transform = "translate3d(" + px.toFixed(2) + "px," + py.toFixed(2) + "px,0) rotate(" + turn.toFixed(2) + "deg)";
-      });
     }
     function paint() {
       entries.forEach(function (entry, i) {
         // Negative index makes the catalogue follow Gift -> Mystic -> ... as
         // it enters from the left, travelling toward the right.
         var x = ((offset - i * width) % total + total) % total - width;
-        var on = x > -width + 8 && x < viewportWidth - 8;
+        var on = x > -width && x < viewportWidth;
         entry.style.transform = "translate3d(" + x.toFixed(2) + "px,0,0)";
         entry.style.visibility = on ? "visible" : "hidden";
         entry.inert = !on;
         if (on) entry.removeAttribute("aria-hidden"); else entry.setAttribute("aria-hidden", "true");
-        if (!on) return;
-        var wave = time * .00065 + i * 1.7;
-        entry.style.setProperty("--current-bob", (Math.sin(wave) * 5).toFixed(2) + "px");
-        entry.style.setProperty("--current-turn", (Math.sin(wave * .7) * 2).toFixed(2) + "deg");
-        if (!streamTiles) paintPetals(entry, petals[i] || [], wave, true);
       });
-      paintStream();
       el.dataset.flowOffset = offset.toFixed(2);
     }
     function tick(t) {
       if (reduced()) { mode(); return; }
       if (!visible || paused || focused || document.hidden) { stop(); return; }
       var dt = last ? Math.min(t - last, 64) : 16;
-      last = t; time += dt;
+      last = t;
       var target = hovering ? 13 : (viewportWidth < 700 ? 32 : 48);
       speed += (target - speed) * (1 - Math.exp(-dt / 550));
       offset = (offset + speed * dt / 1000) % total;
@@ -547,10 +438,8 @@
     }
     function measure() {
       if (!entries.length) return;
-      var next = entries[0].getBoundingClientRect().width || 520;
-      offset = offset / width * next; width = next;
+      width = entries[0].getBoundingClientRect().width || 600;
       total = width * entries.length; viewportWidth = viewport.clientWidth;
-      streamSize();
       if (enabled) paint();
     }
     function mode() {
@@ -559,16 +448,10 @@
       button.hidden = !enabled;
       if (!enabled) {
         stop();
-        entries.forEach(function (entry) { entry.style.transform = ""; entry.style.visibility = ""; entry.style.removeProperty("--current-bob"); entry.style.removeProperty("--current-turn"); entry.inert = false; entry.removeAttribute("aria-hidden"); });
+        entries.forEach(function (entry) { entry.style.transform = ""; entry.style.visibility = ""; entry.inert = false; entry.removeAttribute("aria-hidden"); });
         decorate();
-        petals.forEach(function (group, i) {
-          group.forEach(function (p) { p.node.hidden = false; });
-          paintPetals(entries[i], group, 0, false);
-        });
       } else {
         decorate();
-        prepareStream();
-        petals.forEach(function (group) { group.forEach(function (p) { p.node.hidden = false; }); });
         measure(); wake();
       }
     }
@@ -619,12 +502,9 @@
         viewport.removeEventListener("click", navigate);
         mq.removeEventListener("change", mode); HOC.off("tierchange", mode);
         document.removeEventListener("visibilitychange", visibility);
-        el.classList.remove("is-flowing", "is-matrix-ready", "is-stream-ready"); delete el.dataset.flowOffset; delete el.dataset.streamBlend; button.hidden = true;
-        if (streamImage) streamImage.onload = null;
-        if (stream) stream.remove();
-        stream = null; streamContext = null; streamTiles = null; streamImage = null;
-        entries.forEach(function (entry) { entry.style.transform = ""; entry.style.visibility = ""; entry.style.removeProperty("--current-bob"); entry.style.removeProperty("--current-turn"); entry.inert = false; entry.removeAttribute("aria-hidden"); });
-        petals.forEach(function (group) { group.forEach(function (p) { p.node.remove(); }); });
+        el.classList.remove("is-flowing", "is-matrix-ready"); delete el.dataset.flowOffset; button.hidden = true;
+        entries.forEach(function (entry) { entry.style.transform = ""; entry.style.visibility = ""; entry.inert = false; entry.removeAttribute("aria-hidden"); });
+        petals.forEach(function (group) { group.forEach(function (node) { node.remove(); }); });
       }
     };
   });
