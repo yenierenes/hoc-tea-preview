@@ -422,10 +422,12 @@
         if (itemRect.right < viewportRect.left - 40 || itemRect.left > viewportRect.right + 40) return;
         var range = document.createRange();
         range.selectNodeContents(entry.querySelector(".hoc-current__saying"));
+        var textLeft = Infinity, textRight = -Infinity;
         Array.prototype.forEach.call(range.getClientRects(), function (line) {
-          sloganBounds.push({ left: line.left - viewportRect.left - 13, right: line.right - viewportRect.left + 13,
-            top: line.top - viewportRect.top - 8, bottom: line.bottom - viewportRect.top + 8 });
+          textLeft = Math.min(textLeft, line.left - viewportRect.left);
+          textRight = Math.max(textRight, line.right - viewportRect.left);
         });
+        if (textLeft < textRight) sloganBounds.push({ left: textLeft - 3, right: textRight + 3 });
       });
       ctx.clearRect(0, 0, viewportWidth, canvasHeight);
       entries.forEach(function (entry, index) {
@@ -444,11 +446,11 @@
           var baseX = left + (col + .5) * itemRect.width / cols + (hash(seed) - .5) * 5;
           var baseY = top + (row + .5) * rect.height / rows + (hash(seed + 3) - .5) * 5;
           var size = cell * (.91 + hash(seed + 7) * .19);
-          var radius = size * .71;
-          // Exclusion is based on the resting position, with room for the full
-          // sway. A moving tile must never toggle on/off at a text boundary.
-          if (sloganBounds.some(function (line) { return baseX + radius > line.left && baseX - radius < line.right &&
-            baseY + radius > line.top && baseY - radius < line.bottom; })) continue;
+          var radius = size * .6 + 2;
+          // Reserve the full-height column occupied by each slogan, while
+          // keeping whole recipe tiles as close to both word edges as they fit.
+          // Use resting coordinates so gentle sway never toggles a tile.
+          if (sloganBounds.some(function (line) { return baseX + radius > line.left && baseX - radius < line.right; })) continue;
           var x = baseX + Math.sin(time * .00055 + seed) * 1.7;
           var y = baseY + Math.cos(time * .0007 + seed) * 1.7;
           var type = recipes[index][Math.floor(hash(seed + 13) * recipes[index].length)];
