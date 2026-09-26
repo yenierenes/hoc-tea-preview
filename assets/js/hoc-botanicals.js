@@ -426,7 +426,7 @@
           textLeft = Math.min(textLeft, line.left - viewportRect.left);
           textRight = Math.max(textRight, line.right - viewportRect.left);
         });
-        return textLeft < textRight ? { left: textLeft - 3, right: textRight + 3 } : null;
+        return textLeft < textRight ? { left: textLeft - 18, right: textRight + 3 } : null;
       });
       ctx.clearRect(0, 0, viewportWidth, canvasHeight);
       entries.forEach(function (entry, index) {
@@ -437,8 +437,8 @@
         var rect = media.getBoundingClientRect();
         var left = itemRect.left - viewportRect.left;
         var top = rect.top - viewportRect.top;
-        var cols = Math.ceil(itemRect.width / (viewportWidth < 700 ? 23 : 25));
-        var rows = viewportWidth < 700 ? 5 : 6;
+        var cols = Math.ceil(itemRect.width / (viewportWidth < 700 ? 20 : 25));
+        var rows = 7;
         var cell = Math.min(itemRect.width / cols, rect.height / rows);
         for (var col = 0; col < cols; col++) for (var row = 0; row < rows; row++) {
           var seed = index * 193.1 + col * 17.13 + row * 127.7;
