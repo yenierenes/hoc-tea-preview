@@ -642,179 +642,91 @@
    04  FROM LEAF TO GLASS  §13
    ========================================================================== */
 
-.hoc-l2g {
-  position: relative;
+.hoc-brewstory {
+  --surface: #eeeae1;
+  --on-surface: #292e29;
+  --on-surface-dim: #626c60;
+  --hairline: #cdcfc3;
+  scroll-margin-top: var(--header-h-scrolled);
 }
-.hoc-l2g__track {
-  height: 420vh;
+.hoc-brewstory__stage { padding-block: clamp(2.5rem, 4vw, 4rem); }
+.hoc-brewstory__head {
+  display: flex; align-items: end; justify-content: space-between;
+  gap: 2rem; margin-bottom: 2rem;
 }
-.hoc-l2g__stage {
-  position: sticky;
-  top: 0;
-  height: 100svh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  overflow: hidden;
+.hoc-brewstory__head .hoc-micro { margin-bottom: .85rem; color: #426588; }
+.hoc-brewstory__head h2 { font: 400 clamp(3.3rem, 5.6vw, 6rem)/.95 var(--ff-display); letter-spacing: -.035em; text-wrap: balance; }
+.hoc-brewstory__head h2 em { color: #46698c; font-weight: 400; }
+.hoc-brewstory__intro { font-size: .9rem; line-height: 1.6; color: #646b60; padding-bottom: .1rem; }
+.hoc-brewstory__controls { display: none; align-items: center; border-block: 1px solid var(--hairline); gap: 2rem; }
+.hoc-brewstory__controls button { padding-block: .8rem; font-size: .82rem; border-bottom: 2px solid transparent; margin-bottom: -1px; color: #666f63; }
+.hoc-brewstory__controls button[aria-pressed="true"] { color: #2d4968; border-bottom-color: #46698c; }
+.hoc-brewstory__hint { margin-left: auto; font-size: .59rem; }
+.hoc-brewstory__hint span { display: inline-block; margin-left: 1rem; }
+.hoc-brewstory__scenes { display: grid; gap: 3rem; }
+.hoc-brewstep {
+  display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr);
+  align-items: center; gap: clamp(2rem, 5vw, 5rem);
 }
-.hoc-l2g__inner {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr) minmax(0, 1fr);
-  gap: clamp(1rem, 3vw, 3rem);
-  align-items: center;
-  width: 100%;
-}
-.hoc-l2g__col--left {
-  align-self: center;
-}
-.hoc-l2g__title {
-  margin-block: 0.75rem 2rem;
-}
-.hoc-l2g__ings {
-  display: grid;
-  gap: 0.9rem;
-}
-.hoc-l2g__ings li {
-  display: flex;
-  align-items: center;
-  gap: 0.7rem;
-  opacity: 0.35;
-  transition: opacity var(--t-ui) var(--e-hoc);
-}
-.hoc-l2g__ings li.is-on {
-  opacity: 1;
-}
-.hoc-l2g__ings .hoc-bot {
-  width: 2.4em;
-  height: 2.4em;
-  color: var(--accent-2);
-}
-
-.hoc-l2g__glass {
-  position: relative;
-  width: 100%;
-  height: min(72svh, 700px);
-}
-.hoc-l2g__glass canvas {
-  width: 100%;
-  height: 100%;
-  display: block;
-}
-
-.hoc-l2g__col--right {
-  justify-self: end;
-  width: 100%;
-  max-width: 20rem;
-}
-.hoc-brewdata {
-  display: grid;
-  gap: 0.1rem;
-  margin: 0;
-}
-.hoc-brewdata__row {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 1rem;
-  padding-block: 0.85rem;
-  border-bottom: 1px solid var(--hairline);
-  opacity: 0.34;
-  transition: opacity var(--t-ui) var(--e-hoc),
-    color var(--t-ui) var(--e-hoc);
-}
-.hoc-brewdata__row.is-on {
-  opacity: 1;
-  color: var(--accent-2);
-}
-.hoc-brewdata__row dt {
-  margin: 0;
-}
-.hoc-brewdata__v {
-  margin: 0;
-  font-family: var(--ff-display);
-  font-size: clamp(1.5rem, 2.4vw, 2.25rem);
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-}
-.hoc-brewdata__u {
-  font-size: 0.5em;
-  margin-left: 0.25em;
-  letter-spacing: 0.06em;
-}
-.hoc-l2g__cta {
-  margin-top: 2rem;
-}
-.hoc-l2g__cta .hoc-btn {
-  --btn-edge: rgb(241 239 232 / 0.4);
-}
-
-.hoc-l2g__progress {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: clamp(1.25rem, 4vh, 2.5rem);
-  display: flex;
-  justify-content: center;
-  gap: clamp(0.75rem, 2vw, 2rem);
-  padding-inline: var(--gutter);
-}
-.hoc-l2g__progress li {
-  opacity: 0.28;
-  transition: opacity var(--t-ui) var(--e-hoc);
-  position: relative;
-  padding-top: 0.75rem;
-}
-.hoc-l2g__progress li::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 1px;
-  background: currentColor;
-}
-.hoc-l2g__progress li.is-on {
-  opacity: 1;
-  color: var(--accent-2);
-}
-
-.hoc-l2g__mobile {
-  display: none;
+.hoc-brewstep + .hoc-brewstep { border-top: 1px solid var(--hairline); padding-top: 3rem; }
+.hoc-brewstep__copy { min-width: 0; max-width: 34rem; }
+.hoc-brewstep__eyebrow { color: #4b6c8e; font-size: .64rem; }
+.hoc-brewstep__eyebrow span { margin-inline: .5rem; color: #919caa; }
+.hoc-brewstep h3 { max-width: 13ch; margin-top: 1.1rem; font: 400 clamp(2.6rem, 4vw, 4.4rem)/1 var(--ff-display); letter-spacing: -.025em; text-wrap: balance; }
+.hoc-brewstep__body { max-width: 36ch; margin-top: 1.5rem; font-size: clamp(.94rem, 1.1vw, 1.05rem); line-height: 1.75; color: #626a72; text-wrap: pretty; }
+.hoc-brewstep__cue { margin-top: 1.5rem; color: #41618a; font-size: .65rem; }
+.hoc-brewstep__ingredients { display: flex; flex-wrap: wrap; gap: .75rem 1rem; margin-top: 1.65rem; padding-top: 1rem; border-top: 1px solid var(--hairline); }
+.hoc-brewstep__ingredients li { display: flex; align-items: center; gap: .35rem; color: #616e7c; font-size: .7rem; }
+.hoc-brewstep__ingredients .hoc-bot { width: 1.65rem; height: 1.65rem; color: #5379a0; }
+.hoc-brewstep__visual { min-width: 0; width: min(100%, 580px); justify-self: end; }
+.hoc-brewstep__photo { position: relative; width: 100%; aspect-ratio: 1; overflow: hidden; border-start-start-radius: clamp(3.5rem, 6vw, 7rem); border-end-end-radius: clamp(3.5rem, 6vw, 7rem); background: #e2d9c9; }
+.hoc-brewstep__photo img { display: block; width: 300%; height: 100%; max-width: none; transform: translateX(calc(var(--scene) * -33.333333%)); }
+.hoc-brewstep__photo.is-single img { width: 100%; transform: none; object-fit: cover; }
+.hoc-brewstep__visual figcaption { margin-top: .75rem; font-size: .56rem; color: #686e61; text-align: right; }
+.hoc-brewstory__foot { display: flex; align-items: center; justify-content: space-between; gap: 2rem; border-top: 1px solid var(--hairline); padding-top: 1.2rem; margin-top: 2rem; }
+.hoc-brewstory__recipe { display: flex; gap: clamp(1.5rem, 4vw, 4.5rem); }
+.hoc-brewstory__recipe dt { font-size: .54rem; letter-spacing: .12em; color: #617081; }
+.hoc-brewstory__recipe dd { font: 400 1.8rem/1.3 var(--ff-display); color: #334e6b; }
+.hoc-brewstory__recipe dd span { font: 400 .72rem/1.3 var(--ff-ui); }
+.hoc-brewstory__link { display: inline-flex; align-items: center; gap: 2rem; padding-block: .8rem; font-size: .8rem; border-bottom: 1px solid #6a8099; color: #324e6c; }
+.hoc-brewstory__link:hover { color: #172536; border-color: currentColor; }
+.hoc-brewstory__meter { display: none; height: 2px; background: #d3d7ca; margin-top: 1rem; overflow: hidden; }
+.hoc-brewstory__meter span { display: block; width: 100%; height: 100%; background: #52749a; transform: scaleX(0); transform-origin: left; }
+.hoc-brewstory.is-enhanced .hoc-brewstory__track { height: 250svh; }
+.hoc-brewstory.is-enhanced .hoc-brewstory__stage { position: sticky; top: var(--header-h-scrolled); min-height: calc(100svh - var(--header-h-scrolled)); display: flex; align-items: center; padding-block: clamp(1.25rem, 2.5vh, 2rem); }
+.hoc-brewstory.is-enhanced .hoc-brewstory__head { margin-bottom: 1.25rem; }
+.hoc-brewstory.is-enhanced .hoc-brewstory__controls { display: flex; }
+.hoc-brewstory.is-enhanced .hoc-brewstory__scenes { gap: 0; margin-top: 1.5rem; }
+.hoc-brewstory.is-enhanced .hoc-brewstep { grid-area: 1 / 1; opacity: 0; visibility: hidden; transform: translateY(10px); pointer-events: none; border: 0; padding: 0; transition: opacity .6s var(--e-hoc), transform .7s var(--e-hoc), visibility .6s; }
+.hoc-brewstory.is-enhanced .hoc-brewstep.is-active { opacity: 1; visibility: visible; transform: none; pointer-events: auto; }
+.hoc-brewstory.is-enhanced .hoc-brewstep__visual { width: min(100%, 49svh, 530px); }
+.hoc-brewstory.is-enhanced .hoc-brewstory__foot { margin-top: 1.1rem; padding-top: 1rem; }
+.hoc-brewstory.is-enhanced .hoc-brewstory__meter { display: block; }
+@media (min-width: 900px) and (max-height: 820px) {
+  .hoc-brewstory.is-enhanced .hoc-brewstep__visual { width: min(100%, 44svh); }
+  .hoc-brewstory.is-enhanced .hoc-brewstory__head h2 { font-size: 3.5rem; }
+  .hoc-brewstory.is-enhanced .hoc-brewstep h3 { font-size: 2.8rem; }
+  .hoc-brewstory.is-enhanced .hoc-brewstep__body { margin-top: 1rem; font-size: .9rem; }
+  .hoc-brewstory.is-enhanced .hoc-brewstep__ingredients { margin-top: 1rem; padding-top: .7rem; }
+  .hoc-brewstory.is-enhanced .hoc-brewstep__cue { margin-top: 1rem; }
 }
 @media (max-width: 899px) {
-  .hoc-l2g__track {
-    display: none;
-  }
-  .hoc-l2g__mobile {
-    display: block;
-    padding-block: var(--space-section);
-  }
-  .hoc-l2gm {
-    min-height: 82svh;
-    display: grid;
-    grid-template-rows: 1fr auto;
-    gap: 1.5rem;
-    align-content: center;
-    padding-inline: var(--gutter);
-    padding-block: 2rem;
-  }
-  .hoc-l2gm__glass {
-    min-height: 44svh;
-  }
-  .hoc-l2gm__glass canvas {
-    width: 100%;
-    height: 100%;
-  }
-  .hoc-l2gm__copy .hoc-micro {
-    margin-bottom: 0.6rem;
-  }
-  .hoc-l2gm__cta {
-    padding-inline: var(--gutter);
-    padding-top: 1rem;
-  }
-  .hoc-l2gm__cta .hoc-btn {
-    --btn-edge: rgb(241 239 232 / 0.4);
-  }
+  .hoc-brewstory__head { display: block; margin-bottom: 2.5rem; }
+  .hoc-brewstory__head h2 { max-width: 13ch; }
+  .hoc-brewstory__intro { margin-top: 1.25rem; }
+  .hoc-brewstep { grid-template-columns: minmax(0, 1fr); gap: 1.5rem; }
+  .hoc-brewstep__visual { width: 100%; max-width: 600px; justify-self: center; }
+  .hoc-brewstep__copy { max-width: none; }
+  .hoc-brewstep h3 { max-width: 19ch; }
+  .hoc-brewstep__body { max-width: 45ch; margin-top: 1rem; }
+  .hoc-brewstep__ingredients { display: none; }
+  .hoc-brewstep__cue { margin-top: 1rem; }
+  .hoc-brewstory__foot { flex-direction: column; align-items: stretch; gap: 1rem; }
+  .hoc-brewstory__recipe { justify-content: space-between; gap: .75rem; }
+  .hoc-brewstory__link { justify-content: space-between; align-self: start; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hoc-brewstep { transition: none !important; transform: none !important; }
 }
 
 /* ==========================================================================

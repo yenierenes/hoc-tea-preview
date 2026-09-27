@@ -14,8 +14,8 @@
       imagesizes="100vw" fetchpriority="high">
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="assets/css/hoc-core.css?v=9dc81688f6">
-<link rel="stylesheet" href="assets/css/hoc-sections.css?v=0705fce38c">
+<link rel="stylesheet" href="assets/css/hoc-core.css?v=b13c2b46f4">
+<link rel="stylesheet" href="assets/css/hoc-sections.css?v=1c7a2d5872">
 <script>document.documentElement.classList.add('hoc-js');</script>
 </head>
 <body>
@@ -346,87 +346,69 @@
       </div>
     </section>
 
-    <section class="hoc-section hoc-l2g" id="leaf-to-glass" data-theme="ink"
-             data-header-theme="light" data-hoc="leaf-to-glass"
-             style="--accent:#47857D;--accent-2:#7FB3AD;--accent-wash:#E0EBEA;--accent-ink:#2D4E4A;--liquid:#B4324B">
-
-      <!-- DESKTOP: pinned scrub stage (§13) -->
-      <div class="hoc-l2g__track" data-hoc="l2g-track">
-        <div class="hoc-l2g__stage">
-          <div class="hoc-wrap hoc-l2g__inner">
-
-            <div class="hoc-l2g__col hoc-l2g__col--left">
-              <p class="hoc-micro">
-                <span data-hoc="l2g-label">Raw</span></p>
-              <h2 class="hoc-title hoc-l2g__title">From leaf<br>to glass.</h2>
-              <ul class="hoc-l2g__ings">
-                <li data-ing="hibiscus"><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-hibiscus"></use></svg><span class="hoc-micro">Hibiscus</span></li><li data-ing="mint"><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-mint"></use></svg><span class="hoc-micro">Mint Leaf</span></li><li data-ing="lemongrass"><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-lemongrass"></use></svg><span class="hoc-micro">Lemongrass</span></li>
-              </ul>
+    <section class="hoc-section hoc-brewstory" id="leaf-to-glass" data-header-theme="dark" data-hoc="leaf-to-glass" aria-labelledby="brew-story-title">
+      <div class="hoc-brewstory__track" data-brew-track>
+        <div class="hoc-brewstory__stage">
+          <div class="hoc-wrap">
+            <header class="hoc-brewstory__head">
+              <div><p class="hoc-micro">THE TRANSFORMATION</p><h2 id="brew-story-title">From leaf <em>to glass.</em></h2></div>
+              <p class="hoc-brewstory__intro">A little water. A little time.<br>A whole new character.</p>
+            </header>
+            <div class="hoc-brewstory__controls" role="group" aria-label="Explore the brewing stages">
+              <button type="button" data-brew-go="0" aria-pressed="true">Raw</button><button type="button" data-brew-go="1" aria-pressed="false">Brew</button><button type="button" data-brew-go="2" aria-pressed="false">Serve</button>
+              <span class="hoc-micro hoc-brewstory__hint">SCROLL TO STEEP <span aria-hidden="true">↓</span></span>
             </div>
-
-            <div class="hoc-l2g__col hoc-l2g__col--center">
-            <div class="hoc-l2g__glass">
-              <canvas data-hoc="l2g-canvas" aria-hidden="true"></canvas>
+            <div class="hoc-brewstory__scenes">
+              <article class="hoc-brewstep is-active" data-brew-step="0" style="--scene:0">
+                <div class="hoc-brewstep__copy">
+                  <p class="hoc-micro hoc-brewstep__eyebrow">Mesmerize <span aria-hidden="true">/</span> Raw</p>
+                  <h3>It starts with botanicals.</h3>
+                  <p class="hoc-brewstep__body">Mango and pineapple, lemongrass and butterfly pea. Measure the whole blend and let each ingredient play its part.</p>
+                  <p class="hoc-micro hoc-brewstep__cue">3 G OF THE BLEND</p>
+                  <ul class="hoc-brewstep__ingredients" aria-label="Ingredients"><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-mango"></use></svg><span>Mango</span></li><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-pineapple"></use></svg><span>Pineapple</span></li><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-lemongrass"></use></svg><span>Lemongrass</span></li><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-butterfly-pea"></use></svg><span>Butterfly Pea Flower</span></li></ul>
+                </div>
+                <figure class="hoc-brewstep__visual">
+                  <div class="hoc-brewstep__photo"><img src="assets/img/brew-mesmerize-2160.webp?v=7fc1cfe1bc" srcset="assets/img/brew-mesmerize-1440.webp?v=e203d55ce5 1440w, assets/img/brew-mesmerize-2160.webp?v=7fc1cfe1bc 2160w" sizes="(max-width: 899px) 270vw, 150vw" width="2160" height="720" loading="lazy" decoding="async" alt="Dried mango, pineapple, lemongrass and butterfly pea in a clear glass before brewing."></div>
+                  <figcaption class="hoc-micro">BOTANICALS, IN THEIR ELEMENT.</figcaption>
+                </figure>
+              </article><article class="hoc-brewstep" data-brew-step="1" style="--scene:1">
+                <div class="hoc-brewstep__copy">
+                  <p class="hoc-micro hoc-brewstep__eyebrow">Mesmerize <span aria-hidden="true">/</span> Brew</p>
+                  <h3>Give it a little time.</h3>
+                  <p class="hoc-brewstep__body">Add hot water and let butterfly pea release its blue colour. Five minutes for the tropical aroma and flavour to unfold.</p>
+                  <p class="hoc-micro hoc-brewstep__cue">330 ML · 90 °C · 5 MIN</p>
+                  <ul class="hoc-brewstep__ingredients" aria-label="Ingredients"><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-mango"></use></svg><span>Mango</span></li><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-pineapple"></use></svg><span>Pineapple</span></li><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-lemongrass"></use></svg><span>Lemongrass</span></li><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-butterfly-pea"></use></svg><span>Butterfly Pea Flower</span></li></ul>
+                </div>
+                <figure class="hoc-brewstep__visual">
+                  <div class="hoc-brewstep__photo"><img src="assets/img/brew-mesmerize-2160.webp?v=7fc1cfe1bc" srcset="assets/img/brew-mesmerize-1440.webp?v=e203d55ce5 1440w, assets/img/brew-mesmerize-2160.webp?v=7fc1cfe1bc 2160w" sizes="(max-width: 899px) 270vw, 150vw" width="2160" height="720" loading="lazy" decoding="async" alt="Water pouring into a glass as the botanicals infuse a blue tea."></div>
+                  <figcaption class="hoc-micro">BOTANICALS, IN THEIR ELEMENT.</figcaption>
+                </figure>
+              </article><article class="hoc-brewstep" data-brew-step="2" style="--scene:2">
+                <div class="hoc-brewstep__copy">
+                  <p class="hoc-micro hoc-brewstep__eyebrow">Mesmerize <span aria-hidden="true">/</span> Serve</p>
+                  <h3>Make the moment yours.</h3>
+                  <p class="hoc-brewstep__body">Strain the botanicals and pour over ice. Tropical fruit, a clean citrus finish, and a vivid blue pour.</p>
+                  <p class="hoc-micro hoc-brewstep__cue">STRAIN · POUR · ENJOY</p>
+                  <ul class="hoc-brewstep__ingredients" aria-label="Ingredients"><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-mango"></use></svg><span>Mango</span></li><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-pineapple"></use></svg><span>Pineapple</span></li><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-lemongrass"></use></svg><span>Lemongrass</span></li><li><svg class="hoc-bot" viewBox="0 0 100 100" aria-hidden="true"><use href="#b-butterfly-pea"></use></svg><span>Butterfly Pea Flower</span></li></ul>
+                </div>
+                <figure class="hoc-brewstep__visual">
+                  <div class="hoc-brewstep__photo"><img src="assets/img/brew-mesmerize-2160.webp?v=7fc1cfe1bc" srcset="assets/img/brew-mesmerize-1440.webp?v=e203d55ce5 1440w, assets/img/brew-mesmerize-2160.webp?v=7fc1cfe1bc 2160w" sizes="(max-width: 899px) 270vw, 150vw" width="2160" height="720" loading="lazy" decoding="async" alt="Finished sapphire-blue Mesmerize tea served over clear ice cubes."></div>
+                  <figcaption class="hoc-micro">BOTANICALS, IN THEIR ELEMENT.</figcaption>
+                </figure>
+              </article>
             </div>
-            </div>
-
-            <div class="hoc-l2g__col hoc-l2g__col--right">
-              <dl class="hoc-brewdata">
-                
-                <div class="hoc-brewdata__row" data-metric="g">
-                  <dt class="hoc-micro">Leaf</dt>
-                  <dd class="hoc-brewdata__v">3<span class="hoc-brewdata__u">G</span></dd>
-                </div>
-                <div class="hoc-brewdata__row" data-metric="ml">
-                  <dt class="hoc-micro">Water</dt>
-                  <dd class="hoc-brewdata__v">330<span class="hoc-brewdata__u">ML</span></dd>
-                </div>
-                <div class="hoc-brewdata__row" data-metric="c">
-                  <dt class="hoc-micro">Temperature</dt>
-                  <dd class="hoc-brewdata__v">90<span class="hoc-brewdata__u">°C</span></dd>
-                </div>
-                <div class="hoc-brewdata__row" data-metric="min">
-                  <dt class="hoc-micro">Time</dt>
-                  <dd class="hoc-brewdata__v">05:00<span class="hoc-brewdata__u"></span></dd>
-                </div>
+            <footer class="hoc-brewstory__foot">
+              <dl class="hoc-brewstory__recipe" aria-label="Mesmerize brewing recipe">
+                <div><dt>BLEND</dt><dd>3<span> g</span></dd></div>
+                <div><dt>WATER</dt><dd>330<span> ml</span></dd></div>
+                <div><dt>HEAT</dt><dd>90<span> °C</span></dd></div>
+                <div><dt>STEEP</dt><dd>5<span> min</span></dd></div>
               </dl>
-              <div class="hoc-l2g__cta">
-                <a class="hoc-btn" href="#blends">Discover Gift of Nature</a>
-              </div>
-            </div>
-
+              <a class="hoc-brewstory__link" href="products/mesmerize/">Discover Mesmerize <span aria-hidden="true">↗</span></a>
+            </footer>
+            <div class="hoc-brewstory__meter" aria-hidden="true"><span data-brew-progress></span></div>
           </div>
-          <ol class="hoc-l2g__progress" aria-hidden="true">
-            <li class="is-on" data-step="0"><span class="hoc-micro">Raw</span></li><li data-step="1"><span class="hoc-micro">Fall</span></li><li data-step="2"><span class="hoc-micro">Infuse</span></li><li data-step="3"><span class="hoc-micro">Colour</span></li><li data-step="4"><span class="hoc-micro">Ice</span></li><li data-step="5"><span class="hoc-micro">Serve</span></li>
-          </ol>
         </div>
-      </div>
-
-      <!-- MOBILE: three short stages, no pin (§13, §44) -->
-      <div class="hoc-l2g__mobile" data-hoc="l2g-mobile">
-        
-        <article class="hoc-l2gm" data-progress="0.12">
-          <div class="hoc-l2gm__glass"><canvas data-hoc="l2g-mcanvas" aria-hidden="true"></canvas></div>
-          <div class="hoc-l2gm__copy">
-            <p class="hoc-micro">Raw</p>
-            <p class="hoc-body">Three grams of hibiscus, mint leaf and lemongrass. Dry, whole, unground.</p>
-          </div>
-        </article>
-        <article class="hoc-l2gm" data-progress="0.55">
-          <div class="hoc-l2gm__glass"><canvas data-hoc="l2g-mcanvas" aria-hidden="true"></canvas></div>
-          <div class="hoc-l2gm__copy">
-            <p class="hoc-micro">Brew</p>
-            <p class="hoc-body">330 ml at 90 °C. The hibiscus goes first, and the water turns.</p>
-          </div>
-        </article>
-        <article class="hoc-l2gm" data-progress="0.97">
-          <div class="hoc-l2gm__glass"><canvas data-hoc="l2g-mcanvas" aria-hidden="true"></canvas></div>
-          <div class="hoc-l2gm__copy">
-            <p class="hoc-micro">Serve</p>
-            <p class="hoc-body">Five minutes, then ice. It holds its colour all the way down.</p>
-          </div>
-        </article>
-        <div class="hoc-l2gm__cta"><a class="hoc-btn" href="#blends">Discover Gift of Nature</a></div>
       </div>
     </section>
 
@@ -2124,21 +2106,21 @@
 </svg>
 
 
-<script src="assets/vendor/gsap.min.js?v=96c01b81f4"></script>
-<script src="assets/vendor/ScrollTrigger.min.js?v=308219390e"></script>
-<script src="assets/vendor/SplitText.min.js?v=5e519ea247"></script>
-<script src="assets/vendor/CustomEase.min.js?v=1cb1622270"></script>
-<script src="assets/vendor/DrawSVGPlugin.min.js?v=d8f70b87c1"></script>
-<script src="assets/vendor/Flip.min.js?v=d2d2f30a87"></script>
-<script src="assets/vendor/ScrambleTextPlugin.min.js?v=e9ce04a07d"></script>
-<script src="assets/vendor/Observer.min.js?v=697c7e96ae"></script>
+<script src="assets/vendor/gsap.min.js?v=b9a1a52787"></script>
+<script src="assets/vendor/ScrollTrigger.min.js?v=4aeb84b07a"></script>
+<script src="assets/vendor/SplitText.min.js?v=03f532f721"></script>
+<script src="assets/vendor/CustomEase.min.js?v=155a4e7ffe"></script>
+<script src="assets/vendor/DrawSVGPlugin.min.js?v=1022fa54a7"></script>
+<script src="assets/vendor/Flip.min.js?v=b42ca485d0"></script>
+<script src="assets/vendor/ScrambleTextPlugin.min.js?v=258f54d8bd"></script>
+<script src="assets/vendor/Observer.min.js?v=298b0ea32d"></script>
 <script src="assets/vendor/lenis.min.js?v=804047c1d9"></script>
-<script src="assets/vendor/embla-carousel.umd.js?v=f05b5dbfe3"></script>
+<script src="assets/vendor/embla-carousel.umd.js?v=181961bf7d"></script>
 
-<script src="assets/js/hoc-data.js?v=0457c02380"></script>
+<script src="assets/js/hoc-data.js?v=472d245cb3"></script>
 <script src="assets/js/hoc-core.js?v=7a9baf86e6"></script>
-<script src="assets/js/hoc-botanicals.js?v=a423a63202"></script>
-<script src="assets/js/hoc-webgl.js?v=e2d91a3e21"></script>
-<script src="assets/js/hoc-motion.js?v=d51e2e557d"></script>
+<script src="assets/js/hoc-botanicals.js?v=25f6c9471c"></script>
+<script src="assets/js/hoc-webgl.js?v=d99d4cb262"></script>
+<script src="assets/js/hoc-motion.js?v=9a3f12ac7b"></script>
 </body>
 </html>

@@ -486,187 +486,85 @@
      6. FROM LEAF TO GLASS  §13 — SIGNATURE #2
 
      The stage is held by CSS `position: sticky` rather than ScrollTrigger's
-     pin. Same result, no pin-spacer, and it stays glued under Lenis. The
-     0.8-1.2s scrub the brief asks for is reproduced by lerping the rendered
-     progress toward the scroll progress on the shared ticker.
+     pin. ScrollTrigger selects photographic stages; CSS handles the brief
+     crossfades. Small screens, reduced motion and the editor use normal flow.
      ====================================================================== */
 
-  var L2G_BOUNDS = [0.12, 0.3, 0.5, 0.66, 0.82, 0.93];
-
-  function fitCanvas(canvas, maxDpr) {
-    var r = canvas.getBoundingClientRect();
-    var dpr = Math.min(root.devicePixelRatio || 1, maxDpr || 2);
-    var w = Math.max(1, Math.round(r.width * dpr));
-    var h = Math.max(1, Math.round(r.height * dpr));
-    if (canvas.width !== w || canvas.height !== h) {
-      canvas.width = w;
-      canvas.height = h;
-    }
-    var ctx = canvas.getContext("2d");
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    return { ctx: ctx, w: r.width, h: r.height };
-  }
-
+  /* Photographic scenes stay readable in ordinary flow without enhancement. */
   HOC.controller("leaf-to-glass", function (el) {
-    var track = HOC.$('[data-hoc="l2g-track"]', el);
-    var canvas = HOC.$('[data-hoc="l2g-canvas"]', el);
-    var st = null;
-    var target = 0,
-      p = 0,
-      visible = false,
-      fit = null;
-    var liquid =
-      getComputedStyle(el).getPropertyValue("--liquid").trim() || "#B4324B";
+    var track = HOC.$("[data-brew-track]", el);
+    var scenes = HOC.$$("[data-brew-step]", el);
+    var buttons = HOC.$$("[data-brew-go]", el);
+    var progress = HOC.$("[data-brew-progress]", el);
+    var media = root.matchMedia("(min-width: 900px) and (min-height: 740px) and (prefers-reduced-motion: no-preference)");
+    var st = null, current = -1, offs = [];
 
-    var ings = HOC.$$(".hoc-l2g__ings li", el);
-    var rows = HOC.$$(".hoc-brewdata__row", el);
-    var steps = HOC.$$(".hoc-l2g__progress li", el);
-    var labelEl = HOC.$('[data-hoc="l2g-label"]', el);
-    var LABELS = ["Raw", "Fall", "Infuse", "Colour", "Ice", "Serve"];
-    var METRIC = ["g", "g", "c", "min", "ml", "ml"];
-    var lastStage = -1;
-
-    function stageFor(v) {
-      var s = 0;
-      for (var i = 0; i < L2G_BOUNDS.length; i++) if (v >= L2G_BOUNDS[i]) s = i;
-      return s;
-    }
-
-    function syncUI(v) {
-      var s = stageFor(v);
-      if (s === lastStage) return;
-      lastStage = s;
-      if (labelEl) labelEl.textContent = LABELS[s];
-      steps.forEach(function (n, i) {
-        n.classList.toggle("is-on", i === s);
+    function select(index) {
+      index = Math.max(0, Math.min(scenes.length - 1, index));
+      if (index === current) return;
+      current = index;
+      scenes.forEach(function (scene, i) {
+        scene.classList.toggle("is-active", i === index);
+        scene.setAttribute("aria-hidden", String(i !== index));
+        scene.inert = i !== index;
       });
-      rows.forEach(function (r) {
-        r.classList.toggle("is-on", r.getAttribute("data-metric") === METRIC[s]);
-      });
-      // ingredients light up as they drop in
-      ings.forEach(function (n, i) {
-        n.classList.toggle("is-on", s >= 1 || i === s);
+      buttons.forEach(function (button, i) {
+        button.setAttribute("aria-pressed", String(i === index));
       });
     }
-
-    function tick(time) {
-      if (!visible || !fit) return;
-      p += (target - p) * 0.12; // == ScrollTrigger scrub ~1.0
-      if (Math.abs(target - p) < 0.0004) p = target;
-      HOC.drawGlassScene(fit.ctx, fit.w, fit.h, p, {
-        liquid: liquid,
-        ink: "rgba(241,239,232,0.8)",
-        time: time
-      });
-      syncUI(p);
+    function update(self) {
+      select(Math.min(scenes.length - 1, Math.floor(self.progress * scenes.length)));
+      if (progress) progress.style.transform = "scaleX(" + self.progress + ")";
     }
-
+    function plain() {
+      if (st) st.kill();
+      st = null;
+      current = -1;
+      el.classList.remove("is-enhanced");
+      scenes.forEach(function (scene) {
+        scene.removeAttribute("aria-hidden");
+        scene.inert = false;
+      });
+      if (progress) progress.style.removeProperty("transform");
+    }
+    function setup() {
+      var enabled = media.matches && !reduced() && !HOC.designMode && !!ScrollTrigger;
+      if (!enabled) { plain(); return; }
+      if (st || !track || !scenes.length) return;
+      el.classList.add("is-enhanced");
+      select(0);
+      st = ScrollTrigger.create({
+        trigger: track,
+        start: function () {
+          var header = parseFloat(getComputedStyle(el).getPropertyValue("--header-h-scrolled")) || 62;
+          return "top " + header + "px";
+        },
+        end: "bottom bottom",
+        invalidateOnRefresh: true,
+        onUpdate: update,
+        onRefresh: update
+      });
+      update(st);
+    }
     return {
       init: function () {
-        if (!canvas || !track) return;
-        fit = fitCanvas(canvas, 2);
-        HOC.drawGlassScene(fit.ctx, fit.w, fit.h, 0, {
-          liquid: liquid,
-          ink: "rgba(241,239,232,0.8)",
-          time: 0
+        buttons.forEach(function (button) {
+          offs.push(HOC.onEl(button, "click", function () {
+            if (!st) return;
+            var index = Number(button.getAttribute("data-brew-go"));
+            var destination = st.start + (st.end - st.start) * (index + .35) / scenes.length;
+            if (HOC.lenis) HOC.lenis.scrollTo(destination, { duration: .7 });
+            else root.scrollTo({ top: destination, behavior: "smooth" });
+          }));
         });
-
-        if (!ScrollTrigger) return;
-        st = ScrollTrigger.create({
-          trigger: track,
-          start: "top top",
-          end: "bottom bottom",
-          onUpdate: function (self) {
-            target = self.progress;
-            if (reduced()) {
-              p = target;
-            }
-          },
-          onToggle: function (self) {
-            visible = self.isActive;
-          }
-        });
-        HOC.ticker.add(tick);
+        offs.push(HOC.onEl(media, "change", setup));
+        offs.push(HOC.bind("tierchange", setup));
+        setup();
       },
-      resize: function () {
-        if (canvas && canvas.offsetParent !== null) fit = fitCanvas(canvas, 2);
-      },
+      resize: setup,
       destroy: function () {
-        HOC.ticker.remove(tick);
-        if (st) st.kill();
-      }
-    };
-  });
-
-  /* --- mobile: three short stages, no pin (§13, §44) -------------------- */
-  HOC.controller("l2g-mobile", function (el) {
-    var section = el.closest(".hoc-l2g");
-    var liquid =
-      getComputedStyle(section).getPropertyValue("--liquid").trim() || "#B4324B";
-    var blocks = HOC.$$(".hoc-l2gm", el).map(function (b) {
-      return {
-        el: b,
-        canvas: HOC.$("canvas", b),
-        to: parseFloat(b.getAttribute("data-progress")),
-        p: 0,
-        fit: null,
-        on: false,
-        st: null
-      };
-    });
-
-    function tick(time) {
-      blocks.forEach(function (b) {
-        if (!b.on || !b.fit) return;
-        b.p += (b.to - b.p) * 0.08;
-        HOC.drawGlassScene(b.fit.ctx, b.fit.w, b.fit.h, b.p, {
-          liquid: liquid,
-          ink: "rgba(241,239,232,0.8)",
-          time: time
-        });
-      });
-    }
-
-    return {
-      init: function () {
-        blocks.forEach(function (b) {
-          if (!b.canvas) return;
-          b.fit = fitCanvas(b.canvas, 1.75);
-          // start a quarter-turn back so entering the block plays a short
-          // transition rather than snapping to the finished frame
-          b.p = Math.max(0, b.to - 0.26);
-          if (reduced()) b.p = b.to;
-          HOC.drawGlassScene(b.fit.ctx, b.fit.w, b.fit.h, b.p, {
-            liquid: liquid,
-            ink: "rgba(241,239,232,0.8)",
-            time: 0
-          });
-          if (!ScrollTrigger) {
-            b.on = true;
-            return;
-          }
-          b.st = ScrollTrigger.create({
-            trigger: b.el,
-            start: "top 92%",
-            end: "bottom 8%",
-            onToggle: function (self) {
-              b.on = self.isActive;
-            }
-          });
-        });
-        HOC.ticker.add(tick);
-      },
-      resize: function () {
-        blocks.forEach(function (b) {
-          if (b.canvas && b.canvas.offsetParent !== null)
-            b.fit = fitCanvas(b.canvas, 1.75);
-        });
-      },
-      destroy: function () {
-        HOC.ticker.remove(tick);
-        blocks.forEach(function (b) {
-          if (b.st) b.st.kill();
-        });
+        offs.forEach(function (off) { off(); });
+        plain();
       }
     };
   });
