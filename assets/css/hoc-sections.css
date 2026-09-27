@@ -526,31 +526,116 @@
    ========================================================================== */
 
 .hoc-manifesto {
-  position: relative;
+  --surface: #222723;
+  --on-surface: #f1efe8;
+  padding-block: clamp(2rem, 3vw, 3rem) clamp(2.5rem, 3.5vw, 3.5rem);
   overflow: hidden;
+  scroll-margin-top: var(--header-h-scrolled);
 }
-.hoc-manifesto__sprig {
-  position: absolute;
-  right: -4%;
-  bottom: 6%;
-  width: 74%;
-  height: auto;
-  color: var(--hoc-bone);
-  opacity: 0.10;
-  stroke-width: 0.6;
-  pointer-events: none;
+.hoc-manifesto__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgb(241 239 232 / .2);
+  color: #c4cdbc;
 }
-.hoc-manifesto .hoc-micro {
-  margin-bottom: clamp(1.5rem, 4vh, 2.5rem);
+.hoc-manifesto__composition {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.12fr);
+  align-items: center;
+  gap: clamp(2rem, 5vw, 5rem);
+  padding-block: clamp(2.5rem, 3vw, 3rem);
 }
-.hoc-manifesto__h2 {
-  max-width: 16ch;
-  white-space: pre-line;
+.hoc-manifesto__copy { min-width: 0; }
+.hoc-manifesto__title {
+  font-family: var(--ff-display);
+  font-size: clamp(4.4rem, 8.1vw, 8.3rem);
+  font-weight: 400;
+  line-height: .91;
+  letter-spacing: -.035em;
+  text-wrap: balance;
+}
+.hoc-manifesto__title > span { display: block; max-width: 8ch; }
+.hoc-manifesto__title > em {
+  display: block;
+  margin-top: .09em;
+  padding-right: .08em;
+  color: #bacbb7;
+  font-weight: 400;
 }
 .hoc-manifesto__body {
-  margin-top: clamp(1.75rem, 4vh, 2.75rem);
-  max-width: 46ch;
-  color: rgb(241 239 232 / 0.66);
+  margin-top: clamp(1.75rem, 3vw, 2.5rem);
+  max-width: 35ch;
+  color: #c6cac1;
+  font-size: clamp(.95rem, 1.15vw, 1.125rem);
+  line-height: 1.7;
+  text-wrap: pretty;
+}
+.hoc-manifesto__link {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 2.5rem;
+  margin-top: 1.5rem;
+  padding-block: .65rem;
+  border-bottom: 1px solid rgb(241 239 232 / .5);
+  font-size: .8rem;
+  transition: color .3s, border-color .3s;
+}
+.hoc-manifesto__link:hover { color: #bacbb7; border-color: currentColor; }
+.hoc-manifesto__media { min-width: 0; }
+.hoc-manifesto__image {
+  aspect-ratio: 1.2;
+  overflow: hidden;
+  border-start-start-radius: clamp(4rem, 9vw, 9rem);
+  border-end-end-radius: clamp(4rem, 9vw, 9rem);
+  background: #191b17;
+}
+.hoc-manifesto__image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: right center;
+}
+.hoc-manifesto__media figcaption {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+  color: #b9c0b3;
+  font-size: .72rem;
+}
+.hoc-manifesto__notes {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 1px solid rgb(241 239 232 / .2);
+  padding-top: 1.75rem;
+  gap: 2rem;
+}
+.hoc-manifesto__notes li { display: flex; align-items: baseline; gap: 1rem; }
+.hoc-manifesto__notes li > span { font: italic 2rem/1 var(--ff-display); color: #c4d0bd; }
+.hoc-manifesto__notes p { color: #bfc5bb; font-size: .72rem; }
+@media (min-width: 768px) and (max-width: 1100px) {
+  .hoc-manifesto__composition { gap: 2rem; }
+  .hoc-manifesto__title { font-size: clamp(4rem, 7.8vw, 5.5rem); }
+  .hoc-manifesto__notes li { display: block; }
+  .hoc-manifesto__notes p { margin-top: .5rem; }
+}
+@media (max-width: 767px) {
+  .hoc-manifesto__signature { display: none; }
+  .hoc-manifesto__composition { grid-template-columns: minmax(0, 1fr); gap: 2.25rem; padding-block: 2.5rem 2rem; }
+  .hoc-manifesto__title { font-size: clamp(3.75rem, 16vw, 6.5rem); }
+  .hoc-manifesto__title > span { max-width: 12ch; }
+  .hoc-manifesto__body { max-width: 37ch; margin-top: 1.5rem; }
+  .hoc-manifesto__link { margin-top: .75rem; }
+  .hoc-manifesto__image { aspect-ratio: 1.18; }
+  .hoc-manifesto__media figcaption { gap: .3rem 1rem; }
+  .hoc-manifesto__notes { gap: .75rem; padding-top: 1.5rem; }
+  .hoc-manifesto__notes li { display: block; }
+  .hoc-manifesto__notes li > span { font-size: 1.65rem; }
+  .hoc-manifesto__notes p { margin-top: .6rem; font-size: .68rem; line-height: 1.5; max-width: 15ch; }
 }
 
 /* ==========================================================================

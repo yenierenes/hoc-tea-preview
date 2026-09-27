@@ -15,7 +15,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
 
 <link rel="stylesheet" href="assets/css/hoc-core.css?v=9dc81688f6">
-<link rel="stylesheet" href="assets/css/hoc-sections.css?v=b97754e3f9">
+<link rel="stylesheet" href="assets/css/hoc-sections.css?v=0705fce38c">
 <script>document.documentElement.classList.add('hoc-js');</script>
 </head>
 <body>
@@ -319,14 +319,30 @@
       </div>
     </section>
 
-    <section class="hoc-section hoc-manifesto" data-theme="ink" data-header-theme="light">
-      <svg class="hoc-manifesto__sprig" viewBox="0 0 900 100" aria-hidden="true"
-           data-hoc="draw"><use href="#b-branch"></use></svg>
-      <div class="hoc-wrap hoc-pad">
-        <p class="hoc-micro" data-reveal>HOC / Tea &amp; More</p>
-        <h2 class="hoc-display-l hoc-manifesto__h2" data-split="lines">Not just brewed.
-<em class="hoc-italic">Composed.</em></h2>
-        <p class="hoc-body hoc-manifesto__body" data-reveal="up">Botanical ingredients, layered for aroma, colour and a ritual that works just as beautifully over ice.</p>
+    <section class="hoc-section hoc-manifesto" id="manifesto" data-theme="ink" data-header-theme="light">
+      <div class="hoc-wrap">
+        <header class="hoc-manifesto__top">
+          <p class="hoc-micro">HOC / The art of blending</p>
+          <span class="hoc-manifesto__signature hoc-micro">Botanical by nature.</span>
+        </header>
+        <div class="hoc-manifesto__composition">
+          <div class="hoc-manifesto__copy">
+            <h2 class="hoc-manifesto__title"><span data-split="lines">Not just brewed.</span><em data-split="lines">Composed.</em></h2>
+            <p class="hoc-manifesto__body" data-reveal="up">A flower for its colour. A leaf for its aroma. Every botanical brings something to the blend.</p>
+            <a class="hoc-manifesto__link" href="#atlas">Meet the botanicals <span aria-hidden="true">↗</span></a>
+          </div>
+          <figure class="hoc-manifesto__media">
+            <div class="hoc-manifesto__image">
+              <img src="assets/img/manifesto-still-900.webp?v=6922c28dd1" srcset="assets/img/manifesto-still-600.webp?v=ae3fca92bd 600w, assets/img/manifesto-still-900.webp?v=6922c28dd1 900w, assets/img/manifesto-still-1440.webp?v=b98c249d94 1440w" sizes="(max-width: 767px) 92vw, 48vw" width="1440" height="960" loading="lazy" decoding="async" alt="Ruby-red botanical tea with dried hibiscus, mint leaves and lemongrass.">
+            </div>
+            <figcaption><span class="hoc-micro">Gift of Nature</span><span>Hibiscus · Mint · Lemongrass</span></figcaption>
+          </figure>
+        </div>
+        <ul class="hoc-manifesto__notes">
+          <li><span>Aroma.</span><p>The first impression.</p></li>
+          <li><span>Colour.</span><p>Nature, revealed in water.</p></li>
+          <li><span>Ritual.</span><p>Made for your moment.</p></li>
+        </ul>
       </div>
     </section>
 
