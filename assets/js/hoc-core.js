@@ -670,9 +670,9 @@
               '" data-pack="' +
               i.pack +
               '">' +
-              '<div class="hoc-cartitem__thumb"><img src="' + (HOC.assetBase || '') + 'assets/img/pack-' +
+              '<div class="hoc-cartitem__thumb"><img src="' + (HOC.assetBase || '') + 'assets/img/pack-duo-' +
               b.slug +
-              '-420.webp" alt="" width="420" height="663" loading="lazy"></div>' +
+              '.svg" alt="" width="700" height="640" loading="lazy"></div>' +
               "<div>" +
               '<p class="hoc-cartitem__name">' +
               b.name +
@@ -715,9 +715,9 @@
       if (!pick) return "";
       return (
         '<div class="hoc-upsell">' +
-        '<img src="' + (HOC.assetBase || '') + 'assets/img/pack-' +
+        '<img src="' + (HOC.assetBase || '') + 'assets/img/pack-duo-' +
         pick.slug +
-        '-420.webp" alt="" width="420" height="663" loading="lazy">' +
+        '.svg" alt="" width="700" height="640" loading="lazy">' +
         "<div><p class=\"hoc-micro\">Try another ritual.</p>" +
         '<p class="hoc-cartitem__name">' +
         pick.name +
@@ -1153,7 +1153,6 @@
     var offs = [];
     var steps = $$(".hoc-ritual__step", el);
     var frames = $$(".hoc-ritual__frame", el);
-    var progress = $('[data-hoc="ritual-progress"]', el);
 
     function set(i) {
       if (i < 0 || i >= steps.length) return;
@@ -1165,9 +1164,6 @@
       frames.forEach(function (f, n) {
         f.classList.toggle("is-on", n === i);
       });
-      if (progress) {
-        progress.textContent = String(i + 1).padStart(2, "0") + " / " + String(steps.length).padStart(2, "0");
-      }
     }
 
     return {

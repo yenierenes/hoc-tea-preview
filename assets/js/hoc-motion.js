@@ -521,7 +521,6 @@
     var ings = HOC.$$(".hoc-l2g__ings li", el);
     var rows = HOC.$$(".hoc-brewdata__row", el);
     var steps = HOC.$$(".hoc-l2g__progress li", el);
-    var numEl = HOC.$('[data-hoc="l2g-num"]', el);
     var labelEl = HOC.$('[data-hoc="l2g-label"]', el);
     var LABELS = ["Raw", "Fall", "Infuse", "Colour", "Ice", "Serve"];
     var METRIC = ["g", "g", "c", "min", "ml", "ml"];
@@ -537,7 +536,6 @@
       var s = stageFor(v);
       if (s === lastStage) return;
       lastStage = s;
-      if (numEl) numEl.textContent = String(s + 1).padStart(2, "0");
       if (labelEl) labelEl.textContent = LABELS[s];
       steps.forEach(function (n, i) {
         n.classList.toggle("is-on", i === s);

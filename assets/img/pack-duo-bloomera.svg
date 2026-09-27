@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 640" role="img" aria-label="Bloomera tin and doypack packaging concept">
+<defs>
+  <linearGradient id="metal"><stop stop-color="#87928e"/><stop offset=".09" stop-color="#f7f8f6"/><stop offset=".27" stop-color="#c6cdca"/><stop offset=".55" stop-color="#f9faf8"/><stop offset=".82" stop-color="#bec7c3"/><stop offset=".96" stop-color="#eef0ec"/><stop offset="1" stop-color="#8b9893"/></linearGradient>
+  <linearGradient id="pouch"><stop stop-color="#d7ddd8"/><stop offset=".16" stop-color="#fff"/><stop offset=".58" stop-color="#f8f9f5"/><stop offset=".83" stop-color="#fff"/><stop offset="1" stop-color="#cbd2ce"/></linearGradient>
+  <linearGradient id="shine" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#fff" stop-opacity=".75"/><stop offset=".23" stop-color="#fff" stop-opacity="0"/><stop offset=".74" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#fff" stop-opacity=".4"/></linearGradient>
+  <filter id="shadow" x="-30%" y="-30%" width="160%" height="180%"><feGaussianBlur stdDeviation="16"/></filter>
+</defs>
+<ellipse cx="393" cy="579" rx="222" ry="29" fill="#202b27" opacity=".16" filter="url(#shadow)"/>
+<ellipse cx="177" cy="566" rx="144" ry="23" fill="#202b27" opacity=".12" filter="url(#shadow)"/>
+<!-- Brushed metal tin, proportioned from the supplied HOC tin renders. -->
+<g>
+  <rect x="314" y="104" width="212" height="448" rx="14" fill="url(#metal)" stroke="#a7b1ac" stroke-width="2"/>
+  <rect x="309" y="84" width="222" height="58" rx="13" fill="url(#metal)" stroke="#9ca8a3" stroke-width="2"/>
+  <path d="M312 136 Q419 150 528 136" fill="none" stroke="#73807b" opacity=".55"/>
+  <path d="M315 548 Q420 560 525 548" fill="none" stroke="#73807b" opacity=".65"/>
+  <rect x="318" y="150" width="204" height="388" fill="url(#shine)" opacity=".68"/>
+  <rect x="338" y="211" width="162" height="237" rx="79" fill="#954437" stroke="#572B24" stroke-opacity=".35" stroke-width="2"/>
+  <rect x="351" y="224" width="136" height="211" rx="67" fill="none" stroke="#fff" stroke-opacity=".4"/>
+  <path d="M407 271 Q387 263 384 244 Q404 246 409 264 Q414 247 435 244 Q432 265 411 271 M410 270 V289" fill="none" stroke="#f6f5ee" stroke-width="2" opacity=".9"/>
+  <text x="418" y="315" text-anchor="middle" fill="#fff" font-family="Arial,sans-serif" font-size="28" letter-spacing="4">HOC</text>
+  <text x="418" y="336" text-anchor="middle" fill="#f4f4ee" font-family="Arial,sans-serif" font-size="8" letter-spacing="2.5">TEA &amp; MORE</text>
+  <path d="M365 349 H471" stroke="#fff" stroke-opacity=".5"/>
+  <text x="418" y="377" text-anchor="middle" fill="#fff" font-family="Georgia,serif" font-size="20"><tspan x="418" dy="0">Bloomera</tspan></text>
+  <text x="418" y="421" text-anchor="middle" fill="#fff" font-family="Arial,sans-serif" font-size="8" letter-spacing="1.8">BOTANICAL BLEND</text>
+</g>
+<!-- White HOC doypack. Text is intentionally rendered as real SVG text. -->
+<g transform="rotate(-6 180 382)">
+  <path d="M78 185 H282 L295 217 L287 551 Q180 565 69 551 L66 217 Z" fill="url(#pouch)" stroke="#bfc9c4" stroke-width="2"/>
+  <path d="M76 187 H283 L293 212 H67 Z" fill="#eef0ec" stroke="#c5cbc7"/>
+  <path d="M74 225 H286 M78 239 H282" fill="none" stroke="#c6ceca" stroke-width="3" opacity=".8"/>
+  <path d="M84 251 Q74 377 84 526 M277 249 Q289 386 279 528" fill="none" stroke="#c9d1cb" stroke-width="6" opacity=".35"/>
+  <rect x="148" y="281" width="62" height="62" rx="10" fill="#954437"/>
+  <path d="M178 306 Q165 301 162 291 Q175 291 180 303 Q183 292 197 291 Q194 303 181 307 M180 305 V316" fill="none" stroke="#fff" stroke-width="1.7"/>
+  <text x="179" y="333" text-anchor="middle" fill="#fff" font-family="Arial,sans-serif" font-size="17" letter-spacing="1.3">HOC</text>
+  <text x="179" y="364" text-anchor="middle" fill="#572B24" font-family="Arial,sans-serif" font-size="10" letter-spacing="3">HOCTEA</text>
+  <text x="179" y="381" text-anchor="middle" fill="#67766f" font-family="Arial,sans-serif" font-size="7" letter-spacing="2">TEA &amp; MORE</text>
+  <g fill="none" stroke="#954437" stroke-opacity=".55" stroke-width="1.6" stroke-linecap="round">
+    <path d="M179 400 V468 M179 453 C154 440 148 421 145 409 M178 443 C199 433 209 416 216 403 M169 432 C154 423 149 412 150 400 M190 428 C205 422 216 412 218 395"/>
+    <path d="M146 410 Q132 405 130 389 Q145 391 149 403 M155 420 Q140 419 136 406 Q151 408 158 416 M210 414 Q225 405 226 390 Q211 395 207 408 M200 428 Q216 424 221 411 Q207 414 197 421"/>
+    <circle cx="170" cy="433" r="6"/><circle cx="193" cy="449" r="5"/>
+  </g>
+  <text x="179" y="496" text-anchor="middle" fill="#572B24" font-family="Georgia,serif" font-size="20"><tspan x="179" dy="0">Bloomera</tspan></text>
+  <text x="179" y="541" text-anchor="middle" fill="#718078" font-family="Arial,sans-serif" font-size="7" letter-spacing=".3">Apple · Cinnamon Stick · Hibiscus</text>
+</g>
+</svg>
