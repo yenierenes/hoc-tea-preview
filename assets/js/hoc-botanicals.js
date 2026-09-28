@@ -360,7 +360,11 @@
     var viewport = el.querySelector(".hoc-current__viewport");
     var entries = Array.prototype.slice.call(el.querySelectorAll(".hoc-current__item"));
     var button = el.querySelector("[data-current-pause]");
-    var observer, visible = false, playing = false, paused = false, focused = false, hovering = false;
+    var observer, near, visible = false, playing = false, paused = false, focused = false, hovering = false;
+    // The petals are cut from the 600 KB atlas sheet. Nothing references it
+    // until the footer is within a screen of view, so it is not first-paint
+    // weight for a page most visitors never scroll to the bottom of.
+    var approached = !("IntersectionObserver" in root);
     var decorated = false, enabled = false, width = 600, offset = 620, total = 0, viewportWidth = 0;
     var last = 0, speed = 0, lastPaint = 0, petals = [];
     var columns = 14, rows = 6, cellWidth = 23, cellHeight = 25, particleSize = 22;
@@ -377,7 +381,7 @@
       playing = true; last = 0; HOC.ticker.add(tick);
     }
     function decorate() {
-      if (decorated) return;
+      if (decorated || !approached) return;
       decorated = true;
       entries.forEach(function (entry, index) {
         var media = entry.querySelector(".hoc-current__media");
@@ -480,7 +484,14 @@
       init: function () {
         if (!entries.length || !viewport || !button) return;
         button.textContent = "Pause flow"; button.setAttribute("aria-pressed", "false");
-        decorate(); mode();
+        if (!approached) {
+          near = new IntersectionObserver(function (events) {
+            if (!events[events.length - 1].isIntersecting) return;
+            near.disconnect(); approached = true; mode();
+          }, { rootMargin: "0px 0px 100% 0px" });
+          near.observe(el);
+        }
+        mode();
         observer = new IntersectionObserver(function (events) {
           visible = events[0].isIntersecting;
           if (visible && enabled) { decorate(); paint(); wake(); } else stop();
@@ -495,7 +506,7 @@
       },
       resize: measure,
       destroy: function () {
-        stop(); if (observer) observer.disconnect();
+        stop(); if (observer) observer.disconnect(); if (near) near.disconnect();
         button.removeEventListener("click", pause);
         viewport.removeEventListener("pointerenter", enter); viewport.removeEventListener("pointerleave", leave);
         viewport.removeEventListener("focusin", focusIn); viewport.removeEventListener("focusout", focusOut);

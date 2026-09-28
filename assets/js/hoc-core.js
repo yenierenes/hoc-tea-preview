@@ -1146,6 +1146,554 @@
   });
 
   /* ======================================================================
+     12b. COLOUR ALCHEMY  §14
+
+     The working half of the section. It owns the reaction and everything
+     you can read or operate — the button, the four pieces, the scale, the
+     status line — and paints a plain SVG glass. hoc-motion.js lays the
+     rendered glass over that by reading the same state (el.__alc), so the
+     section makes the same sense with no WebGL, no GSAP, reduced motion, or
+     inside the theme editor.
+
+     The model is small on purpose; the point is that you can follow it.
+       * each hibiscus piece is one fixed dose of acid (DOSE)
+       * it lands T_FALL after it is added and gives its acid up over about
+         a second (RELEASE) — the rendered plume shows it working locally
+       * the glass as a whole follows the running total (FOLLOW)
+       * four pieces turn it all the way
+     Nobody has to do anything, either: a glass left in view untouched drops
+     its own pieces, one every few seconds, and puts itself back once it has
+     scrolled away so the next visit sees it happen too.
+     ====================================================================== */
+
+  // Glass geometry in the shader's units — x across, y up, the vessel box
+  // spanning -1..1. Must match HOC.shaderAlchemy.
+  var ALC_E = 0.15,
+    ALC_W_TOP = 0.455,
+    ALC_W_BOT = 0.395,
+    ALC_WALL = 0.018,
+    ALC_T_FALL = 0.62;
+  var ALC_Y_TOP = 1 - ALC_E * ALC_W_TOP;
+  var ALC_Y_BOT = -1 + ALC_E * ALC_W_BOT;
+  var ALC_Y_INB = ALC_Y_BOT + 0.08;
+  var ALC_Y_FULL = ALC_Y_TOP - 0.22;
+  // The liquid as it reads at the centre of the rendered glass.
+  var ALC_RAMP = [
+    [22, 47, 168],
+    [98, 38, 169],
+    [195, 28, 98]
+  ];
+  // QA: ?hocdemo=off keeps the glass from dropping its own pieces, so a
+  // check can walk the states in a known order. Read-only, like ?hoctier=.
+  var ALC_NO_DEMO = /[?&]hocdemo=off/.test(root.location.search);
+
+  function alcStep(a, b, x) {
+    var t = Math.min(1, Math.max(0, (x - a) / (b - a)));
+    return t * t * (3 - 2 * t);
+  }
+
+  /** Same ramp as the shader's pigment(): violet at 0.5, magenta at 1. */
+  function alcColour(level) {
+    var s1 = alcStep(0, 0.5, level),
+      s2 = alcStep(0.5, 1, level),
+      out = [];
+    for (var i = 0; i < 3; i++) {
+      var v = ALC_RAMP[0][i] + (ALC_RAMP[1][i] - ALC_RAMP[0][i]) * s1;
+      out.push(Math.round(v + (ALC_RAMP[2][i] - v) * s2));
+    }
+    return "rgb(" + out.join(" ") + ")";
+  }
+
+  function alcSurface(fill) {
+    return ALC_Y_INB + 0.02 + (ALC_Y_FULL - ALC_Y_INB - 0.02) * fill;
+  }
+
+  function alcHalfWidth(y) {
+    var k = Math.min(1, Math.max(0, (y - ALC_Y_BOT) / (ALC_Y_TOP - ALC_Y_BOT)));
+    return ALC_W_BOT + (ALC_W_TOP - ALC_W_BOT) * k;
+  }
+
+  /** Where a piece is at time t — the same path the shader draws. */
+  function alcPiece(d, t, ySurf) {
+    var age = t - d.t0;
+    var air = age <= ALC_T_FALL;
+    var ft = Math.min(Math.max(age, 0), ALC_T_FALL) / ALC_T_FALL;
+    var sink = Math.max(age - ALC_T_FALL, 0);
+    var depth =
+      Math.max(ySurf - ALC_Y_INB - 0.12, 0) * (1 - Math.exp(-sink / 1.9));
+    var sway =
+      0.028 * Math.sin(sink * 1.6 + d.seed * 6.2832) * (1 - Math.exp(-sink * 0.9));
+    var yStart = ALC_Y_TOP + 0.34;
+    return {
+      air: air,
+      x: d.x + sway,
+      y: air ? yStart + (ySurf - yStart) * ft * ft : ySurf - depth,
+      r:
+        d.seed * 6.2832 +
+        (air ? age * 1.6 : ALC_T_FALL * 1.6 + 0.35 * Math.sin(sink * 1.1 + d.seed * 4)),
+      s: 0.09 * (0.88 + 0.24 * ((d.seed * 13.7) % 1))
+    };
+  }
+
+  HOC.controller("alchemy", function (el) {
+    var offs = [];
+    var stage = $(".hoc-alchemy__stage", el);
+    var vessel = $('[data-hoc="alchemy-vessel"]', el);
+    var btn = $('[data-hoc="alchemy-add"]', el);
+    var btnLabel = $('[data-hoc="alchemy-add-label"]', el);
+    var status = $('[data-hoc="alchemy-status"]', el);
+    var stops = $$("[data-stop]", el);
+    var dots = $$(".hoc-alchemy__dots i", el);
+    var svg = $(".hoc-alchemy__glass", el);
+    var sprites = el.getAttribute("data-sprites") || "";
+
+    var FULL = 4; // pieces that turn the glass all the way
+    var DOSE = 0.28; // acid per piece; four overshoot 1 so the last one lands
+    var RELEASE = 1.0; // s for a landed piece to give up its acid
+    var FOLLOW = 1.1; // s for the whole glass to catch up
+    var DRAIN = 0.6;
+    var REFILL = 1.0;
+    // Where pieces go in, in glass units: spread out, never stacked.
+    var SPOTS = [-0.12, 0.1, -0.02, 0.15];
+
+    var text = {
+      add: el.getAttribute("data-label-add") || "Add hibiscus",
+      again: el.getAttribute("data-label-again") || "Start again",
+      added:
+        el.getAttribute("data-msg-added") ||
+        "Hibiscus added, {n} of {total}. The tea is turning {colour}.",
+      fresh:
+        el.getAttribute("data-msg-fresh") || "A fresh glass. Deep blue again."
+    };
+
+    var origin = performance.now();
+    var S = (el.__alc = {
+      drops: [], // { x, t0, k: plume strength, seed }
+      level: 0, // 0 blue … 0.5 violet … 1 magenta
+      fill: 1, // liquid height; drains and refills on "Start again"
+      fade: 0, // clears pieces and plumes while it drains
+      ghostX: 0,
+      ghostA: 0,
+      ghostOn: false,
+      visible: false,
+      still: false, // reduced motion: no clock, pieces arrive settled
+      frozen: 100, // the clock value a still glass is drawn at
+      now: function () {
+        return (performance.now() - origin) / 1000;
+      }
+    });
+
+    var io = null,
+      ioGlass = null,
+      ioNear = null,
+      last = 0,
+      touched = false, // any real input ends the self-running demo for good
+      demoAt = 0,
+      reset = null,
+      nudge = 0,
+      seedN = 0,
+      shown = { level: -1, stage: -1, complete: null };
+
+    var NS = "http://www.w3.org/2000/svg";
+    var gLiquid = svg ? $$(".hoc-alchemy__g-liquid", svg) : [];
+    var gColumn = svg ? $$(".hoc-alchemy__g-body, .hoc-alchemy__g-tint", svg) : [];
+    var gSurface = svg ? $$(".hoc-alchemy__g-surface", svg) : [];
+    var gSunk = svg && $(".hoc-alchemy__g-sunk", svg);
+    var gAir = svg && $(".hoc-alchemy__g-air", svg);
+    var pieces = [];
+
+    function frac(v) {
+      return v - Math.floor(v);
+    }
+    function clamp(v, a, b) {
+      return v < a ? a : v > b ? b : v;
+    }
+    function isStill() {
+      return !!HOC.env.reduced || HOC.env.tier === "reduced";
+    }
+
+    function say(msg) {
+      if (!status) return;
+      status.textContent = "";
+      root.setTimeout(function () {
+        status.textContent = msg;
+      }, 60);
+    }
+
+    function stopName(i) {
+      var n = stops[i] && $("[data-stop-name]", stops[i]);
+      return n
+        ? n.textContent.trim().toLowerCase()
+        : ["blue", "violet", "magenta"][i];
+    }
+
+    /** Total acid released by time t. */
+    function target(t) {
+      var sum = 0;
+      for (var i = 0; i < S.drops.length; i++) {
+        var a = t - S.drops[i].t0 - ALC_T_FALL;
+        if (a > 0) sum += DOSE * (1 - Math.exp(-a / RELEASE));
+      }
+      return Math.min(1, sum);
+    }
+
+    function syncControls() {
+      var n = S.drops.length;
+      var full = n >= FULL;
+      dots.forEach(function (d, i) {
+        d.classList.toggle("is-on", i < n);
+      });
+      if (btnLabel) btnLabel.textContent = full ? text.again : text.add;
+      if (btn) {
+        btn.setAttribute("data-mode", full ? "again" : "add");
+        // aria-disabled, not disabled: a focused button must keep focus.
+        btn.setAttribute("aria-disabled", reset ? "true" : "false");
+      }
+      el.classList.toggle("is-full", full);
+      el.classList.toggle("is-resetting", !!reset);
+    }
+
+    function add(x, byUser) {
+      if (reset || S.drops.length >= FULL) return false;
+      if (byUser) touched = true;
+      seedN++;
+      var t = S.still ? S.frozen : S.now();
+      S.drops.push({
+        x: clamp(x, -0.3, 0.3),
+        t0: S.still ? t - 60 : t, // reduced motion: already there, settled
+        k: 0.9 + 0.2 * frac(seedN * 0.618034),
+        seed: frac(seedN * 0.754878 + 0.137)
+      });
+      var n = S.drops.length;
+      if (byUser) {
+        say(
+          text.added
+            .replace("{n}", n)
+            .replace("{total}", FULL)
+            .replace("{colour}", stopName(n < 3 ? 1 : 2))
+        );
+      }
+      syncControls();
+      return true;
+    }
+
+    function empty() {
+      S.drops.length = 0;
+      S.level = 0;
+      S.fade = 0;
+    }
+
+    function startReset() {
+      if (reset) return;
+      touched = true;
+      if (S.still) {
+        empty();
+        S.fill = 1;
+        say(text.fresh);
+        syncControls();
+        return;
+      }
+      reset = { t: S.now(), drained: false };
+      syncControls();
+    }
+
+    function stepReset(t) {
+      var a = t - reset.t;
+      if (!reset.drained) {
+        var k = Math.min(1, a / DRAIN);
+        S.fill = 1 - k * k * (3 - 2 * k);
+        S.fade = k;
+        if (k >= 1) {
+          empty();
+          S.fill = 0;
+          reset.drained = true;
+          reset.t = t;
+        }
+        return;
+      }
+      var b = Math.min(1, a / REFILL);
+      S.fill = 1 - Math.pow(1 - b, 3);
+      if (b >= 1) {
+        S.fill = 1;
+        reset = null;
+        say(text.fresh);
+        syncControls();
+      }
+    }
+
+    /* ---- the SVG glass ------------------------------------------------ */
+    function makePiece() {
+      var g = doc.createElementNS(NS, "g");
+      var box = doc.createElementNS(NS, "svg");
+      var im = doc.createElementNS(NS, "image");
+      box.setAttribute("x", "-1");
+      box.setAttribute("y", "-1");
+      box.setAttribute("width", "2");
+      box.setAttribute("height", "2");
+      box.setAttribute("viewBox", "0 0 256 256");
+      box.setAttribute("overflow", "hidden");
+      im.setAttribute("href", sprites);
+      im.setAttribute("width", "512");
+      im.setAttribute("height", "256");
+      box.appendChild(im);
+      g.appendChild(box);
+      return g;
+    }
+
+    function paintGlass(t) {
+      var ys = alcSurface(S.fill);
+      var ws = alcHalfWidth(ys) - ALC_WALL;
+      var top = (-ys).toFixed(4);
+      var tall = (1 + ys).toFixed(4);
+      gLiquid.forEach(function (g) {
+        g.style.opacity = S.fill > 0.03 ? "1" : "0";
+      });
+      gColumn.forEach(function (r) {
+        r.setAttribute("y", top);
+        r.setAttribute("height", tall);
+      });
+      gSurface.forEach(function (e) {
+        e.setAttribute("cy", top);
+        e.setAttribute("rx", ws.toFixed(4));
+        e.setAttribute("ry", (ALC_E * ws).toFixed(4));
+      });
+
+      while (pieces.length > S.drops.length) {
+        var old = pieces.pop();
+        if (old.parentNode) old.parentNode.removeChild(old);
+      }
+      while (pieces.length < S.drops.length) pieces.push(makePiece());
+      var clock = S.still ? S.frozen : t;
+      for (var i = 0; i < S.drops.length; i++) {
+        var p = alcPiece(S.drops[i], clock, ys);
+        var g = pieces[i];
+        var home = p.air ? gAir : gSunk;
+        if (home && g.parentNode !== home) home.appendChild(g);
+        g.setAttribute(
+          "transform",
+          "translate(" + p.x.toFixed(4) + " " + (-p.y).toFixed(4) + ") rotate(" +
+            (-p.r * 57.29578).toFixed(2) + ") scale(" + p.s.toFixed(4) + ")"
+        );
+        g.style.opacity = String(1 - S.fade);
+      }
+    }
+
+    function paint(t) {
+      if (Math.abs(S.level - shown.level) > 0.0015) {
+        shown.level = S.level;
+        el.style.setProperty("--alc-level", S.level.toFixed(4));
+        el.style.setProperty("--alc-liquid", alcColour(S.level));
+      }
+      var st = S.level < 0.2 ? 0 : S.level < 0.7 ? 1 : 2;
+      if (st !== shown.stage) {
+        shown.stage = st;
+        el.setAttribute("data-stage", String(st));
+        stops.forEach(function (s, i) {
+          if (i === st) s.setAttribute("aria-current", "step");
+          else s.removeAttribute("aria-current");
+        });
+      }
+      var done = S.drops.length >= FULL && S.level > 0.9 && !reset;
+      if (done !== shown.complete) {
+        shown.complete = done;
+        el.classList.toggle("is-complete", done);
+      }
+      if (svg && !el.classList.contains("is-gl")) paintGlass(t);
+    }
+
+    function tick() {
+      var t = S.now();
+      var dt = Math.min(0.1, Math.max(0, t - last));
+      last = t;
+
+      if (demoAt && t >= demoAt) {
+        demoAt = 0;
+        if (S.ghostOn) demoAt = t + 1.2; // someone is about to click: wait
+        else if (!touched && !reset && S.drops.length < FULL) {
+          add(SPOTS[S.drops.length], false);
+          if (S.drops.length < FULL) demoAt = t + 2.8;
+        }
+      }
+      if (reset) stepReset(t);
+      if (nudge && t > nudge) {
+        nudge = 0;
+        if (btn) btn.classList.remove("is-nudge");
+      }
+
+      // A still glass times its pieces on the frozen clock, so read the acid
+      // off that clock too.
+      var goal = target(S.still ? S.frozen : t);
+      S.level += (goal - S.level) * (1 - Math.exp(-dt / (S.still ? 0.3 : FOLLOW)));
+      if (Math.abs(goal - S.level) < 0.0004) S.level = goal;
+
+      var g = S.ghostOn && !reset && S.drops.length < FULL ? 1 : 0;
+      S.ghostA += (g - S.ghostA) * (1 - Math.exp(-dt / 0.14));
+      if (S.ghostA < 0.002 && !g) S.ghostA = 0;
+
+      paint(t);
+    }
+
+    // The sprite sheet (the flowers, the pieces, the button's icon) is
+    // referenced by data- attributes only, so it costs nothing on first
+    // paint; it is attached once the section is within a screen of view.
+    function attachArt() {
+      $$("image[data-href]", el).forEach(function (im) {
+        im.setAttribute("href", im.getAttribute("data-href"));
+      });
+      $$("[data-bg]", el).forEach(function (n) {
+        n.style.backgroundImage = "url('" + n.getAttribute("data-bg") + "')";
+      });
+    }
+
+    function glassX(e) {
+      var r = vessel.getBoundingClientRect();
+      return (e.clientX - (r.left + r.width / 2)) / (r.height / 2);
+    }
+
+    function armDemo(delay) {
+      if (ALC_NO_DEMO || touched || S.still || reset || demoAt) return;
+      if (S.drops.length < FULL) demoAt = S.now() + delay;
+    }
+
+    return {
+      init: function () {
+        if (!vessel || !btn) return;
+        S.still = isStill();
+
+        offs.push(
+          on(btn, "click", function () {
+            if (reset) return;
+            if (S.drops.length >= FULL) startReset();
+            else
+              add(
+                SPOTS[S.drops.length] + (frac(seedN * 0.381966) - 0.5) * 0.06,
+                true
+              );
+          })
+        );
+        if (stage) {
+          offs.push(
+            on(stage, "click", function (e) {
+              if (reset) return;
+              if (S.drops.length >= FULL) {
+                // Nothing left to add — point at what you can do instead.
+                touched = true;
+                btn.classList.add("is-nudge");
+                nudge = S.now() + 0.7;
+                return;
+              }
+              add(glassX(e), true);
+            })
+          );
+          offs.push(
+            on(stage, "pointermove", function (e) {
+              if (e.pointerType !== "mouse") return;
+              S.ghostOn = true;
+              S.ghostX = clamp(glassX(e), -0.3, 0.3);
+            })
+          );
+          offs.push(
+            on(stage, "pointerleave", function () {
+              S.ghostOn = false;
+            })
+          );
+        }
+
+        offs.push(
+          HOC.bind("tierchange", function () {
+            var still = isStill();
+            if (still === S.still) return;
+            S.still = still;
+            if (!still) {
+              // Motion back on: the pieces stay settled, now on the live clock.
+              S.drops.forEach(function (d) {
+                d.t0 = S.now() - 60;
+              });
+              return;
+            }
+            // Motion switched off mid-reaction: settle everything where it
+            // was headed, now.
+            demoAt = 0;
+            S.frozen = Math.max(100, S.now());
+            S.drops.forEach(function (d) {
+              d.t0 = S.frozen - 60;
+            });
+            if (reset) {
+              reset = null;
+              empty();
+              S.fill = 1;
+              syncControls();
+            }
+          })
+        );
+
+        if ("IntersectionObserver" in root) {
+          ioNear = new IntersectionObserver(
+            function (entries) {
+              if (!entries[entries.length - 1].isIntersecting) return;
+              attachArt();
+              ioNear.disconnect();
+            },
+            { rootMargin: "0px 0px 100% 0px" }
+          );
+          ioNear.observe(el);
+          io = new IntersectionObserver(function (entries) {
+            var vis = entries[entries.length - 1].isIntersecting;
+            if (vis === S.visible) return;
+            S.visible = vis;
+            if (vis) {
+              last = S.now();
+              HOC.ticker.add(tick);
+              return;
+            }
+            HOC.ticker.remove(tick);
+            demoAt = 0;
+            // Nobody touched it: put it back so the next visit sees it.
+            if (!touched && !reset && S.drops.length) {
+              empty();
+              syncControls();
+              paint(S.now());
+            }
+          });
+          io.observe(el);
+          // The demo only starts once most of the glass is actually on
+          // screen, and pauses while it is not.
+          ioGlass = new IntersectionObserver(
+            function (entries) {
+              var e = entries[entries.length - 1];
+              if (e.isIntersecting && e.intersectionRatio >= 0.55)
+                armDemo(S.drops.length ? 1.2 : 1.6);
+              else demoAt = 0;
+            },
+            { threshold: [0, 0.55] }
+          );
+          ioGlass.observe(vessel);
+        } else {
+          attachArt();
+          S.visible = true;
+          HOC.ticker.add(tick);
+        }
+
+        syncControls();
+        paint(0);
+      },
+      destroy: function () {
+        offs.forEach(function (f) {
+          f();
+        });
+        if (io) io.disconnect();
+        if (ioGlass) ioGlass.disconnect();
+        if (ioNear) ioNear.disconnect();
+        HOC.ticker.remove(tick);
+        pieces.forEach(function (g) {
+          if (g.parentNode) g.parentNode.removeChild(g);
+        });
+        delete el.__alc;
+      }
+    };
+  });
+
+  /* ======================================================================
      13. RITUAL  §20
      ====================================================================== */
 

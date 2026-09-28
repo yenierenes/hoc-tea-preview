@@ -571,148 +571,220 @@
 
   /* ======================================================================
      7. COLOR ALCHEMY  §14 — SIGNATURE #3
+
+     The rendered glass. The reaction itself and everything you can operate
+     — the button, the four pieces, the scale, the status line — live in
+     hoc-core.js and work without any of this. This layer reads that state
+     (el.__alc) each frame and draws it, and only takes over from the SVG
+     glass once a real frame exists.
      ====================================================================== */
 
-  function hexToVec(h) {
-    h = (h || "").trim().replace("#", "");
-    if (h.length === 3) h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
-    var n = parseInt(h || "000000", 16);
-    return [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255];
-  }
-
   HOC.controller("alchemy", function (el) {
-    var track = HOC.$('[data-hoc="alchemy-track"]', el);
     var canvas = HOC.$('[data-hoc="alchemy-gl"]', el);
-    var fallback = HOC.$('[data-hoc="alchemy-fallback"]', el);
-    var drop = HOC.$('[data-hoc="alchemy-drop"]', el);
-    var hint = HOC.$('[data-hoc="alchemy-hint"]', el);
-    var chain = HOC.$$(".hoc-alchemy__chain [data-step]", el);
-    var stage = HOC.$(".hoc-alchemy__stage", el);
-
+    var vessel = HOC.$('[data-hoc="alchemy-vessel"]', el);
+    var S = el.__alc;
     var gl = null,
-      st = null,
-      offs = [],
-      visible = false;
-    var scrollP = 0;
-    var pointerBoost = 0; // grows with travel, decays slowly
-    var px = 0.5,
-      py = 0.5,
-      tx = 0.5,
-      ty = 0.5,
-      vel = 0;
-    var dropX = null,
-      dropY = null;
+      img = null,
+      ready = false,
+      measured = false,
+      dirty = true,
+      frame = 0,
+      sig = "",
+      ro = null,
+      near = null,
+      offs = [];
+    var drops = new Float32Array(16);
+    // Adaptive resolution: a GPU that cannot hold ~30fps with this glass on
+    // screen gets fewer pixels, then the SVG glass. A pinned ?hoctier= is a
+    // deliberate QA choice and is left alone, as the tier sampler does.
+    var pinned = /[?&]hoctier=/.test(root.location.search);
+    var cap = 0,
+      perf = { n: 0, sum: 0, last: 0 };
 
-    function useFallback() {
-      if (fallback) fallback.classList.add("is-on");
-      if (hint) hint.classList.add("is-off");
+    // Reduced motion still gets the rendered glass, only without movement:
+    // hoc-core.js freezes the clock and settles every piece on arrival.
+    // A tier forced to "reduced" (QA) or no WebGL gets the SVG glass.
+    function wanted() {
+      return !!(
+        S && canvas && vessel && HOC.GL && env.webgl && !HOC.designMode &&
+        (env.tier !== "reduced" || env.reduced)
+      );
     }
 
-    function onMove(e) {
-      var r = stage.getBoundingClientRect();
-      var nx = (e.clientX - r.left) / r.width;
-      var ny = (e.clientY - r.top) / r.height;
-      var d = Math.hypot(nx - tx, 1 - ny - ty);
-      tx = nx;
-      ty = 1 - ny;
-      vel = Math.min(1, vel + d * 3.2);
-      // Moving across the surface is what spreads the catalyst.
-      pointerBoost = Math.min(1, pointerBoost + d * 0.55);
-      if (hint && pointerBoost > 0.08) hint.classList.add("is-off");
-      if (dropX) {
-        dropX(e.clientX - r.left);
-        dropY(e.clientY - r.top);
+    function dpr() {
+      var d = Math.min(root.devicePixelRatio || 1, full() ? 2 : 1.5);
+      return cap ? Math.min(d, cap) : d;
+    }
+
+    /** Frame pacing while the glass is on screen. False once it gave up. */
+    function pace() {
+      if (pinned) return true;
+      var t = performance.now();
+      var gap = t - perf.last;
+      perf.last = t;
+      if (gap > 250) return true; // a tab switch or a hitch, not the GPU
+      perf.sum += gap;
+      if (++perf.n < 90) return true;
+      var avg = perf.sum / perf.n;
+      perf.n = perf.sum = 0;
+      if (avg <= 34) return true;
+      var d = dpr();
+      if (d > 1.01) {
+        cap = Math.max(1, d - 0.5);
+        fit();
+        return true;
+      }
+      if (avg > 55) {
+        giveUp();
+        return false;
+      }
+      return true;
+    }
+
+    // The glass is laid out by CSS (the vessel box); the shader only needs
+    // to know where that box sits on the canvas, in canvas pixels.
+    function measure() {
+      if (!gl) return;
+      var c = canvas.getBoundingClientRect();
+      var v = vessel.getBoundingClientRect();
+      if (c.width < 1 || v.height < 1) return;
+      var k = canvas.width / c.width;
+      gl.set("uVessel", [
+        (v.left + v.width / 2 - c.left) * k,
+        (c.bottom - v.top - v.height / 2) * k,
+        (v.width / 2) * k,
+        (v.height / 2) * k
+      ]);
+      measured = true;
+      dirty = true;
+    }
+
+    function fit() {
+      if (!gl) return;
+      gl.resize(dpr());
+      measure();
+    }
+
+    function giveUp() {
+      HOC.ticker.remove(tick);
+      ready = false;
+      el.classList.remove("is-gl");
+      if (gl) {
+        gl.destroy();
+        gl = null;
       }
     }
 
-    function tick(time) {
-      if (!gl || !visible || gl.lost) return;
-      px += (tx - px) * 0.12;
-      py += (ty - py) * 0.12;
-      vel *= 0.93;
-      pointerBoost *= 0.997; // pigment settles back very slowly
+    function tick() {
+      if (!gl || !ready) return;
+      if (gl.lost) return giveUp();
+      if (!S.visible) {
+        perf.last = 0;
+        return;
+      }
+      if (!pace()) return;
+      if (!measured || ++frame % 45 === 0) measure();
+      if (!measured) return;
 
-      var level = Math.min(1.05, scrollP * 0.72 + pointerBoost * 0.62);
-      gl.set("uPointer", [px, py])
-        .set("uVelocity", vel)
-        .set("uProgress", level)
-        .set("uTime", time / 1000)
+      for (var i = 0; i < 4; i++) {
+        var d = S.drops[i];
+        drops[i * 4] = d ? d.x : 0;
+        drops[i * 4 + 1] = d ? d.t0 : 0;
+        drops[i * 4 + 2] = d ? d.k : 0; // strength 0 marks an empty slot
+        drops[i * 4 + 3] = d ? d.seed : 0;
+      }
+      // A frozen clock only needs a frame when something actually changed.
+      if (S.still) {
+        var now = [
+          S.level.toFixed(4), S.fill.toFixed(3), S.fade.toFixed(3),
+          S.drops.length, S.ghostA.toFixed(2), S.ghostX.toFixed(3)
+        ].join();
+        if (now === sig && !dirty) return;
+        sig = now;
+      }
+      dirty = false;
+      gl.set("uTime", S.still ? S.frozen : S.now())
+        .set("uLevel", S.level)
+        .set("uFill", S.fill)
+        .set("uFade", S.fade)
+        .set("uDrop", drops)
+        .set("uGhost", [S.ghostX, S.ghostA])
         .render();
-
-      var stepI = level < 0.3 ? 0 : level < 0.68 ? 1 : 2;
-      chain.forEach(function (c, i) {
-        c.style.opacity = i === stepI ? "1" : "0.45";
-      });
+      if (!el.classList.contains("is-gl")) el.classList.add("is-gl");
     }
 
     return {
       init: function () {
-        if (!canvas || !HOC.GL || reduced() || !env.webgl || HOC.designMode) {
-          useFallback();
-        } else {
-          gl = HOC.GL(canvas, HOC.shaderAlchemy, { alpha: false });
-          if (!gl) useFallback();
-        }
+        if (!wanted()) return;
+        gl = HOC.GL(canvas, HOC.shaderAlchemy, { alpha: false });
+        if (!gl) return;
+        gl.set("uBg", [11 / 255, 12 / 255, 20 / 255])
+          .set("uLevel", 0)
+          .set("uFill", 1)
+          .set("uFade", 0)
+          .set("uGhost", [0, 0]);
+        fit();
 
-        if (gl) {
-          var cs = getComputedStyle(el);
-          gl.resize(full() ? 1.75 : 1.25)
-            // Deeper than the UI accents: this is pigment in a dark room,
-            // not a neon gradient (§59).
-            .set("uBlue", hexToVec("#1B2A6E"))
-            .set("uViolet", hexToVec("#553784"))
-            .set("uMagenta", hexToVec("#9C2F63"))
-            .set("uGlass", 1)
-            .set("uPointer", [0.5, 0.5])
-            .set("uVelocity", 0)
-            .set("uProgress", 0)
-            .render();
+        // The flowers and hibiscus are real drawings (the atlas plates), so
+        // nothing is shown until they are on the GPU — and they are only
+        // fetched once the section is within a screen of view.
+        var src = el.getAttribute("data-sprites") || "";
+        var triedPng = false;
+        img = new Image();
+        img.crossOrigin = "anonymous";
+        img.decoding = "async";
+        img.onload = function () {
+          if (!gl) return;
+          // False over file:// (a tainted image): the SVG glass stays.
+          if (!gl.texture("uSprites", img, { premultiply: true, mipmap: true }))
+            return giveUp();
+          ready = true;
+          dirty = true;
           HOC.ticker.add(tick);
-        }
-
-        if (ScrollTrigger && track) {
-          st = ScrollTrigger.create({
-            trigger: track,
-            start: "top top",
-            end: "bottom bottom",
-            onUpdate: function (self) {
-              scrollP = self.progress;
-              if (fallback && fallback.classList.contains("is-on"))
-                fallback.style.opacity = String(0.35 + self.progress * 0.65);
+        };
+        img.onerror = function () {
+          if (!triedPng && /\.webp(\?|$)/.test(src)) {
+            triedPng = true;
+            img.src = src.replace(/\.webp(\?|$)/, ".png$1");
+          } else giveUp();
+        };
+        if ("IntersectionObserver" in root) {
+          near = new IntersectionObserver(
+            function (entries) {
+              if (!entries[entries.length - 1].isIntersecting) return;
+              near.disconnect();
+              img.src = src;
             },
-            onToggle: function (self) {
-              visible = self.isActive;
-            }
+            { rootMargin: "0px 0px 100% 0px" }
+          );
+          near.observe(el);
+        } else img.src = src;
+
+        if ("ResizeObserver" in root) {
+          ro = new ResizeObserver(function () {
+            fit();
           });
+          ro.observe(el);
+          ro.observe(vessel);
         }
-
-        if (drop && !env.touch && gsap) {
-          dropX = gsap.quickTo(drop, "x", { duration: 0.22, ease: EASE });
-          dropY = gsap.quickTo(drop, "y", { duration: 0.22, ease: EASE });
-        }
-        if (!env.touch && stage) offs.push(HOC.onEl(stage, "pointermove", onMove));
-
+        if (doc.fonts && doc.fonts.ready) doc.fonts.ready.then(measure);
         offs.push(
           HOC.bind("tierchange", function () {
-            if (reduced() && gl) {
-              HOC.ticker.remove(tick);
-              gl.destroy();
-              gl = null;
-              useFallback();
-            }
+            if (!gl) return;
+            if (!wanted()) giveUp();
+            else fit();
           })
         );
       },
-      resize: function () {
-        if (gl) gl.resize(full() ? 1.75 : 1.25).render();
-      },
+      resize: fit,
       destroy: function () {
         offs.forEach(function (f) {
           f();
         });
-        HOC.ticker.remove(tick);
-        if (gl) gl.destroy();
-        if (st) st.kill();
+        if (ro) ro.disconnect();
+        if (near) near.disconnect();
+        if (img) img.onload = img.onerror = null;
+        giveUp();
       }
     };
   });

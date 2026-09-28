@@ -731,143 +731,505 @@
 
 /* ==========================================================================
    05  COLOR ALCHEMY  §14
+   One cause, one control, one effect you can read. Hibiscus goes in; the
+   butterfly-pea blue turns violet, then magenta; the scale names each stage
+   as the glass reaches it. hoc-motion.js renders the glass in WebGL; the SVG
+   glass here is what shows without it (and in the theme editor).
    ========================================================================== */
 
 .hoc-alchemy {
+  /* The liquid as it reads at the centre of the glass. hoc-core.js mixes
+     these into --alc-liquid on the same ramp as the shader. */
+  --alc-blue: #162fa8;
+  --alc-violet: #6226a9;
+  --alc-magenta: #c31c62;
+  --alc-hibiscus: #b4324b;
+  --alc-liquid: var(--alc-blue);
+  --alc-level: 0;
+  --alc-w: min(32svh, 300px);
+  --alc-ground: #0b0c14;
   position: relative;
-  background: #0e0f17;
-}
-.hoc-alchemy__track {
-  height: 280vh;
-}
-@media (max-width: 899px) {
-  .hoc-alchemy__track {
-    height: 200vh;
-  }
-}
-.hoc-alchemy__stage {
-  position: sticky;
-  top: 0;
-  height: 100svh;
   overflow: hidden;
-  display: flex;
-  align-items: center;
-  cursor: none; /* replaced by the catalyst indicator, section-local only §14 */
+  isolation: isolate;
+  background: var(--alc-ground);
+  color: var(--hoc-bone);
 }
-@media (hover: none) {
-  .hoc-alchemy__stage {
-    cursor: auto;
-  }
-}
-.hoc-alchemy__gl,
-.hoc-alchemy__fallback {
+
+.hoc-alchemy__gl {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-}
-.hoc-alchemy__fallback {
-  background: linear-gradient(
-    118deg,
-    #1b2a7a 0%,
-    #3d2f86 34%,
-    #7a3a86 68%,
-    #b0417e 100%
-  );
   opacity: 0;
-  transition: opacity 0.6s var(--e-hoc);
-}
-.hoc-alchemy__fallback.is-on {
-  opacity: 1;
-}
-.hoc-alchemy__copy {
-  position: relative;
-  width: 100%;
-  color: var(--hoc-bone);
-  mix-blend-mode: normal;
+  transition: opacity 0.9s var(--e-hoc);
   pointer-events: none;
 }
-.hoc-alchemy__copy .hoc-micro {
-  color: rgb(241 239 232 / 0.72);
-  margin-bottom: 1.25rem;
+.hoc-alchemy.is-gl .hoc-alchemy__gl {
+  opacity: 1;
 }
-.hoc-alchemy__copy h2 {
-  max-width: 13ch;
-  text-shadow: 0 2px 40px rgb(10 10 20 / 0.35);
+
+.hoc-alchemy__inner {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  min-height: 100svh;
+  grid-template-columns: minmax(0, 40fr) minmax(0, 26fr) minmax(0, 34fr);
+  grid-template-rows: 1fr auto auto auto 1fr;
+  grid-template-areas:
+    ".        stage scale"
+    "copy     stage scale"
+    "controls stage scale"
+    "outro    stage scale"
+    ".        stage scale";
+  column-gap: clamp(2rem, 4.5vw, 5.5rem);
+  padding-block: calc(var(--header-h) + clamp(1rem, 3vh, 2rem))
+    clamp(2.5rem, 7vh, 4.5rem);
+}
+
+/* ---- the words ------------------------------------------------------- */
+.hoc-alchemy__copy {
+  grid-area: copy;
+}
+.hoc-alchemy__eyebrow {
+  margin-bottom: 1.25rem;
+  color: rgb(241 239 232 / 0.66);
+}
+.hoc-alchemy__title {
+  max-width: 6em; /* "Watch nature / change its mind." — em, not ch (§5 note) */
+  font-size: clamp(2.625rem, 4.7vw, 5.25rem);
+}
+.hoc-alchemy__lede {
+  max-width: 37ch;
+  margin-top: clamp(1.25rem, 2.6vh, 1.75rem);
+  color: rgb(241 239 232 / 0.76);
+}
+
+/* ---- the one control --------------------------------------------------- */
+.hoc-alchemy__controls {
+  grid-area: controls;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.9rem 1.15rem;
+  margin-top: clamp(1.75rem, 4vh, 2.5rem);
+}
+.hoc-alchemy__add {
+  --btn-edge: rgb(241 239 232 / 0.55);
+  padding-inline: 1.2em 1.9em;
+}
+/* What you are adding, cut from the same drawing the glass uses. The
+   image itself is set inline, so its URL resolves against the page and not
+   against this stylesheet. */
+.hoc-alchemy__icon {
+  flex: none;
+  width: 2.3em;
+  height: 2.3em;
+  margin-block: -0.7em;
+  background-position: 0 0;
+  background-size: 200% 100%;
+  background-repeat: no-repeat;
+  transition: transform var(--t-ui) var(--e-hoc);
+}
+.hoc-alchemy__add:hover .hoc-alchemy__icon,
+.hoc-alchemy__add:focus-visible .hoc-alchemy__icon {
+  transform: rotate(-16deg) translateY(2px);
+}
+.hoc-alchemy__again {
+  display: none;
+  flex: none;
+  width: 1.45em;
+  height: 1.45em;
+}
+.hoc-alchemy__add[data-mode="again"] {
+  padding-inline: 1.5em 1.9em;
+}
+.hoc-alchemy__add[data-mode="again"] .hoc-alchemy__icon {
+  display: none;
+}
+.hoc-alchemy__add[data-mode="again"] .hoc-alchemy__again {
+  display: block;
+}
+/* Touch browsers keep :hover on whatever was tapped last, which would leave
+   this button filled after the first of four taps — read as "stuck". The
+   fill stays for keyboard focus; on touch the press itself is the feedback. */
+@media (hover: none) {
+  .hoc-alchemy__add:hover:not(:focus-visible) {
+    color: var(--btn-fg);
+  }
+  .hoc-alchemy__add:hover:not(:focus-visible)::before {
+    transform: scale(1.02) translate3d(0, 101%, 0);
+  }
+  .hoc-alchemy__add:hover .hoc-alchemy__icon {
+    transform: none;
+  }
+  .hoc-alchemy__add:active {
+    transform: scale(0.97);
+  }
+}
+.hoc-alchemy__add.is-nudge {
+  animation: hoc-alc-nudge 0.62s var(--e-hoc);
+}
+@keyframes hoc-alc-nudge {
+  30% {
+    transform: translate3d(0, -3px, 0);
+    border-color: var(--hoc-bone);
+  }
+}
+
+/* One mark per piece; four turn the glass all the way. */
+.hoc-alchemy__dots {
+  display: inline-flex;
+  gap: 7px;
+}
+.hoc-alchemy__dots i {
+  width: 9px;
+  height: 9px;
+  border: 1px solid rgb(241 239 232 / 0.42);
+  border-radius: 50%;
+  transition: background-color var(--t-ui) var(--e-hoc),
+    border-color var(--t-ui) var(--e-hoc), transform var(--t-ui) var(--e-hoc);
+}
+.hoc-alchemy__dots i.is-on {
+  background: var(--alc-hibiscus);
+  border-color: var(--alc-hibiscus);
+  transform: scale(1.15);
 }
 .hoc-alchemy__hint {
-  margin-top: 1.75rem;
-  color: rgb(241 239 232 / 0.55);
+  flex-basis: 100%;
+  color: rgb(241 239 232 / 0.5);
   transition: opacity var(--t-ui) var(--e-hoc);
 }
-.hoc-alchemy__hint.is-off {
+.hoc-alchemy__hint .is-touch {
+  display: none;
+}
+@media (hover: none) {
+  .hoc-alchemy__hint .is-hover {
+    display: none;
+  }
+  .hoc-alchemy__hint .is-touch {
+    display: inline;
+  }
+}
+.hoc-alchemy.is-full .hoc-alchemy__hint {
   opacity: 0;
 }
 
-.hoc-alchemy__chain {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: clamp(1.5rem, 5vh, 3rem);
+/* ---- the glass --------------------------------------------------------- */
+.hoc-alchemy__stage {
+  grid-area: stage;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: clamp(0.6rem, 1.6vw, 1.25rem);
-  padding-inline: var(--gutter);
-  color: rgb(241 239 232 / 0.8);
-  pointer-events: none;
-  flex-wrap: wrap;
+  min-width: 0;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
-.hoc-alchemy__chain li {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
+.hoc-alchemy.is-full .hoc-alchemy__stage,
+.hoc-alchemy.is-resetting .hoc-alchemy__stage,
+html:not(.hoc-js) .hoc-alchemy__stage {
+  cursor: default;
 }
-.hoc-swatch {
-  width: 12px;
-  height: 12px;
-  background: var(--s);
-  border-start-start-radius: 3px;
-  border-end-end-radius: 3px;
+.hoc-alchemy__vessel {
+  position: relative;
   flex: none;
-}
-.hoc-alchemy__plus,
-.hoc-alchemy__arrow {
-  opacity: 0.45;
+  width: min(100%, var(--alc-w));
+  aspect-ratio: 1 / 2;
 }
 
-/* Local catalyst indicator. Not a site-wide custom cursor §14, §59. */
-.hoc-alchemy__drop {
+/* The SVG glass: the whole story without WebGL. */
+.hoc-alchemy__glass {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 34px;
-  height: 34px;
-  margin: -17px 0 0 -17px;
-  border: 1px solid rgb(241 239 232 / 0.7);
-  border-start-start-radius: 50%;
-  border-end-end-radius: 50%;
-  border-start-end-radius: 50%;
-  border-end-start-radius: 50%;
-  opacity: 0;
-  transition: opacity var(--t-micro) var(--e-hoc),
-    transform var(--t-micro) var(--e-hoc);
-  pointer-events: none;
-  will-change: transform;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  transition: opacity 0.6s var(--e-hoc), visibility 0s linear 0s;
 }
-.hoc-alchemy__drop::after {
+.hoc-alchemy.is-gl .hoc-alchemy__glass {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.6s var(--e-hoc), visibility 0s linear 0.6s;
+}
+/* a backlight the colour of whatever it shines through */
+.hoc-alchemy__vessel::before {
   content: "";
   position: absolute;
-  inset: 12px;
-  background: #b4324b;
-  border-radius: 50%;
+  inset: -16% -75% -10%;
+  z-index: -1;
+  background: radial-gradient(
+    closest-side,
+    color-mix(in srgb, var(--alc-liquid) 30%, transparent),
+    transparent
+  );
+  transition: opacity 0.6s var(--e-hoc);
+  pointer-events: none;
 }
-.hoc-alchemy__stage:hover .hoc-alchemy__drop {
+.hoc-alchemy.is-gl .hoc-alchemy__vessel::before {
+  opacity: 0;
+}
+.hoc-alchemy__g-back {
+  fill: rgb(241 239 232 / 0.035);
+}
+.hoc-alchemy__g-liquid {
+  transition: opacity 0.25s linear;
+}
+.hoc-alchemy__g-body,
+.hoc-alchemy__g-tint,
+.hoc-alchemy__g-surface {
+  fill: var(--alc-liquid);
+}
+.hoc-alchemy__g-tint {
+  opacity: 0.4;
+}
+.hoc-alchemy__g-sheen {
+  fill: rgb(255 255 255 / 0.14);
+}
+.hoc-alchemy__g-foot {
+  fill: var(--alc-liquid);
+  opacity: 0.28;
+}
+.hoc-alchemy__g-spec {
+  fill: rgb(255 255 255 / 0.1);
+}
+.hoc-alchemy__g-line {
+  fill: none;
+  stroke: rgb(241 239 232 / 0.52);
+  stroke-width: 1.25px;
+  vector-effect: non-scaling-stroke;
+}
+.hoc-alchemy__g-line--soft {
+  stroke: rgb(241 239 232 / 0.22);
+}
+
+/* ---- the scale ----------------------------------------------------------- */
+.hoc-alchemy__scale {
+  grid-area: scale;
+  align-self: center;
+  justify-self: start;
+  width: 100%;
+  max-width: 21rem;
+}
+.hoc-alchemy__scalehead {
+  margin-bottom: clamp(1rem, 2.6vh, 1.75rem);
+  color: rgb(241 239 232 / 0.66);
+}
+.hoc-alchemy__meter {
+  position: relative;
+}
+.hoc-alchemy__stops {
+  display: grid;
+  grid-auto-rows: 1fr;
+}
+.hoc-alchemy__stops li {
+  display: grid;
+  grid-template-columns: 1.25rem minmax(0, 1fr);
+  column-gap: 1.15rem;
+  align-content: center;
+  align-items: center;
+  padding-block: clamp(0.85rem, 2.3vh, 1.45rem);
+  opacity: 0.4;
+  transition: opacity var(--t-ui) var(--e-hoc);
+}
+.hoc-alchemy__stops li[aria-current] {
   opacity: 1;
 }
-@media (hover: none) {
-  .hoc-alchemy__drop {
+.hoc-alchemy__sw {
+  position: relative;
+  z-index: 1;
+  grid-row: 1 / span 2;
+  justify-self: center;
+  width: 0.8rem;
+  height: 0.8rem;
+  border-radius: 50%;
+  background: var(--sw);
+  box-shadow: 0 0 0 4px var(--alc-ground);
+}
+.hoc-alchemy [data-stop="0"] {
+  --sw: var(--alc-blue);
+}
+.hoc-alchemy [data-stop="1"] {
+  --sw: var(--alc-violet);
+}
+.hoc-alchemy [data-stop="2"] {
+  --sw: var(--alc-magenta);
+}
+.hoc-alchemy__stopname {
+  grid-column: 2;
+  font-family: var(--ff-display);
+  font-size: clamp(1.75rem, 2.3vw, 2.5rem);
+  line-height: 1;
+  letter-spacing: var(--ls-display);
+}
+.hoc-alchemy__stopnote {
+  grid-column: 2;
+  margin-top: 0.4rem;
+  font-size: var(--fs-small);
+  line-height: 1.35;
+  color: rgb(241 239 232 / 0.66);
+}
+.hoc-alchemy__ph {
+  color: var(--hoc-bone);
+  font-variant-numeric: tabular-nums;
+}
+/* The rail runs through the three swatches; the marker is the glass, read
+   off the same number its colour comes from. */
+.hoc-alchemy__rail {
+  position: absolute;
+  top: calc(100% / 6);
+  bottom: calc(100% / 6);
+  left: calc(0.625rem - 1px);
+  width: 2px;
+}
+.hoc-alchemy__rail::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 1px;
+  background: linear-gradient(
+    var(--alc-blue),
+    var(--alc-violet),
+    var(--alc-magenta)
+  );
+  opacity: 0.5;
+}
+.hoc-alchemy__marker {
+  position: absolute;
+  z-index: 2;
+  top: calc(var(--alc-level) * 100%);
+  left: 50%;
+  width: 1.3rem;
+  height: 1.3rem;
+  border-radius: 50%;
+  background: var(--alc-liquid);
+  box-shadow: 0 0 0 2px var(--alc-ground), 0 0 0 3.5px rgb(241 239 232 / 0.9),
+    0 0 22px 3px color-mix(in srgb, var(--alc-liquid) 65%, transparent);
+  transform: translate(-50%, -50%);
+}
+
+/* ---- the payoff ---------------------------------------------------------- */
+.hoc-alchemy__outro {
+  grid-area: outro;
+  max-width: 34ch;
+  margin-top: clamp(1.1rem, 2.4vh, 1.6rem);
+  opacity: 0;
+  visibility: hidden;
+  transform: translate3d(0, 0.6rem, 0);
+  transition: opacity 0.7s var(--e-hoc), transform 0.7s var(--e-hoc),
+    visibility 0s linear 0.7s;
+}
+.hoc-alchemy.is-complete .hoc-alchemy__outro,
+html:not(.hoc-js) .hoc-alchemy__outro {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition-delay: 0s;
+}
+.hoc-alchemy__outro p {
+  margin-bottom: 0.9rem;
+  color: rgb(241 239 232 / 0.82);
+}
+html:not(.hoc-js) .hoc-alchemy__controls {
+  display: none;
+}
+
+/* ---- phones and small tablets: one column, the glass and its control
+        kept together so both are on screen when you press it ----------- */
+@media (max-width: 899px) {
+  .hoc-alchemy {
+    --alc-w: min(22svh, 190px);
+  }
+  .hoc-alchemy__inner {
+    min-height: 0;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: none;
+    grid-template-areas: "copy" "stage" "controls" "scale" "outro";
+    padding-block: calc(var(--header-h) + 1.5rem) 3.5rem;
+  }
+  .hoc-alchemy__lede {
+    max-width: 40ch;
+  }
+  .hoc-alchemy__stage {
+    padding-block: calc(var(--alc-w) * 0.5) calc(var(--alc-w) * 0.14);
+  }
+  .hoc-alchemy__vessel {
+    width: var(--alc-w);
+  }
+  .hoc-alchemy__controls {
+    justify-content: center;
+    margin-top: 0.35rem;
+  }
+  .hoc-alchemy__hint {
+    text-align: center;
+  }
+  .hoc-alchemy__scale {
+    justify-self: stretch;
+    max-width: 30rem;
+    margin: 2.25rem auto 0;
+  }
+  .hoc-alchemy__scalehead {
+    text-align: center;
+  }
+  .hoc-alchemy__stops {
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+    grid-auto-rows: auto;
+  }
+  .hoc-alchemy__stops li {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+    align-content: start;
+    padding: 0 0.25rem;
+    text-align: center;
+  }
+  .hoc-alchemy__sw {
+    grid-row: auto;
+    margin-bottom: 0.7rem;
+  }
+  .hoc-alchemy__stopname,
+  .hoc-alchemy__stopnote {
+    grid-column: 1;
+  }
+  .hoc-alchemy__stopname {
+    font-size: 1.5rem;
+  }
+  .hoc-alchemy__stopnote {
+    font-size: 0.75rem;
+  }
+  /* pH on its own line, the caption under it — no orphaned last word */
+  .hoc-alchemy__ph {
+    display: block;
+    margin-bottom: 0.15rem;
+  }
+  .hoc-alchemy__sep {
     display: none;
+  }
+  .hoc-alchemy__rail {
+    top: calc(0.4rem - 1px);
+    bottom: auto;
+    left: calc(100% / 6);
+    right: calc(100% / 6);
+    width: auto;
+    height: 2px;
+  }
+  .hoc-alchemy__rail::before {
+    background: linear-gradient(
+      90deg,
+      var(--alc-blue),
+      var(--alc-violet),
+      var(--alc-magenta)
+    );
+  }
+  .hoc-alchemy__marker {
+    top: 50%;
+    left: calc(var(--alc-level) * 100%);
+  }
+  .hoc-alchemy__outro {
+    justify-self: center;
+    margin-top: 2rem;
+    text-align: center;
   }
 }
 
@@ -1807,9 +2169,12 @@
 }
 .hoc-ritual__btn {
   display: grid;
-  grid-template-columns: 2.25rem minmax(6rem, 0.4fr) minmax(0, 1fr);
-  align-items: center;
-  gap: 0.35rem clamp(0.75rem, 1.5vw, 1.5rem);
+  /* name | instruction. (A step-number column used to lead this grid; the
+     numbers were removed, so the name took that 2.25rem track and ran into
+     the text beside it.) */
+  grid-template-columns: minmax(7.5rem, 0.3fr) minmax(0, 1fr);
+  align-items: baseline;
+  gap: 0.35rem clamp(1rem, 2vw, 2rem);
   width: 100%;
   padding-block: clamp(0.9rem, 1.65vh, 1.25rem);
   text-align: left;
@@ -1839,9 +2204,10 @@
 }
 .hoc-ritual__cold {
   display: grid;
-  grid-template-columns: minmax(6rem, 0.4fr) minmax(0, 1fr);
-  gap: clamp(0.75rem, 1.5vw, 1.5rem);
-  padding: 1.25rem 0 0 3rem;
+  grid-template-columns: minmax(7.5rem, 0.3fr) minmax(0, 1fr);
+  align-items: baseline;
+  gap: clamp(1rem, 2vw, 2rem);
+  padding: 1.25rem 0 0;
   font-size: clamp(0.875rem, 1vw, 1rem);
   line-height: 1.5;
   color: var(--on-surface-dim);
@@ -1851,14 +2217,10 @@
 }
 @media (min-width: 900px) and (max-width: 1199px) {
   .hoc-ritual__btn {
-    grid-template-columns: 2rem minmax(0, 1fr);
-  }
-  .hoc-ritual__copy {
-    grid-column: 2;
+    grid-template-columns: minmax(0, 1fr);
   }
   .hoc-ritual__cold {
     display: block;
-    padding-left: 3rem;
   }
   .hoc-ritual__cold .hoc-micro {
     display: block;
@@ -1880,26 +2242,25 @@
     display: block;
   }
   .hoc-ritual__btn {
-    grid-template-columns: 2rem minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 1fr) auto;
     padding-block: 1rem;
   }
   .hoc-ritual__label {
-    grid-column: 2;
+    grid-column: 1;
   }
   .hoc-ritual__inline-data {
     display: block;
-    grid-column: 3;
+    grid-column: 2;
     color: var(--hoc-teal-deep);
     text-align: right;
   }
   .hoc-ritual__copy {
-    grid-column: 2 / -1;
+    grid-column: 1 / -1;
     max-width: 58ch;
   }
   .hoc-ritual__cold {
     grid-template-columns: 1fr;
     gap: 0.35rem;
-    padding-left: 3rem;
   }
 }
 @media (prefers-reduced-motion: reduce) {

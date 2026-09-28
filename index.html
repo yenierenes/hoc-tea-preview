@@ -9,13 +9,18 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" as="image" href="assets/img/hero-poster.jpg?v=c191b17f13"
+<!-- One preload per crop, matching the <picture> sources exactly, so a phone
+     preloads the portrait poster it shows and never also the landscape one. -->
+<link rel="preload" as="image" media="(max-width: 767px)"
+      imagesrcset="assets/img/hero-poster-mobile-540.webp?v=25042bf2a0 540w, assets/img/hero-poster-mobile-780.webp?v=1e9e27556c 780w, assets/img/hero-poster-mobile-1080.webp?v=69c357dd82 1080w"
+      imagesizes="100vw" fetchpriority="high">
+<link rel="preload" as="image" media="(min-width: 768px)"
       imagesrcset="assets/img/hero-poster-960.webp?v=7ebbaf5492 960w, assets/img/hero-poster-1280.webp?v=762eac0520 1280w, assets/img/hero-poster-1600.webp?v=870d182e07 1600w, assets/img/hero-poster-1920.webp?v=cda70ab518 1920w"
       imagesizes="100vw" fetchpriority="high">
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="assets/css/hoc-core.css?v=b13c2b46f4">
-<link rel="stylesheet" href="assets/css/hoc-sections.css?v=1c7a2d5872">
+<link rel="stylesheet" href="assets/css/hoc-core.css?v=9dc81688f6">
+<link rel="stylesheet" href="assets/css/hoc-sections.css?v=5f044bbfbe">
 <script>document.documentElement.classList.add('hoc-js');</script>
 </head>
 <body>
@@ -413,28 +418,84 @@
     </section>
 
     <section class="hoc-section hoc-alchemy" id="alchemy" data-theme="ink"
-             data-header-theme="light" data-hoc="alchemy" style="--accent:#553B91;--accent-2:#8A75BD;--accent-wash:#E2DEED;--accent-ink:#342654;--liquid:#2B3A8F">
-      <div class="hoc-alchemy__track" data-hoc="alchemy-track">
-        <div class="hoc-alchemy__stage">
-          <canvas class="hoc-alchemy__gl" data-hoc="alchemy-gl" aria-hidden="true"></canvas>
-          <div class="hoc-alchemy__fallback" data-hoc="alchemy-fallback" aria-hidden="true"></div>
-
-          <div class="hoc-wrap hoc-alchemy__copy">
-            <p class="hoc-micro">Mystic Butterfly / Natural colour reaction</p>
-            <h2 class="hoc-display-l" data-split="lines">Watch nature change its mind.</h2>
-            <p class="hoc-alchemy__hint hoc-micro" data-hoc="alchemy-hint">Move across the glass</p>
-          </div>
-
-          <ol class="hoc-alchemy__chain" aria-label="Colour reaction">
-            <li data-step="0"><span class="hoc-swatch" style="--s:#2B3A8F"></span><span class="hoc-micro">Butterfly Pea</span></li>
-            <li class="hoc-alchemy__plus" aria-hidden="true">+</li>
-            <li data-step="1"><span class="hoc-swatch" style="--s:#B4324B"></span><span class="hoc-micro">Hibiscus</span></li>
-            <li class="hoc-alchemy__arrow" aria-hidden="true">→</li>
-            <li data-step="2"><span class="hoc-swatch" style="--s:#B0417E"></span><span class="hoc-micro">Magenta</span></li>
-          </ol>
-
-          <div class="hoc-alchemy__drop" data-hoc="alchemy-drop" aria-hidden="true"></div>
+             data-header-theme="light" data-hoc="alchemy" data-stage="0"
+             data-sprites="assets/img/alchemy-sprites.webp?v=94abe2a2b5" aria-labelledby="alchemy-title"
+             style="--accent:#553B91;--accent-2:#8A75BD;--accent-wash:#E2DEED;--accent-ink:#342654;--liquid:#2B3A8F">
+      <canvas class="hoc-alchemy__gl" data-hoc="alchemy-gl" aria-hidden="true"></canvas>
+      <div class="hoc-wrap hoc-alchemy__inner">
+        <div class="hoc-alchemy__copy">
+          <p class="hoc-micro hoc-alchemy__eyebrow">Mystic Butterfly · A colour reaction</p>
+          <h2 class="hoc-display-l hoc-alchemy__title" id="alchemy-title" data-split="lines">Watch nature change its mind.</h2>
+          <p class="hoc-alchemy__lede" data-reveal="up">Butterfly pea brews a deep blue, and its pigment changes colour with acidity. Hibiscus is naturally acidic. Add it, and the same tea turns violet, then magenta.</p>
         </div>
+
+        <div class="hoc-alchemy__stage">
+          <div class="hoc-alchemy__vessel" data-hoc="alchemy-vessel" aria-hidden="true">
+            <svg class="hoc-alchemy__glass" viewBox="-0.5 -1 1 2" focusable="false">
+              <defs>
+                <clipPath id="alc-main-in"><path d="M-0.437 -0.93175A0.437 0.06555 0 0 1 0.437 -0.93175L0.3796 0.86075A0.3796 0.05694 0 0 1 -0.3796 0.86075Z"/></clipPath>
+                <linearGradient id="alc-main-depth" x1="0" x2="1" y1="0" y2="0">
+                  <stop offset="0" stop-color="#05060e" stop-opacity=".62"/>
+                  <stop offset=".3" stop-color="#05060e" stop-opacity="0"/>
+                  <stop offset=".64" stop-color="#05060e" stop-opacity="0"/>
+                  <stop offset="1" stop-color="#05060e" stop-opacity=".68"/>
+                </linearGradient>
+              </defs>
+              <path class="hoc-alchemy__g-back" d="M-0.455 -0.93175A0.455 0.06825 0 0 1 0.455 -0.93175L0.395 0.94075A0.395 0.05925 0 0 1 -0.395 0.94075Z"/>
+              <g clip-path="url(#alc-main-in)">
+                <g class="hoc-alchemy__g-liquid"><rect class="hoc-alchemy__g-body" x="-0.5" y="-0.71175" width="1" height="1.71175"/></g>
+                <g class="hoc-alchemy__g-flowers">
+                  <g transform="translate(-0.215 0.8258) rotate(42.97) scale(0.078)"><svg x="-1" y="-1" width="2" height="2" viewBox="256 0 256 256" overflow="hidden"><image data-href="assets/img/alchemy-sprites.webp?v=94abe2a2b5" width="512" height="256"/></svg></g>
+                  <g transform="translate(0.0224 0.8072) rotate(-28.65) scale(0.088)"><svg x="-1" y="-1" width="2" height="2" viewBox="256 0 256 256" overflow="hidden"><image data-href="assets/img/alchemy-sprites.webp?v=94abe2a2b5" width="512" height="256"/></svg></g>
+                  <g transform="translate(0.1852 0.8187) rotate(-100.27) scale(0.098)"><svg x="-1" y="-1" width="2" height="2" viewBox="256 0 256 256" overflow="hidden"><image data-href="assets/img/alchemy-sprites.webp?v=94abe2a2b5" width="512" height="256"/></svg></g>
+                </g>
+                <g class="hoc-alchemy__g-sunk"></g>
+                <g class="hoc-alchemy__g-liquid">
+                  <rect class="hoc-alchemy__g-tint" x="-0.5" y="-0.71175" width="1" height="1.71175"/>
+                  <ellipse class="hoc-alchemy__g-surface" cx="0" cy="-0.71175" rx="0.42995" ry="0.06449"/>
+                  <ellipse class="hoc-alchemy__g-surface hoc-alchemy__g-sheen" cx="0" cy="-0.71175" rx="0.42995" ry="0.06449"/>
+                </g>
+                <rect x="-0.5" y="-1" width="1" height="2" fill="url(#alc-main-depth)"/>
+              </g>
+              <path class="hoc-alchemy__g-foot" d="M-0.3796 0.86075A0.3796 0.05694 0 0 0 0.3796 0.86075L0.395 0.94075A0.395 0.05925 0 0 1 -0.395 0.94075Z"/>
+              <path class="hoc-alchemy__g-spec" d="M-0.305 -0.8L-0.272 -0.8L-0.241 0.72L-0.273 0.72Z"/>
+              <path class="hoc-alchemy__g-spec" d="M0.357 -0.78L0.365 -0.78L0.326 0.7L0.318 0.7Z"/>
+              <path class="hoc-alchemy__g-line hoc-alchemy__g-line--soft" d="M-0.3796 0.86075A0.3796 0.05694 0 0 0 0.3796 0.86075"/>
+              <path class="hoc-alchemy__g-line" d="M-0.455 -0.93175A0.455 0.06825 0 0 1 0.455 -0.93175L0.395 0.94075A0.395 0.05925 0 0 1 -0.395 0.94075Z"/>
+              <ellipse class="hoc-alchemy__g-line" cx="0" cy="-0.93175" rx="0.446" ry="0.0669"/>
+              <g class="hoc-alchemy__g-air"></g>
+            </svg>
+          </div>
+        </div>
+
+        <div class="hoc-alchemy__controls" data-reveal="up">
+          <button type="button" class="hoc-btn hoc-alchemy__add" data-hoc="alchemy-add" data-mode="add">
+            <span class="hoc-alchemy__icon" aria-hidden="true" data-bg="assets/img/alchemy-sprites.webp?v=94abe2a2b5"></span>
+            <svg class="hoc-alchemy__again" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5.2 13.4A7 7 0 1 0 7 7.1M6.4 3.6v3.9h3.9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span data-hoc="alchemy-add-label">Add hibiscus</span>
+          </button>
+          <span class="hoc-alchemy__dots" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+          <p class="hoc-micro hoc-alchemy__hint"><span class="is-hover">or click the glass</span><span class="is-touch">or tap the glass</span></p>
+        </div>
+
+        <div class="hoc-alchemy__scale" data-reveal="up">
+          <p class="hoc-micro hoc-alchemy__scalehead" id="alchemy-scale">Acidity, read as colour</p>
+          <div class="hoc-alchemy__meter">
+            <span class="hoc-alchemy__rail" aria-hidden="true"><span class="hoc-alchemy__marker"></span></span>
+            <ol class="hoc-alchemy__stops" aria-labelledby="alchemy-scale">
+              <li data-stop="0" aria-current="step"><span class="hoc-alchemy__sw" aria-hidden="true"></span><span class="hoc-alchemy__stopname" data-stop-name>Blue</span><span class="hoc-alchemy__stopnote"><span class="hoc-alchemy__ph">pH 7</span><span class="hoc-alchemy__sep"> · </span>Butterfly pea alone</span></li>
+              <li data-stop="1"><span class="hoc-alchemy__sw" aria-hidden="true"></span><span class="hoc-alchemy__stopname" data-stop-name>Violet</span><span class="hoc-alchemy__stopnote"><span class="hoc-alchemy__ph">pH 5</span><span class="hoc-alchemy__sep"> · </span>Hibiscus arriving</span></li>
+              <li data-stop="2"><span class="hoc-alchemy__sw" aria-hidden="true"></span><span class="hoc-alchemy__stopname" data-stop-name>Magenta</span><span class="hoc-alchemy__stopnote"><span class="hoc-alchemy__ph">pH 3</span><span class="hoc-alchemy__sep"> · </span>Fully turned</span></li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="hoc-alchemy__outro">
+          <p>Both are in Mystic Butterfly, with a stick of cinnamon. Brew a glass and watch it turn.</p>
+          <a class="hoc-link" href="products/mystic-butterfly/">Shop Mystic Butterfly</a>
+        </div>
+
+        <p class="hoc-sr" role="status" aria-live="polite" data-hoc="alchemy-status"></p>
       </div>
     </section>
 
@@ -723,7 +784,7 @@
           
           <li class="hoc-range__cell" data-index="0">
             <div class="hoc-range__pile" data-hoc="botanical-pile" style="--accent:#47857D;--accent-2:#7FB3AD;--accent-wash:#E0EBEA;--accent-ink:#2D4E4A;--liquid:#B4324B"
-                 data-atlas="assets/img/botanical-atlas.webp?v=6377b35b4b" data-seed="gift-of-nature"
+                 data-atlas="assets/img/botanical-atlas.webp?v=73ade9fb8a" data-seed="gift-of-nature"
                  data-ingredients="Hibiscus|Mint Leaf|Lemongrass" data-label="Gift of Nature">
               <img
         src="assets/img/pile-gift-of-nature.webp?v=ecd68be307"
@@ -749,7 +810,7 @@
           </li>
           <li class="hoc-range__cell" data-index="1">
             <div class="hoc-range__pile" data-hoc="botanical-pile" style="--accent:#553B91;--accent-2:#8A75BD;--accent-wash:#E2DEED;--accent-ink:#342654;--liquid:#2B3A8F"
-                 data-atlas="assets/img/botanical-atlas.webp?v=6377b35b4b" data-seed="mystic-butterfly"
+                 data-atlas="assets/img/botanical-atlas.webp?v=73ade9fb8a" data-seed="mystic-butterfly"
                  data-ingredients="Butterfly Pea Flower|Hibiscus|Cinnamon Stick" data-label="Mystic Butterfly">
               <img
         src="assets/img/pile-mystic-butterfly.webp?v=42630e2230"
@@ -775,7 +836,7 @@
           </li>
           <li class="hoc-range__cell" data-index="2">
             <div class="hoc-range__pile" data-hoc="botanical-pile" style="--accent:#376395;--accent-2:#7196C1;--accent-wash:#DDE5EE;--accent-ink:#243C57;--liquid:#2F62A8"
-                 data-atlas="assets/img/botanical-atlas.webp?v=6377b35b4b" data-seed="mesmerize"
+                 data-atlas="assets/img/botanical-atlas.webp?v=73ade9fb8a" data-seed="mesmerize"
                  data-ingredients="Mango|Pineapple|Lemongrass|Butterfly Pea Flower" data-label="Mesmerize">
               <img
         src="assets/img/pile-mesmerize.webp?v=3c16522329"
@@ -801,7 +862,7 @@
           </li>
           <li class="hoc-range__cell" data-index="3">
             <div class="hoc-range__pile" data-hoc="botanical-pile" style="--accent:#913B41;--accent-2:#BD7579;--accent-wash:#EDDEDF;--accent-ink:#542629;--liquid:#A8462F"
-                 data-atlas="assets/img/botanical-atlas.webp?v=6377b35b4b" data-seed="sunset-valley"
+                 data-atlas="assets/img/botanical-atlas.webp?v=73ade9fb8a" data-seed="sunset-valley"
                  data-ingredients="Rooibos|Strawberry|Apple|Bourbon Vanilla" data-label="Sunset Valley">
               <img
         src="assets/img/pile-sunset-valley.webp?v=7d27b155a1"
@@ -827,7 +888,7 @@
           </li>
           <li class="hoc-range__cell" data-index="4">
             <div class="hoc-range__pile" data-hoc="botanical-pile" style="--accent:#9B6231;--accent-2:#C6966C;--accent-wash:#EFE5DC;--accent-ink:#5A3B21;--liquid:#B4682A"
-                 data-atlas="assets/img/botanical-atlas.webp?v=6377b35b4b" data-seed="asian-breeze"
+                 data-atlas="assets/img/botanical-atlas.webp?v=73ade9fb8a" data-seed="asian-breeze"
                  data-ingredients="Rooibos|Mango|Pineapple|Dried Ginger|Cinnamon Stick|Lemon Peel" data-label="Asian Breeze">
               <img
         src="assets/img/pile-asian-breeze.webp?v=751eab5773"
@@ -853,7 +914,7 @@
           </li>
           <li class="hoc-range__cell" data-index="5">
             <div class="hoc-range__pile" data-hoc="botanical-pile" style="--accent:#85475E;--accent-2:#B37F92;--accent-wash:#EBE0E4;--accent-ink:#4E2D39;--liquid:#9E4A5E"
-                 data-atlas="assets/img/botanical-atlas.webp?v=6377b35b4b" data-seed="souls-rest"
+                 data-atlas="assets/img/botanical-atlas.webp?v=73ade9fb8a" data-seed="souls-rest"
                  data-ingredients="Oolong|Dried Rose|Hibiscus|Chamomile" data-label="Soul's Rest">
               <img
         src="assets/img/pile-souls-rest.webp?v=c03384b3da"
@@ -879,7 +940,7 @@
           </li>
           <li class="hoc-range__cell" data-index="6">
             <div class="hoc-range__pile" data-hoc="botanical-pile" style="--accent:#6B8B41;--accent-2:#9DB87A;--accent-wash:#E6ECDF;--accent-ink:#405129;--liquid:#6E8A3F"
-                 data-atlas="assets/img/botanical-atlas.webp?v=6377b35b4b" data-seed="gold-skies"
+                 data-atlas="assets/img/botanical-atlas.webp?v=73ade9fb8a" data-seed="gold-skies"
                  data-ingredients="Green Tea|Lemongrass|Strawberry|Blackberry|Butterfly Pea Flower" data-label="Gold Skies">
               <img
         src="assets/img/pile-gold-skies.webp?v=19c950d00d"
@@ -905,7 +966,7 @@
           </li>
           <li class="hoc-range__cell" data-index="7">
             <div class="hoc-range__pile" data-hoc="botanical-pile" style="--accent:#89436B;--accent-2:#B67C9D;--accent-wash:#ECDFE6;--accent-ink:#502A40;--liquid:#B04E77"
-                 data-atlas="assets/img/botanical-atlas.webp?v=6377b35b4b" data-seed="pink-moon"
+                 data-atlas="assets/img/botanical-atlas.webp?v=73ade9fb8a" data-seed="pink-moon"
                  data-ingredients="Jasmine|Pineapple|Hibiscus|White Tea|Cinnamon Stick" data-label="Pink Moon">
               <img
         src="assets/img/pile-pink-moon.webp?v=0eb61fd2c5"
@@ -931,7 +992,7 @@
           </li>
           <li class="hoc-range__cell" data-index="8">
             <div class="hoc-range__pile" data-hoc="botanical-pile" style="--accent:#6C4983;--accent-2:#9E81B1;--accent-wash:#E7E0EB;--accent-ink:#402E4D;--liquid:#B9A44C"
-                 data-atlas="assets/img/botanical-atlas.webp?v=6377b35b4b" data-seed="innerbloom"
+                 data-atlas="assets/img/botanical-atlas.webp?v=73ade9fb8a" data-seed="innerbloom"
                  data-ingredients="Jasmine|Chamomile|Lavender|Lemon Balm" data-label="Innerbloom">
               <img
         src="assets/img/pile-innerbloom.webp?v=5feecddc57"
@@ -957,7 +1018,7 @@
           </li>
           <li class="hoc-range__cell" data-index="9">
             <div class="hoc-range__pile" data-hoc="botanical-pile" style="--accent:#8B5241;--accent-2:#B8887A;--accent-wash:#ECE2DF;--accent-ink:#513329;--liquid:#C06A4A"
-                 data-atlas="assets/img/botanical-atlas.webp?v=6377b35b4b" data-seed="white-tea-melody"
+                 data-atlas="assets/img/botanical-atlas.webp?v=73ade9fb8a" data-seed="white-tea-melody"
                  data-ingredients="Strawberry|White Tea|Lemon Peel|Apple|Mango|Cinnamon Stick" data-label="White Tea Melody">
               <img
         src="assets/img/pile-white-tea-melody.webp?v=aacaaa13e7"
@@ -983,7 +1044,7 @@
           </li>
           <li class="hoc-range__cell" data-index="10">
             <div class="hoc-range__pile" data-hoc="botanical-pile" style="--accent:#854785;--accent-2:#B37FB3;--accent-wash:#EBE0EB;--accent-ink:#4E2D4E;--liquid:#8A3B63"
-                 data-atlas="assets/img/botanical-atlas.webp?v=6377b35b4b" data-seed="reflection"
+                 data-atlas="assets/img/botanical-atlas.webp?v=73ade9fb8a" data-seed="reflection"
                  data-ingredients="Passionflower|Apple|Lemongrass|Hibiscus|Blackberry" data-label="Reflection">
               <img
         src="assets/img/pile-reflection.webp?v=409dec8773"
@@ -1009,7 +1070,7 @@
           </li>
           <li class="hoc-range__cell" data-index="11">
             <div class="hoc-range__pile" data-hoc="botanical-pile" style="--accent:#975235;--accent-2:#C3886F;--accent-wash:#EEE2DD;--accent-ink:#583323;--liquid:#A85426"
-                 data-atlas="assets/img/botanical-atlas.webp?v=6377b35b4b" data-seed="winter-tale"
+                 data-atlas="assets/img/botanical-atlas.webp?v=73ade9fb8a" data-seed="winter-tale"
                  data-ingredients="Rooibos|Mate|Fresh Ginger|Strawberry|Orange Peel" data-label="Winter Tale">
               <img
         src="assets/img/pile-winter-tale.webp?v=f223005500"
@@ -1035,7 +1096,7 @@
           </li>
           <li class="hoc-range__cell" data-index="12">
             <div class="hoc-range__pile" data-hoc="botanical-pile" style="--accent:#997A33;--accent-2:#C4AA6E;--accent-wash:#EFE9DC;--accent-ink:#594822;--liquid:#C0752F"
-                 data-atlas="assets/img/botanical-atlas.webp?v=6377b35b4b" data-seed="wintertide"
+                 data-atlas="assets/img/botanical-atlas.webp?v=73ade9fb8a" data-seed="wintertide"
                  data-ingredients="Apple|Mango|Rosehip|Fennel|Passionflower" data-label="Wintertide">
               <img
         src="assets/img/pile-wintertide.webp?v=b255bb89fb"
@@ -1061,7 +1122,7 @@
           </li>
           <li class="hoc-range__cell" data-index="13">
             <div class="hoc-range__pile" data-hoc="botanical-pile" style="--accent:#954437;--accent-2:#C17C71;--accent-wash:#EEDFDD;--accent-ink:#572B24;--liquid:#B03C33"
-                 data-atlas="assets/img/botanical-atlas.webp?v=6377b35b4b" data-seed="bloomera"
+                 data-atlas="assets/img/botanical-atlas.webp?v=73ade9fb8a" data-seed="bloomera"
                  data-ingredients="Apple|Cinnamon Stick|Hibiscus|Orange Peel" data-label="Bloomera">
               <img
         src="assets/img/pile-bloomera.webp?v=9e0e81fef8"
@@ -1605,7 +1666,7 @@
           </nav>
         </div>
 
-        <div class="hoc-current" data-hoc="footer-current" data-atlas="assets/img/botanical-atlas.webp?v=6377b35b4b" aria-label="The HOC botanical collection">
+        <div class="hoc-current" data-hoc="footer-current" data-atlas="assets/img/botanical-atlas-petals.webp?v=d1b16089cf" aria-label="The HOC botanical collection">
           <div class="hoc-current__head hoc-micro">
             <p>Botanical by nature.</p>
             <button class="hoc-current__pause" type="button" data-current-pause aria-pressed="false" hidden>Pause flow</button>
@@ -2106,21 +2167,21 @@
 </svg>
 
 
-<script src="assets/vendor/gsap.min.js?v=b9a1a52787"></script>
-<script src="assets/vendor/ScrollTrigger.min.js?v=4aeb84b07a"></script>
-<script src="assets/vendor/SplitText.min.js?v=03f532f721"></script>
-<script src="assets/vendor/CustomEase.min.js?v=155a4e7ffe"></script>
-<script src="assets/vendor/DrawSVGPlugin.min.js?v=1022fa54a7"></script>
-<script src="assets/vendor/Flip.min.js?v=b42ca485d0"></script>
-<script src="assets/vendor/ScrambleTextPlugin.min.js?v=258f54d8bd"></script>
-<script src="assets/vendor/Observer.min.js?v=298b0ea32d"></script>
+<script src="assets/vendor/gsap.min.js?v=96c01b81f4"></script>
+<script src="assets/vendor/ScrollTrigger.min.js?v=308219390e"></script>
+<script src="assets/vendor/SplitText.min.js?v=5e519ea247"></script>
+<script src="assets/vendor/CustomEase.min.js?v=1cb1622270"></script>
+<script src="assets/vendor/DrawSVGPlugin.min.js?v=d8f70b87c1"></script>
+<script src="assets/vendor/Flip.min.js?v=d2d2f30a87"></script>
+<script src="assets/vendor/ScrambleTextPlugin.min.js?v=e9ce04a07d"></script>
+<script src="assets/vendor/Observer.min.js?v=697c7e96ae"></script>
 <script src="assets/vendor/lenis.min.js?v=804047c1d9"></script>
-<script src="assets/vendor/embla-carousel.umd.js?v=181961bf7d"></script>
+<script src="assets/vendor/embla-carousel.umd.js?v=f05b5dbfe3"></script>
 
-<script src="assets/js/hoc-data.js?v=472d245cb3"></script>
-<script src="assets/js/hoc-core.js?v=7a9baf86e6"></script>
-<script src="assets/js/hoc-botanicals.js?v=25f6c9471c"></script>
-<script src="assets/js/hoc-webgl.js?v=d99d4cb262"></script>
-<script src="assets/js/hoc-motion.js?v=9a3f12ac7b"></script>
+<script src="assets/js/hoc-data.js?v=0457c02380"></script>
+<script src="assets/js/hoc-core.js?v=49cd647a37"></script>
+<script src="assets/js/hoc-botanicals.js?v=9645064dea"></script>
+<script src="assets/js/hoc-webgl.js?v=5d4a3d1df4"></script>
+<script src="assets/js/hoc-motion.js?v=e0873768ae"></script>
 </body>
 </html>

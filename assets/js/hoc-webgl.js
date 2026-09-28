@@ -111,11 +111,23 @@
       get lost() {
         return lost;
       },
+      /** The device-pixel ratio the last resize() settled on. */
+      get dpr() {
+        return dpr;
+      },
 
       set: function (name, v) {
         var u = uniforms[name];
         if (!u) return api;
         var t = u.type;
+        // Uniform arrays (uniform vec4 uDrop[6]) take the whole flat array.
+        if (u.size > 1) {
+          if (t === gl.FLOAT) gl.uniform1fv(u.loc, v);
+          else if (t === gl.FLOAT_VEC2) gl.uniform2fv(u.loc, v);
+          else if (t === gl.FLOAT_VEC3) gl.uniform3fv(u.loc, v);
+          else if (t === gl.FLOAT_VEC4) gl.uniform4fv(u.loc, v);
+          return api;
+        }
         if (t === gl.FLOAT) gl.uniform1f(u.loc, v);
         else if (t === gl.FLOAT_VEC2) gl.uniform2f(u.loc, v[0], v[1]);
         else if (t === gl.FLOAT_VEC3) gl.uniform3f(u.loc, v[0], v[1], v[2]);
@@ -130,7 +142,8 @@
           local image counts as cross-origin and texImage2D throws, and a
           caller that ignores that ends up showing an empty black quad on top
           of a perfectly good poster. */
-      texture: function (name, source) {
+      texture: function (name, source, opts) {
+        opts = opts || {};
         var slot = textures[name];
         if (!slot) {
           slot = textures[name] = { unit: texUnit++, tex: gl.createTexture() };
@@ -138,9 +151,11 @@
         gl.activeTexture(gl.TEXTURE0 + slot.unit);
         gl.bindTexture(gl.TEXTURE_2D, slot.tex);
         gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+        // Cut-outs with soft alpha edges want premultiplied texels, or linear
+        // filtering drags whatever colour sits under alpha 0 into the edge.
+        gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, !!opts.premultiply);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
         try {
           gl.texImage2D(
@@ -153,7 +168,20 @@
           );
         } catch (e) {
           // Tainted (file://), or not decoded yet.
+          gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
           return false;
+        }
+        gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+        // WebGL1 can only mipmap power-of-two images. Art drawn much smaller
+        // than its source (the hibiscus pieces) shimmers without it.
+        var w = source.naturalWidth || source.videoWidth || source.width;
+        var h = source.naturalHeight || source.videoHeight || source.height;
+        var pot = w > 0 && h > 0 && (w & (w - 1)) === 0 && (h & (h - 1)) === 0;
+        if (opts.mipmap && pot) {
+          gl.generateMipmap(gl.TEXTURE_2D);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+        } else {
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
         }
         api.set(name, slot.unit);
         return true;
@@ -264,106 +292,282 @@
   ].join("\n");
 
   /* ======================================================================
-     4. COLOR ALCHEMY SHADER  §14
+     4. COLOR ALCHEMY SHADER  §14 — rebuilt
 
-     Butterfly pea steeps indigo. Hibiscus is an acid; where it reaches, the
-     pigment turns violet and then magenta. The transition must NOT be a
-     radial gradient — real pigment spreads unevenly.
+     The first version drove the colour from two invisible things at once —
+     scroll progress and how far the pointer had travelled — and never showed
+     what actually causes the change. People could not tell what they were
+     doing, so they could not tell what they were seeing.
 
-     So the reaction is a threshold against an FBM field: as the reaction
-     level rises, more of the field falls below it and turns, blooming
-     outward in ragged fingers. The pointer adds a local bump so the user
-     feels they caused it, and the level itself is fed by both pointer travel
-     and scroll (§14 scroll alternative for non-pointer devices).
+     This one renders the real mechanism. Butterfly pea steeps blue; its
+     pigment reads acidity as colour; hibiscus is naturally acidic. So:
+
+       * the glass holds blue tea, with dried butterfly-pea flowers resting on
+         the bottom — you can see where the blue comes from
+       * each hibiscus piece (uDrop) falls in, rings the surface, and sinks,
+         bleeding a plume of pigment behind it through a shared flow field so
+         the ribbons curl together like ink in water
+       * the whole glass follows more slowly (uLevel), the way a steeping
+         glass actually evens out
+
+     Coordinates are glass-local: y runs -1..1 over the glass's box, whose
+     place on the canvas comes from a DOM element (uVessel), so CSS owns the
+     layout and this shader only ever draws.
      ====================================================================== */
 
   HOC.shaderAlchemy = [
+    "#ifdef GL_FRAGMENT_PRECISION_HIGH",
+    "precision highp float;",
+    "#else",
     "precision mediump float;",
+    "#endif",
     "varying vec2 vUv;",
     "uniform vec2 uRes;",
-    "uniform vec2 uPointer;",
-    "uniform float uVelocity;",
-    "uniform float uProgress;",
+    "uniform vec4 uVessel;",   // centre x, centre y, half-width, half-height (canvas px)
     "uniform float uTime;",
-    "uniform vec3 uBlue;",
-    "uniform vec3 uViolet;",
-    "uniform vec3 uMagenta;",
-    "uniform float uGlass;",
+    "uniform float uLevel;",   // 0..1 how far the whole glass has turned
+    "uniform float uFill;",    // 0..1 liquid height (drains and refills on reset)
+    "uniform float uFade;",    // 0..1 clears pieces and plumes during a reset
+    "uniform vec4 uDrop[4];",  // x, time dropped, strength, seed   (strength 0: empty)
+    "uniform vec2 uGhost;",    // x, alpha of the pointer preview above the rim
+    "uniform sampler2D uSprites;", // [ hibiscus | butterfly pea ], premultiplied
+    "uniform vec3 uBg;",
     NOISE,
+    "float fbm4(vec2 p){float v=0.0,a=0.5;for(int i=0;i<4;i++){v+=a*vnoise(p);p=ROT*p*2.03;a*=0.5;}return v/0.9375;}",
+
+    // --- the glass, in glass-local units ---------------------------------
+    "const float E=0.15;",        // how far above the glass we sit: ellipse ratio
+    "const float W_TOP=0.455;",
+    "const float W_BOT=0.395;",
+    "const float WALL=0.018;",
+    "const float FOOT=0.080;",
+    "const float Y_TOP=1.0-E*W_TOP;",
+    "const float Y_BOT=-1.0+E*W_BOT;",
+    "const float Y_INB=Y_BOT+FOOT;",
+    "const float Y_FULL=Y_TOP-0.22;",
+    "const float T_FALL=0.62;",
+
+    "float halfW(float y){return mix(W_BOT,W_TOP,clamp((y-Y_BOT)/(Y_TOP-Y_BOT),0.0,1.0));}",
+    "float arc(float x,float w){float k=x/w;return E*w*sqrt(max(0.0,1.0-k*k));}",
+    "float ellDist(vec2 q,vec2 ab){float k0=length(q/ab);float k1=length(q/(ab*ab));return k0*(k0-1.0)/max(k1,1e-5);}",
+
+    // Butterfly pea's anthocyanins: blue near neutral, violet, then magenta.
+    // Violet sits at exactly half way and magenta at full, so the scale
+    // beside the glass can be read straight off uLevel.
+    // Deep rather than bright: pigment in a dark room, not neon (§59).
+    "vec3 pigment(float a){",
+    "  vec3 c=mix(vec3(0.085,0.175,0.560),vec3(0.360,0.150,0.585),smoothstep(0.0,0.5,a));",
+    "  return mix(c,vec3(0.660,0.110,0.360),smoothstep(0.5,1.0,a));",
+    "}",
+
+    // One cell of the sprite strip, premultiplied, centred on c, rotated by r.
+    // No early return: sampling stays in uniform control flow so the mip
+    // level is always well defined.
+    "vec4 sprite(vec2 p,vec2 c,float s,float r,float cell){",
+    "  vec2 d=(p-c)/s;",
+    "  float cs=cos(r),sn=sin(r);",
+    "  d=vec2(cs*d.x+sn*d.y,-sn*d.x+cs*d.y);",
+    "  float inb=step(abs(d.x),1.0)*step(abs(d.y),1.0);",
+    "  vec2 uv=clamp(d*0.5+0.5,0.0,1.0);",
+    "  uv.x=(uv.x*0.98+0.01+cell)*0.5;",
+    "  return texture2D(uSprites,uv)*inb;",
+    "}",
+
     "void main(){",
-    "  float asp=uRes.x/uRes.y;",
-    "  vec2 p=(vUv-0.5)*vec2(asp,1.0);",
-    // Wide screens: sit the glass right of centre so the headline owns the
-    // left. Portrait: centre it.
-    "  float shift=asp>1.15?0.215:0.0;",
-    "  vec2 g=vec2(p.x-shift*asp*0.5,p.y);",
+    "  vec2 frag=gl_FragCoord.xy;",
+    "  vec2 p=(frag-uVessel.xy)/uVessel.w;",
+    "  float px=1.0/uVessel.w;",
+    "  float t=uTime;",
 
-    // --- tumbler: tapered walls, softened base, open top -----------------
-    "  float hTop=0.375, hBot=0.395;",
-    "  float wTop=0.168, wBot=0.150;",
-    "  float t=clamp((g.y+hBot)/(hTop+hBot),0.0,1.0);",
-    "  float halfW=mix(wBot,wTop,t);",
-    "  halfW*=0.855+0.145*sqrt(clamp((g.y+hBot)/0.085,0.0,1.0));", // rounded base
-    "  float dx=abs(g.x)-halfW;",
-    "  float d=max(max(dx,g.y-hTop),-g.y-hBot);",
-    "  float inside=smoothstep(0.0035,-0.0035,d);",
-    "  float wall=smoothstep(0.0075,0.0,abs(d));",
+    // --- the ground: a backlight behind the glass that carries the colour
+    //     of whatever it shines through, and the table it stands on --------
+    "  vec2 sv=vUv-0.5;",
+    "  vec3 col=uBg*(1.0-0.35*dot(sv,sv));",
+    "  vec3 tint=pigment(uLevel);",
+    "  vec2 hq=vec2(p.x/1.05,(p.y-0.12)/1.45);",
+    "  col+=(vec3(0.040,0.044,0.064)+tint*0.17*uFill)*exp(-dot(hq,hq)*1.7);",
+    "  vec2 cq=vec2(p.x/(W_BOT*1.20),(p.y-Y_BOT+0.014)/(E*W_BOT*1.7));",
+    "  col*=1.0-0.62*exp(-dot(cq,cq)*1.4);",
+    "  vec2 bq=vec2(p.x/0.60,(p.y+1.07)/0.085);",
+    "  col+=tint*0.22*exp(-dot(bq,bq))*uFill;",
 
-    // --- pigment field ---------------------------------------------------
-    "  vec2 q=vUv*vec2(asp,1.0);",
-    "  float warp=fbm(q*1.7+uTime*0.02);",
-    "  float field=fbm(q*3.4+vec2(warp*1.5,-uTime*0.035));",
-    "  field=field*0.82+0.18*fbm(q*8.0-uTime*0.05);",
-    "  vec2 ap=vec2((vUv.x-uPointer.x)*asp,vUv.y-uPointer.y);",
-    "  float local=smoothstep(0.30,0.0,length(ap))*(0.18+uVelocity*0.50);",
-    // A rising threshold against noise: the boundary is ragged fingers, not
-    // a radial gradient. This is the whole point of the section (§14).
-    "  float level=uProgress*1.24+local;",
-    "  float react=smoothstep(field-0.19,field+0.19,level);",
+    // Everything expensive lives near the glass. The box edge is far from any
+    // sprite, so the branch never splits a quad that is sampling one.
+    "  if(abs(p.x)<0.80&&p.y>-1.30&&p.y<Y_TOP+0.52){",
 
-    // --- liquid ----------------------------------------------------------
-    "  float surface=hTop-0.052+0.0045*sin(g.x*26.0+uTime*0.7);",
-    "  float inLiquid=inside*smoothstep(0.004,-0.004,g.y-surface);",
-    "  vec3 col=mix(uBlue,uViolet,smoothstep(0.02,0.60,react));",
-    "  col=mix(col,uMagenta,smoothstep(0.50,1.0,react));",
-    // depth: denser and darker toward the base
-    "  col*=0.62+0.52*smoothstep(-hBot,surface,g.y);",
-    // slow caustic sheet, kept well under a highlight
-    "  float caustic=fbm(q*6.0+vec2(uTime*0.08,uTime*0.05));",
-    "  col+=pow(caustic,4.0)*0.20*mix(vec3(0.45,0.55,1.0),vec3(1.0,0.55,0.8),react);",
+    // --- silhouettes ------------------------------------------------------
+    "    float w=halfW(p.y);",
+    "    float wi=w-WALL;",
+    "    float dOut=max(abs(p.x)-w,max((Y_BOT-arc(p.x,W_BOT))-p.y,p.y-(Y_TOP+arc(p.x,W_TOP))));",
+    "    float outer=smoothstep(px,-px,dOut);",
+    "    float ibot=Y_INB-arc(p.x,W_BOT-WALL);",
+    "    float dIn=max(abs(p.x)-wi,max(ibot-p.y,p.y-(Y_TOP+arc(p.x,W_TOP-WALL))));",
+    "    float inner=smoothstep(px,-px,dIn);",
 
-    // --- the empty glass above the liquid --------------------------------
-    "  vec3 air=mix(vec3(0.030,0.031,0.045),col*0.30,0.35);",
-    "  vec3 glassCol=mix(air,col,inLiquid);",
+    // --- the liquid: a body seen through the wall, and a surface seen from
+    //     slightly above ------------------------------------------------------
+    "    float ySurf=mix(Y_INB+0.02,Y_FULL,uFill);",
+    "    float ws=halfW(ySurf)-WALL;",
+    "    float wave=(0.0035*sin(p.x*21.0+t*1.25)+0.0022*sin(p.x*39.0-t*1.8))*uFill;",
+    "    float front=ySurf-arc(p.x,ws)+wave;",
+    "    float back=ySurf+arc(p.x,ws)+wave;",
+    "    float live=step(0.03,uFill);",
+    "    float body=inner*smoothstep(px,-px,p.y-front)*live;",
+    "    float topS=inner*smoothstep(-px,px,p.y-front)*smoothstep(px,-px,p.y-back)*live;",
 
-    // --- ground + bounce --------------------------------------------------
-    "  vec3 ground=vec3(0.026,0.027,0.038);",
-    "  float floorY=smoothstep(-hBot-0.10,-hBot,g.y)*(1.0-smoothstep(-hBot,-hBot+0.02,g.y));",
-    "  float bounce=smoothstep(0.30,0.0,abs(g.x))*smoothstep(-hBot-0.16,-hBot,g.y)*(1.0-inside);",
-    "  ground+=col*bounce*0.22;",
-    "  vec3 outCol=mix(ground,glassCol,inside);",
+    // --- one flow field for every plume, so the ribbons curl together -----
+    "    vec2 fq=p*vec2(2.3,1.5);",
+    "    vec2 flow=vec2(fbm4(fq+vec2(0.0,t*0.10)),fbm4(fq+vec2(7.3,-t*0.08)))-0.5;",
+    "    vec2 pw=p+flow*0.17;",
 
-    // --- glass edges: a thin bright line, a left-wall specular, and at most
-    //     1-2px of chromatic separation. No glow, no glitch (§14, §59).
-    "  float px=1.2/uRes.y;",
-    "  float er=smoothstep(0.0060,0.0,abs(d-px));",
-    "  float eb=smoothstep(0.0060,0.0,abs(d+px));",
-    "  outCol.r+=er*0.10*uGlass;",
-    "  outCol.b+=eb*0.12*uGlass;",
-    "  outCol+=wall*0.22*uGlass*vec3(0.86,0.90,1.0);",
-    "  float spec=smoothstep(0.012,0.0,abs(g.x+halfW*0.72))*inside;",
-    "  outCol+=spec*0.10*vec3(1.0);",
-    // rim ellipse at the mouth of the glass
-    "  float rimE=abs(length(vec2(g.x/max(wTop,0.001),(g.y-hTop)/0.028))-1.0);",
-    "  outCol+=smoothstep(0.16,0.0,rimE)*0.16*uGlass;",
-    // meniscus line where liquid meets glass
-    "  outCol+=smoothstep(0.0045,0.0,abs(g.y-surface))*inside*0.14;",
+    "    float local=0.0;",
+    "    float ripple=0.0;",
+    "    vec4 sunk=vec4(0.0);",
+    "    vec4 fallIn=vec4(0.0);",  // falling, already below the rim: behind its front edge
+    "    vec4 fallOut=vec4(0.0);", // falling, still above the glass
+    "    for(int i=0;i<4;i++){",
+    "      vec4 d=uDrop[i];",
+    "      float age=t-d.y;",
+    "      if(d.z<=0.0||age<0.0)continue;",
+    "      float seed=d.w;",
+    "      float yStart=Y_TOP+0.34;",
+    "      float ft=min(age,T_FALL)/T_FALL;",
+    "      float sinkT=max(age-T_FALL,0.0);",
+    "      float depth=max(ySurf-Y_INB-0.12,0.0)*(1.0-exp(-sinkT/1.9));",
+    "      float sway=0.028*sin(sinkT*1.6+seed*6.2832)*(1.0-exp(-sinkT*0.9));",
+    "      float inAir=step(age,T_FALL);",
+    "      vec2 P=vec2(d.x+sway,mix(ySurf-depth,yStart+(ySurf-yStart)*ft*ft,inAir));",
 
-    // --- grain + vignette so overlay type always holds --------------------
-    "  outCol+=(hash21(vUv*uRes)-0.5)*0.018;",
-    "  float vig=smoothstep(1.30,0.22,length(p));",
-    "  outCol*=0.70+0.30*vig;",
-    "  gl_FragColor=vec4(outCol,1.0);",
+    // the piece itself: tumbling in the air, rocking once it is in
+    "      float spin=seed*6.2832+age*1.6*inAir+(T_FALL*1.6+0.35*sin(sinkT*1.1+seed*4.0))*(1.0-inAir);",
+    "      float size=0.090*(0.88+0.24*fract(seed*13.7));",
+    "      vec4 s=sprite(p,P,size,spin,0.0);",
+    "      s.rgb*=mix(1.0,0.58,1.0-exp(-sinkT/2.6));", // gives its colour up
+    "      s*=1.0-uFade;",
+    "      float below=step(P.y,Y_TOP-0.01);",
+    "      vec4 si=s*inAir*below;",
+    "      fallIn=si+fallIn*(1.0-si.a);",
+    "      vec4 so=s*inAir*(1.0-below);",
+    "      fallOut=so+fallOut*(1.0-so.a);",
+    "      vec4 sb=s*(1.0-inAir);",
+    "      sunk=sb+sunk*(1.0-sb.a);",
+
+    // the plume: a trail from where it went in to where it is now, released
+    // earliest (and so spread widest) near the surface
+    "      if(sinkT>0.0){",
+    "        vec2 En=vec2(d.x,ySurf-0.012);",
+    "        vec2 ba=P-En;",
+    "        vec2 pa=pw-En;",
+    "        float h=clamp(dot(pa,ba)/max(dot(ba,ba),1e-4),0.0,1.0);",
+    "        float dist=length(pa-ba*h);",
+    "        float rel=sinkT*(1.0-h);",
+    "        float r=0.016+0.080*sqrt(rel)+0.015*sinkT;",
+    "        float strength=d.z*(1.0-exp(-sinkT/0.75));",
+    "        float trail=smoothstep(r,r*0.18,dist)*exp(-rel*0.10);",
+    "        float head=smoothstep(0.070+0.035*sqrt(sinkT),0.0,length(pw-P));",
+    "        float pool=smoothstep(Y_INB+0.30,Y_INB+0.02,pw.y)*smoothstep(0.50,0.0,abs(pw.x-P.x))*(1.0-exp(-sinkT/3.2));",
+    "        local+=strength*(0.85*trail+0.95*head+0.40*pool);",
+    "        vec2 rq=vec2(p.x-d.x,(p.y-ySurf)/E);",
+    "        ripple+=smoothstep(0.011,0.0,abs(length(rq)-sinkT*0.36))*exp(-sinkT*2.3);",
+    "      }",
+    "    }",
+    "    local*=1.0-uFade;",
+
+    // filaments: ridged noise in the same flowing frame, so the ribbons have
+    // grain instead of reading as soft blobs
+    "    float ridge=1.0-abs(fbm4(pw*6.2+vec2(t*0.05,-t*0.03))*2.0-1.0);",
+    "    local=clamp(local,0.0,1.35)*(0.55+0.70*ridge);",
+    "    float g=uLevel*(0.80+0.40*fbm4(pw*2.1+vec2(-t*0.02,t*0.015)));",
+    "    float acid=clamp(g+local*(1.0-0.6*g),0.0,1.0);",
+
+    // --- backlit liquid: a luminous core, dark toward the walls, a little
+    //     brighter under the surface, a slow caustic shimmer ----------------
+    "    vec3 pig=pigment(acid);",
+    "    float xn=clamp(p.x/max(wi,0.01),-1.0,1.0);",
+    "    float core=smoothstep(0.0,1.0,sqrt(max(0.0,1.0-xn*xn)));",
+    "    float vert=mix(0.72,1.10,smoothstep(Y_INB,ySurf,p.y));",
+    "    vec3 liq=pig*(0.22+0.74*core)*vert;",
+    "    liq+=pig*pig*0.30*core*core;",
+    "    float ca=fbm4(p*vec2(5.0,2.8)+vec2(t*0.11,-t*0.07));",
+    "    liq+=pig*pow(ca,3.0)*0.60*core;",
+
+    // the cavity: air above the liquid, liquid below
+    "    vec3 air=col*0.90+vec3(0.010,0.012,0.018)+tint*0.035*uFill;",
+    "    vec3 cav=mix(air,liq,body);",
+
+    // butterfly-pea flowers resting on the bottom: this is where the blue
+    // comes from, and they take the liquid's colour like everything in it
+    "    vec4 fl=vec4(0.0);",
+    "    for(int j=0;j<3;j++){",
+    "      float fj=float(j);",
+    "      vec2 c=vec2(-0.215+0.215*fj+0.03*sin(fj*2.3),Y_INB+0.035+0.030*fract(fj*0.618));",
+    "      c.x+=0.006*sin(t*0.55+fj*2.0)*live;",
+    "      float r=-0.75+fj*1.25+0.05*sin(t*0.45+fj)*live;",
+    "      vec4 s=sprite(p,c,0.078+0.010*fj,r,1.0);",
+    "      fl=s+fl*(1.0-s.a);",
+    "    }",
+    "    fl*=inner;",
+    "    vec3 flc=mix(fl.rgb,pig*fl.a*0.55,0.42*body)*(0.80+0.30*core*body);",
+    "    cav=flc+cav*(1.0-fl.a);",
+    "    sunk*=inner;",
+    "    vec3 skc=mix(sunk.rgb,pig*sunk.a*0.50,0.38)*(0.82+0.28*core);",
+    "    cav=skc+cav*(1.0-sunk.a);",
+
+    // the surface, seen from above, with the rings each piece leaves
+    "    vec3 surf=pig*(0.80+0.30*core)+vec3(0.07,0.08,0.10);",
+    "    surf=mix(surf,vec3(0.62,0.64,0.72),0.08+0.22*smoothstep(0.35,1.0,abs(p.x/max(ws,0.01))));",
+    "    surf+=ripple*0.35;",
+    "    cav=mix(cav,surf,topS);",
+    "    cav+=smoothstep(2.5*px,0.0,abs(p.y-front))*inner*live*0.22;",
+
+    // --- glass: the cavity through thin side walls, a heavy foot that holds
+    //     some of the colour, then light on the edges ------------------------
+    "    vec3 glassCol=mix(col,cav,inner);",
+    "    float wallBand=clamp(outer-inner,0.0,1.0);",
+    "    float foot=outer*smoothstep(-px,px,ibot-p.y);",
+    "    vec3 footCol=col*0.55+tint*0.30*uFill+vec3(0.045,0.050,0.062);",
+    // a side wall with liquid behind it carries the liquid's darkest edge
+    "    float bodyH=smoothstep(px,-px,p.y-front)*live;",
+    "    vec3 sideCol=mix(col*0.60+vec3(0.050,0.055,0.068),liq*0.85+vec3(0.030,0.034,0.046),bodyH);",
+    "    glassCol=mix(glassCol,sideCol,clamp(wallBand-foot,0.0,1.0));",
+    "    glassCol=mix(glassCol,footCol,foot);",
+    "    col=mix(col,glassCol,outer);",
+
+    // The far half of the rim sits behind a piece on its way in, the near
+    // half and the front wall's light in front of it.
+    "    float far=step(Y_TOP,p.y);",
+    "    float edge=smoothstep(2.2*px,0.0,abs(dOut))*0.30;",
+    "    float dr=ellDist(vec2(p.x,p.y-Y_TOP),vec2(W_TOP-WALL*0.5,E*(W_TOP-WALL*0.5)));",
+    "    float rim=smoothstep(WALL*0.55,WALL*0.15,abs(dr));",
+    "    col+=edge*far*vec3(0.90,0.93,1.0);",
+    "    col=mix(col,vec3(0.80,0.84,0.90),rim*0.22*far);",
+    "    col=fallIn.rgb+col*(1.0-fallIn.a);",
+
+    "    float xo=p.x/max(w,0.01);",
+    "    float vfade=smoothstep(Y_BOT+0.10,Y_BOT+0.45,p.y)*smoothstep(Y_TOP+0.04,Y_TOP-0.32,p.y);",
+    "    float spec=smoothstep(0.080,0.0,abs(xo+0.64))*0.18+smoothstep(0.024,0.0,abs(xo-0.80))*0.13;",
+    "    col+=spec*vfade*outer*vec3(0.95,0.97,1.0);",
+    "    col+=edge*(1.0-far)*vec3(0.90,0.93,1.0);",
+    "    col+=smoothstep(1.6*px,0.0,abs(dIn))*0.10;",
+    // at most a pixel of chromatic separation on the outline — never a glitch
+    "    col.r+=smoothstep(2.0*px,0.0,abs(dOut-1.5*px))*0.05;",
+    "    col.b+=smoothstep(2.0*px,0.0,abs(dOut+1.5*px))*0.06;",
+    "    col+=smoothstep(2.0*px,0.0,abs(p.y-ibot))*step(abs(p.x),W_BOT-WALL)*0.16;",
+    "    col=mix(col,vec3(0.80,0.84,0.90),rim*0.52*(1.0-far));",
+
+    // --- pieces still above the glass, then the preview under the pointer --
+    "    col=fallOut.rgb+col*(1.0-fallOut.a);",
+    "    if(uGhost.y>0.001){",
+    "      vec2 gc=vec2(uGhost.x,Y_TOP+0.24+0.012*sin(t*2.3));",
+    "      vec4 gs=sprite(p,gc,0.082,0.45+0.08*sin(t*1.4),0.0)*(0.62*uGhost.y);",
+    "      col=gs.rgb+col*(1.0-gs.a);",
+    "      float guide=smoothstep(1.5*px,0.0,abs(p.x-uGhost.x))*step(ySurf+0.02,p.y)*step(p.y,gc.y-0.10);",
+    "      col+=guide*step(0.5,fract(p.y*28.0))*0.18*uGhost.y;",
+    "    }",
+    "  }",
+
+    "  col+=(hash21(frag)-0.5)*0.016;",
+    "  gl_FragColor=vec4(clamp(col,0.0,1.0),1.0);",
     "}"
   ].join("\n");
 
